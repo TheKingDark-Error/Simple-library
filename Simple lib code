@@ -1,15 +1,14 @@
 -- SuperLib.lua
--- Version 2.0.0 (Premium UI, Full Animations, Auto Config, Def Support)
+-- Version 2.0.1 (Old UI Restored + New Features + Resize Handle)
 
 local SuperLib = {
-    Version = "2.0.0",
-    _dropdowns = {},
+    Version = "2.0.1",
     _configCache = nil,
     _configPath = "SuperLib_Config.json"
 }
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "SuperLibV2"
+ScreenGui.Name = "SuperLib"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.Parent = game:GetService("CoreGui")
@@ -38,28 +37,6 @@ local function Tween(obj, info, props, callback)
         tween.Completed:Connect(callback)
     end
     return tween
-end
-
-local function Ripple(button, x, y)
-    local ripple = New("Frame", {
-        Size = UDim2.new(0, 0, 0, 0),
-        Position = UDim2.new(0, x - button.AbsolutePosition.X, 0, y - button.AbsolutePosition.Y),
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        BackgroundTransparency = 0.8,
-        BorderSizePixel = 0,
-        ZIndex = button.ZIndex + 1,
-        AnchorPoint = Vector2.new(0.5, 0.5)
-    }, {
-        New("UICorner", { CornerRadius = UDim.new(1, 0) })
-    })
-    ripple.Parent = button
-    local maxSize = math.max(button.AbsoluteSize.X, button.AbsoluteSize.Y) * 2.5
-    Tween(ripple, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Size = UDim2.new(0, maxSize, 0, maxSize),
-        BackgroundTransparency = 1
-    }, function()
-        ripple:Destroy()
-    end)
 end
 
 -- ========== CONFIG SYSTEM ==========
@@ -115,96 +92,66 @@ function SuperLib:Win(config)
     local use_load = loadingConfig.load ~= nil and loadingConfig.load or (config.load ~= nil and config.load or true)
     local load_time = loadingConfig.load_time or config.load_time or 2.5
     local title_load = loadingConfig.title_load or loadingConfig.Title_load or config.title or "SuperLib"
-    local subtitle_load = loadingConfig.subtitle_load or loadingConfig.Subtitle_load or "Initializing modules..."
+    local subtitle_load = loadingConfig.subtitle_load or loadingConfig.Subtitle_load or "initializing modules..."
 
     local title = config.title or "SuperLib"
     local desc = config.desc or ""
     local icon = config.icon
-    local size = config.size and UDim2.new(unpack(config.size)) or UDim2.new(0, 520, 0, 380)
+    local size = config.size and UDim2.new(unpack(config.size)) or UDim2.new(0, 500, 0, 350)
     local autoSave = config.autoSave ~= false
     local configId = config.configId or title
 
-    -- Shadow
-    local Shadow = New("ImageLabel", {
-        Size = UDim2.new(1, 60, 1, 60),
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundTransparency = 1,
-        Image = "rbxassetid://1316045217",
-        ImageColor3 = Color3.fromRGB(0, 0, 0),
-        ImageTransparency = 0.6,
-        ScaleType = Enum.ScaleType.Slice,
-        SliceCenter = Rect.new(10, 10, 118, 118),
-        ZIndex = 9
-    })
-
+    -- MainFrame old UI style
     local MainFrame = New("Frame", {
         Size = UDim2.new(0, 0, 0, 0),
         Position = UDim2.new(0.5, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = Color3.fromRGB(28, 28, 34),
+        BackgroundColor3 = Color3.fromRGB(35, 35, 40),
         BorderSizePixel = 0,
         BackgroundTransparency = 1,
         ZIndex = 10,
-        ClipsDescendants = true
+        Active = true
     }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 12) }),
+        New("UICorner", { CornerRadius = UDim.new(0, 10) }),
         New("UIStroke", {
-            Color = Color3.fromRGB(60, 60, 75),
-            Thickness = 1.5,
-            Transparency = 0.5
+            Color = Color3.fromRGB(60, 60, 70),
+            Thickness = 1.5
         })
     })
-    Shadow.Parent = MainFrame
     MainFrame.Parent = ScreenGui
 
     local targetSize = size
     local scaleFrame = Instance.new("UIScale")
-    scaleFrame.Scale = 0.85
+    scaleFrame.Scale = 0.9
     scaleFrame.Parent = MainFrame
 
-    Tween(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Tween(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Size = targetSize,
         BackgroundTransparency = 0
     })
-    Tween(scaleFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Tween(scaleFrame, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Scale = 1
     })
 
-    -- Topbar
+    -- Topbar old style
     local Topbar = New("Frame", {
-        Size = UDim2.new(1, 0, 0, 50),
-        BackgroundColor3 = Color3.fromRGB(32, 32, 40),
+        Size = UDim2.new(1, 0, 0, 48),
+        BackgroundColor3 = Color3.fromRGB(30, 30, 35),
         BorderSizePixel = 0,
         ZIndex = 11
     }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 12) }),
-        New("UIGradient", {
-            Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 45)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 28, 36))
-            }),
-            Rotation = 90
-        })
+        New("UICorner", { CornerRadius = UDim.new(0, 10) })
     })
-
-    local TopbarFix = New("Frame", {
-        Size = UDim2.new(1, 0, 0, 12),
-        Position = UDim2.new(0, 0, 1, -12),
-        BackgroundColor3 = Color3.fromRGB(32, 32, 40),
-        BorderSizePixel = 0,
-        ZIndex = 11
-    })
-    TopbarFix.Parent = Topbar
 
     local IconLabel
     if icon then
         IconLabel = New("ImageLabel", {
-            Size = UDim2.new(0, 26, 0, 26),
-            Position = UDim2.new(0, 14, 0, 12),
+            Size = UDim2.new(0, 24, 0, 24),
+            Position = UDim2.new(0, 16, 0, 12),
             BackgroundTransparency = 1,
             Image = icon,
             ScaleType = Enum.ScaleType.Fit,
+            Visible = true,
             ZIndex = 12
         })
         IconLabel.Parent = Topbar
@@ -213,56 +160,57 @@ function SuperLib:Win(config)
     local TitleLabel = New("TextLabel", {
         Name = "TitleLabel",
         Text = title,
-        TextSize = 18,
+        TextSize = 20,
         Font = Enum.Font.GothamBold,
-        TextColor3 = Color3.fromRGB(245, 245, 255),
+        TextColor3 = Color3.fromRGB(255, 255, 255),
         BackgroundTransparency = 1,
-        Position = icon and UDim2.new(0, 48, 0, 8) or UDim2.new(0, 16, 0, 8),
-        Size = UDim2.new(0, 220, 0, 22),
+        Position = icon and UDim2.new(0, 16 + 24 + 4, 0, 8) or UDim2.new(0, 16, 0, 8),
+        Size = UDim2.new(0, 200, 0, 24),
         ZIndex = 12
     })
     local DescLabel = New("TextLabel", {
         Name = "DescLabel",
         Text = desc,
-        TextSize = 12,
+        TextSize = 13,
         Font = Enum.Font.Gotham,
-        TextColor3 = Color3.fromRGB(160, 160, 180),
+        TextColor3 = Color3.fromRGB(180, 180, 190),
         BackgroundTransparency = 1,
-        Position = icon and UDim2.new(0, 48, 0, 30) or UDim2.new(0, 16, 0, 30),
-        Size = UDim2.new(0, 220, 0, 14),
+        Position = icon and UDim2.new(0, 16 + 24 + 4, 0, 32) or UDim2.new(0, 16, 0, 32),
+        Size = UDim2.new(0, 200, 0, 16),
         ZIndex = 12
     })
     TitleLabel.Parent = Topbar
     DescLabel.Parent = Topbar
 
+    -- Minimize/Close buttons old style
     local MinimizeBtn = New("TextButton", {
-        Size = UDim2.new(0, 32, 0, 32),
-        Position = UDim2.new(1, -42, 0, 9),
-        BackgroundColor3 = Color3.fromRGB(50, 50, 60),
+        Size = UDim2.new(0, 30, 0, 30),
+        Position = UDim2.new(1, -40, 0, 9),
+        BackgroundColor3 = Color3.fromRGB(50, 50, 55),
         AutoButtonColor = false,
         Text = "—",
         Font = Enum.Font.GothamBold,
-        TextSize = 18,
+        TextSize = 24,
         TextColor3 = Color3.fromRGB(255, 255, 255),
         BorderSizePixel = 0,
         ZIndex = 12
     }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 8) })
+        New("UICorner", { CornerRadius = UDim.new(0, 6) })
     })
 
     local CloseBtn = New("TextButton", {
-        Size = UDim2.new(0, 32, 0, 32),
-        Position = UDim2.new(1, -80, 0, 9),
-        BackgroundColor3 = Color3.fromRGB(50, 50, 60),
+        Size = UDim2.new(0, 30, 0, 30),
+        Position = UDim2.new(1, -75, 0, 9),
+        BackgroundColor3 = Color3.fromRGB(50, 50, 55),
         AutoButtonColor = false,
         Text = "✕",
         Font = Enum.Font.GothamBold,
-        TextSize = 16,
+        TextSize = 20,
         TextColor3 = Color3.fromRGB(255, 255, 255),
         BorderSizePixel = 0,
         ZIndex = 12
     }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 8) })
+        New("UICorner", { CornerRadius = UDim.new(0, 6) })
     })
 
     MinimizeBtn.Parent = Topbar
@@ -270,25 +218,20 @@ function SuperLib:Win(config)
 
     for _, btn in ipairs({ MinimizeBtn, CloseBtn }) do
         btn.MouseEnter:Connect(function()
-            Tween(btn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(70, 70, 85) })
+            Tween(btn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(60, 60, 65) })
         end)
         btn.MouseLeave:Connect(function()
-            Tween(btn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(50, 50, 60) })
-        end)
-        btn.MouseButton1Down:Connect(function()
-            Tween(btn, TweenInfo.new(0.1), { Size = UDim2.new(0, 30, 0, 30) })
-        end)
-        btn.MouseButton1Up:Connect(function()
-            Tween(btn, TweenInfo.new(0.1), { Size = UDim2.new(0, 32, 0, 32) })
+            Tween(btn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(50, 50, 55) })
         end)
     end
 
+    -- Sidebar old style
     local Sidebar = New("ScrollingFrame", {
-        Position = UDim2.new(0, 0, 0, 50),
-        Size = UDim2.new(0, 150, 1, -50),
-        BackgroundColor3 = Color3.fromRGB(24, 24, 30),
+        Position = UDim2.new(0, 0, 0, 48),
+        Size = UDim2.new(0, 140, 1, -48),
+        BackgroundColor3 = Color3.fromRGB(25, 25, 30),
         BorderSizePixel = 0,
-        ScrollBarThickness = 3,
+        ScrollBarThickness = 4,
         CanvasSize = UDim2.new(0, 0, 0, 0),
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
         ZIndex = 10
@@ -298,160 +241,157 @@ function SuperLib:Win(config)
             Padding = UDim.new(0, 6)
         }),
         New("UIPadding", {
-            PaddingTop = UDim.new(0, 10),
-            PaddingBottom = UDim.new(0, 10),
-            PaddingLeft = UDim.new(0, 8),
-            PaddingRight = UDim.new(0, 8)
+            PaddingTop = UDim.new(0, 8),
+            PaddingBottom = UDim.new(0, 8),
+            PaddingLeft = UDim.new(0, 6),
+            PaddingRight = UDim.new(0, 6)
         })
     })
 
     local MainPanel = New("Frame", {
-        Position = UDim2.new(0, 150, 0, 50),
-        Size = UDim2.new(1, -150, 1, -50),
-        BackgroundColor3 = Color3.fromRGB(22, 22, 28),
+        Position = UDim2.new(0, 140, 0, 48),
+        Size = UDim2.new(1, -140, 1, -48),
+        BackgroundColor3 = Color3.fromRGB(22, 22, 26),
         BorderSizePixel = 0,
         ZIndex = 10
     }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 10) })
-    })
-
-    local PanelScroll = New("ScrollingFrame", {
-        Size = UDim2.new(1, 0, 1, 0),
-        BackgroundTransparency = 1,
-        ScrollBarThickness = 4,
-        CanvasSize = UDim2.new(0, 0, 0, 0),
-        AutomaticCanvasSize = Enum.AutomaticSize.Y,
-        ZIndex = 10
-    }, {
+        New("UICorner", { CornerRadius = UDim.new(0, 8) }),
         New("UIListLayout", {
             SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 10)
+            Padding = UDim.new(0, 12)
         }),
         New("UIPadding", {
-            PaddingTop = UDim.new(0, 12),
-            PaddingLeft = UDim.new(0, 12),
-            PaddingRight = UDim.new(0, 12),
-            PaddingBottom = UDim.new(0, 12)
+            PaddingTop = UDim.new(0, 16),
+            PaddingLeft = UDim.new(0, 16),
+            PaddingRight = UDim.new(0, 16),
+            PaddingBottom = UDim.new(0, 16)
         })
     })
-    PanelScroll.Parent = MainPanel
 
     Topbar.Parent = MainFrame
     Sidebar.Parent = MainFrame
     MainPanel.Parent = MainFrame
 
-    -- Loading overlay
+    -- ========== RESIZE HANDLE ==========
+    local ResizeHandle = New("Frame", {
+        Name = "ResizeHandle",
+        Size = UDim2.new(0, 18, 0, 18),
+        Position = UDim2.new(1, -18, 1, -18),
+        BackgroundColor3 = Color3.fromRGB(220, 220, 230),
+        BorderSizePixel = 0,
+        ZIndex = 20,
+        Active = true
+    }, {
+        New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+        New("UIStroke", { Color = Color3.fromRGB(150, 150, 160), Thickness = 1 })
+    })
+    ResizeHandle.Parent = MainFrame
+
+    local resizing = false
+    local resizeStart = Vector2.new(0, 0)
+    local startSize = MainFrame.Size
+
+    ResizeHandle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            resizing = true
+            resizeStart = UserInputService:GetMouseLocation()
+            startSize = MainFrame.Size
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local mousePos = UserInputService:GetMouseLocation()
+            local delta = mousePos - resizeStart
+            local newWidth = math.clamp(startSize.X.Offset + delta.X, 350, 900)
+            local newHeight = math.clamp(startSize.Y.Offset + delta.Y, 250, 700)
+            MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            resizing = false
+        end
+    end)
+
+    -- Loading overlay (improved but old style compatible)
     local function ShowLoadingOverlay(libName, subTitle, duration)
         duration = tonumber(duration) or 2.5
         local loading = New("Frame", {
             Size = UDim2.new(1, 0, 1, 0),
             Position = UDim2.new(0, 0, 0, 0),
-            BackgroundColor3 = Color3.fromRGB(18, 18, 24),
+            BackgroundColor3 = Color3.fromRGB(12, 12, 12),
             BorderSizePixel = 0,
-            ZIndex = 999,
-            BackgroundTransparency = 1
+            ZIndex = 999
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 12) }),
-            New("UIGradient", {
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(22, 22, 30)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 15, 20))
-                }),
-                Rotation = 45
-            })
+            New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+            New("UIStroke", { Color = Color3.fromRGB(40, 180, 80), Thickness = 1 })
         })
 
         local center = New("Frame", {
-            Size = UDim2.new(0, 380, 0, 140),
+            Size = UDim2.new(0, 360, 0, 120),
             Position = UDim2.new(0.5, 0, 0.5, 0),
             AnchorPoint = Vector2.new(0.5, 0.5),
             BackgroundTransparency = 1,
             ZIndex = 1000
+        }, {
+            New("UICorner", { CornerRadius = UDim.new(0, 6) })
         })
 
         local libLabel = New("TextLabel", {
             Text = libName,
             Font = Enum.Font.GothamBold,
-            TextSize = 26,
-            TextColor3 = Color3.fromRGB(80, 180, 255),
+            TextSize = 22,
+            TextColor3 = Color3.fromRGB(50, 220, 120),
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 16, 0, 8),
-            Size = UDim2.new(1, -32, 0, 34),
+            Position = UDim2.new(0, 12, 0, 8),
+            Size = UDim2.new(1, -24, 0, 30),
             TextXAlignment = Enum.TextXAlignment.Left
         })
 
         local subLabel = New("TextLabel", {
             Text = subTitle,
             Font = Enum.Font.Gotham,
-            TextSize = 13,
-            TextColor3 = Color3.fromRGB(140, 180, 220),
+            TextSize = 12,
+            TextColor3 = Color3.fromRGB(150, 255, 180),
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 16, 0, 42),
-            Size = UDim2.new(1, -32, 0, 20),
+            Position = UDim2.new(0, 12, 0, 36),
+            Size = UDim2.new(1, -24, 0, 18),
             TextXAlignment = Enum.TextXAlignment.Left
         })
 
         local barBg = New("Frame", {
-            Size = UDim2.new(1, -32, 0, 10),
-            Position = UDim2.new(0, 16, 1, -36),
+            Size = UDim2.new(1, -24, 0, 12),
+            Position = UDim2.new(0, 12, 1, -28),
             AnchorPoint = Vector2.new(0, 0),
-            BackgroundColor3 = Color3.fromRGB(30, 30, 38),
-            BorderSizePixel = 0,
-            ZIndex = 1001
+            BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+            BorderSizePixel = 0
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 5) })
+            New("UICorner", { CornerRadius = UDim.new(0, 6) })
         })
 
         local barFill = New("Frame", {
             Size = UDim2.new(0, 0, 1, 0),
             Position = UDim2.new(0, 0, 0, 0),
-            BackgroundColor3 = Color3.fromRGB(80, 180, 255),
+            BackgroundColor3 = Color3.fromRGB(50, 220, 120),
             BorderSizePixel = 0,
-            ZIndex = 1002
+            ZIndex = 1001
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 5) }),
-            New("UIGradient", {
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 200, 255)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 150, 240))
-                }),
-                Rotation = 0
-            })
+            New("UICorner", { CornerRadius = UDim.new(0, 6) })
         })
 
         local percentLabel = New("TextLabel", {
             Text = "0%",
-            Font = Enum.Font.GothamBold,
-            TextSize = 14,
-            TextColor3 = Color3.fromRGB(200, 230, 255),
+            Font = Enum.Font.Gotham,
+            TextSize = 12,
+            TextColor3 = Color3.fromRGB(200, 255, 200),
             BackgroundTransparency = 1,
-            Position = UDim2.new(1, -60, 1, -58),
+            Position = UDim2.new(1, -60, 1, -48),
             Size = UDim2.new(0, 48, 0, 18),
-            ZIndex = 1003,
+            ZIndex = 1002,
             TextXAlignment = Enum.TextXAlignment.Right
         })
-
-        local spinner = New("Frame", {
-            Size = UDim2.new(0, 40, 0, 40),
-            Position = UDim2.new(1, -56, 0, 8),
-            BackgroundTransparency = 1,
-            ZIndex = 1001
-        })
-        for i = 1, 8 do
-            local dot = New("Frame", {
-                Size = UDim2.new(0, 4, 0, 4),
-                Position = UDim2.new(0.5, 0, 0.5, 0),
-                AnchorPoint = Vector2.new(0.5, 0.5),
-                BackgroundColor3 = Color3.fromRGB(80, 180, 255),
-                BorderSizePixel = 0,
-                BackgroundTransparency = 0.3 + (i * 0.08)
-            }, {
-                New("UICorner", { CornerRadius = UDim.new(1, 0) })
-            })
-            local angle = math.rad((i - 1) * 45)
-            dot.Position = UDim2.new(0.5, math.cos(angle) * 14, 0.5, math.sin(angle) * 14)
-            dot.Parent = spinner
-        end
 
         barFill.Parent = barBg
         center.Parent = loading
@@ -459,16 +399,9 @@ function SuperLib:Win(config)
         subLabel.Parent = center
         barBg.Parent = center
         percentLabel.Parent = center
-        spinner.Parent = center
         loading.Parent = MainFrame
 
-        Tween(loading, TweenInfo.new(0.3), { BackgroundTransparency = 0 })
-
-        local spinConn = RunService.RenderStepped:Connect(function(dt)
-            spinner.Rotation = spinner.Rotation + dt * 200
-        end)
-
-        local tween = TweenService:Create(barFill, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), { Size = UDim2.new(1, 0, 1, 0) })
+        local tween = TweenService:Create(barFill, TweenInfo.new(duration, Enum.EasingStyle.Linear), { Size = UDim2.new(1, 0, 1, 0) })
         tween:Play()
 
         local start = tick()
@@ -477,19 +410,20 @@ function SuperLib:Win(config)
                 local t = (tick() - start) / duration
                 local pct = math.clamp(math.floor(t * 100), 0, 100)
                 percentLabel.Text = tostring(pct) .. "%"
-                subLabel.Text = subTitle .. string.rep(".", math.floor(t * 4) % 4)
-                task.wait(0.05)
+                if math.random() < 0.05 then
+                    subLabel.Text = subTitle .. string.rep(".", math.random(0, 3))
+                else
+                    subLabel.Text = subTitle
+                end
+                task.wait(0.04)
             end
             percentLabel.Text = "100%"
-            subLabel.Text = subTitle .. " Done!"
         end)
 
         tween.Completed:Wait()
-        task.wait(0.2)
-        spinConn:Disconnect()
 
-        local fade = TweenService:Create(loading, TweenInfo.new(0.3, Enum.EasingStyle.Quad), { BackgroundTransparency = 1 })
-        local moveUp = TweenService:Create(center, TweenInfo.new(0.3, Enum.EasingStyle.Quad), { Position = UDim2.new(0.5, 0, 0.4, 0) })
+        local fade = TweenService:Create(loading, TweenInfo.new(0.25, Enum.EasingStyle.Quad), { BackgroundTransparency = 1 })
+        local moveUp = TweenService:Create(center, TweenInfo.new(0.25, Enum.EasingStyle.Quad), { Position = UDim2.new(0.5, 0, 0.45, 0) })
         fade:Play()
         moveUp:Play()
         moveUp.Completed:Wait()
@@ -536,54 +470,26 @@ function SuperLib:Win(config)
     local function CreateMiniBar()
         if MiniBar then return end
         MiniBar = New("TextButton", {
-            Size = UDim2.new(0, 220, 0, 44),
-            Position = UDim2.new(0.5, 0, 0, -44),
+            Size = UDim2.new(0, 200, 0, 40),
+            Position = UDim2.new(0.5, 0, 0, 0),
             AnchorPoint = Vector2.new(0.5, 0),
-            BackgroundColor3 = Color3.fromRGB(32, 32, 40),
+            BackgroundColor3 = Color3.fromRGB(35, 35, 40),
             BorderSizePixel = 0,
-            Text = "  " .. title,
+            Text = title,
             TextColor3 = Color3.fromRGB(255, 255, 255),
             Font = Enum.Font.GothamBold,
             TextSize = 14,
             AutoButtonColor = false,
-            ZIndex = 100,
-            TextXAlignment = Enum.TextXAlignment.Left
+            ZIndex = 100
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 10) }),
-            New("UIStroke", { Color = Color3.fromRGB(60, 60, 75), Thickness = 1.5 }),
-            New("UIGradient", {
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(38, 38, 48)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 28, 36))
-                }),
-                Rotation = 90
-            }),
-            New("ImageLabel", {
-                Size = UDim2.new(0, 18, 0, 18),
-                Position = UDim2.new(1, -30, 0.5, -9),
-                BackgroundTransparency = 1,
-                Image = "rbxassetid://7072706620",
-                ImageColor3 = Color3.fromRGB(200, 200, 220)
-            })
+            New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+            New("UIStroke", { Color = Color3.fromRGB(60, 60, 70), Thickness = 1 })
         })
         MiniBar.Parent = ScreenGui
-
-        MiniBar.Position = UDim2.new(0.5, 0, 0, -60)
-        Tween(MiniBar, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.new(0.5, 0, 0, 10) })
-
-        MiniBar.MouseEnter:Connect(function()
-            Tween(MiniBar, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(40, 40, 50) })
-        end)
-        MiniBar.MouseLeave:Connect(function()
-            Tween(MiniBar, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(32, 32, 40) })
-        end)
-
         MiniBar.MouseButton1Click:Connect(function()
             if MiniBar then
-                Tween(MiniBar, TweenInfo.new(0.3, Enum.EasingStyle.Quad), { Position = UDim2.new(0.5, 0, 0, -60) }, function()
-                    MiniBar:Destroy()
-                    MiniBar = nil
-                end)
+                MiniBar:Destroy()
+                MiniBar = nil
             end
             MainFrame.Visible = true
             MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -591,161 +497,130 @@ function SuperLib:Win(config)
             local smallScale = Instance.new("UIScale")
             smallScale.Scale = 0.9
             smallScale.Parent = MainFrame
-            Tween(smallScale, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }, function()
-                game:GetService("Debris"):AddItem(smallScale, 0.1)
-            end)
+            TweenService:Create(smallScale, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { Scale = 1 }):Play()
+            game:GetService("Debris"):AddItem(smallScale, 0.2)
             isMinimized = false
             MinimizeBtn.Text = "—"
             Sidebar.Visible = true
             MainPanel.Visible = true
-            Topbar.Size = UDim2.new(1, 0, 0, 50)
+            Topbar.Size = UDim2.new(1, 0, 0, 48)
             if IconLabel then
                 IconLabel.Visible = true
-                IconLabel.Size = UDim2.new(0, 26, 0, 26)
-                IconLabel.Position = UDim2.new(0, 14, 0, 12)
+                IconLabel.Size = UDim2.new(0, 24, 0, 24)
+                IconLabel.Position = UDim2.new(0, 16, 0, 12)
             end
-            TitleLabel.Position = icon and UDim2.new(0, 48, 0, 8) or UDim2.new(0, 16, 0, 8)
-            TitleLabel.Size = UDim2.new(0, 220, 0, 22)
-            TitleLabel.TextSize = 18
+            TitleLabel.Position = icon and UDim2.new(0, 16 + 24 + 4, 0, 8) or UDim2.new(0, 16, 0, 8)
+            TitleLabel.Size = UDim2.new(0, 200, 0, 24)
+            TitleLabel.TextSize = 20
             DescLabel.Visible = true
             CloseBtn.Visible = true
         end)
     end
 
     MinimizeBtn.MouseButton1Click:Connect(function()
-        if isMinimized then return end
-        isMinimized = true
-        Sidebar.Visible = false
-        MainPanel.Visible = false
-        Topbar.Size = UDim2.new(1, 0, 1, 0)
-        if IconLabel then IconLabel.Visible = false end
-        DescLabel.Visible = false
-        TitleLabel.TextSize = 14
-        TitleLabel.Position = UDim2.new(0, 12, 0.5, -10)
-        TitleLabel.Size = UDim2.new(1, -20, 0, 22)
-        MinimizeBtn.Text = "❐"
-        MinimizeBtn.Size = UDim2.new(0, 38, 0, 38)
-        MinimizeBtn.Position = UDim2.new(1, -46, 0.5, -19)
-        MinimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 100)
-        CloseBtn.Visible = false
-        MainFrame.Visible = false
-        CreateMiniBar()
+        if isMinimized then
+            -- nothing
+        else
+            isMinimized = true
+            Sidebar.Visible = false
+            MainPanel.Visible = false
+            Topbar.Size = UDim2.new(1, 0, 1, 0)
+            if IconLabel then
+                IconLabel.Visible = false
+            end
+            DescLabel.Visible = false
+            TitleLabel.TextSize = 14
+            TitleLabel.Position = UDim2.new(0, 8, 0.5, -10)
+            TitleLabel.Size = UDim2.new(1, -16, 0, 20)
+            MinimizeBtn.Text = "❐"
+            MinimizeBtn.Size = UDim2.new(0, 36, 0, 36)
+            MinimizeBtn.Position = UDim2.new(1, -42, 0.5, -18)
+            MinimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 100)
+            CloseBtn.Visible = false
+            MainFrame.Visible = false
+            CreateMiniBar()
+        end
     end)
 
     -- Confirm dialog
     local function ShowConfirmDialog()
-        local overlay = New("Frame", {
-            Size = UDim2.new(1, 0, 1, 0),
-            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            ZIndex = 998
-        })
-        overlay.Parent = MainFrame
-        Tween(overlay, TweenInfo.new(0.2), { BackgroundTransparency = 0.5 })
-
         local Dialog = New("Frame", {
-            Size = UDim2.new(0, 320, 0, 160),
+            Size = UDim2.new(0, 300, 0, 150),
             Position = UDim2.new(0.5, 0, 0.5, 0),
             AnchorPoint = Vector2.new(0.5, 0.5),
-            BackgroundColor3 = Color3.fromRGB(32, 32, 40),
+            BackgroundColor3 = Color3.fromRGB(30, 30, 35),
             BorderSizePixel = 0,
-            Visible = true,
+            Visible = false,
             BackgroundTransparency = 1,
             ZIndex = 999
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 12) }),
-            New("UIStroke", { Color = Color3.fromRGB(60, 60, 75), Thickness = 1.5 }),
-            New("UIGradient", {
-                Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromRGB(38, 38, 48)),
-                    ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 28, 36))
-                }),
-                Rotation = 90
-            }),
+            New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+            New("UIStroke", { Color = Color3.fromRGB(60, 60, 70), Thickness = 1.5 }),
             New("TextLabel", {
-                Text = "Close GUI?",
-                TextSize = 20,
+                Text = "Are you sure to close GUI?",
+                TextSize = 18,
                 Font = Enum.Font.GothamBold,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 20, 0, 18),
-                Size = UDim2.new(1, -40, 0, 28),
-                ZIndex = 1000
-            }),
-            New("TextLabel", {
-                Text = "Are you sure you want to close this interface?",
-                TextSize = 13,
-                Font = Enum.Font.Gotham,
-                TextColor3 = Color3.fromRGB(160, 160, 180),
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 20, 0, 50),
-                Size = UDim2.new(1, -40, 0, 20),
-                ZIndex = 1000
+                Position = UDim2.new(0, 16, 0, 16),
+                Size = UDim2.new(1, -32, 0, 30)
             }),
             New("TextButton", {
                 Name = "NoBtn",
-                Size = UDim2.new(0, 90, 0, 34),
-                Position = UDim2.new(0.5, -100, 0, 100),
+                Size = UDim2.new(0, 80, 0, 30),
+                Position = UDim2.new(0.5, -95, 0, 90),
                 BackgroundColor3 = Color3.fromRGB(255, 80, 80),
                 AutoButtonColor = false,
-                Text = "Cancel",
+                Text = "No",
                 Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
-                BorderSizePixel = 0,
-                ZIndex = 1000
-            }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) }),
+                BorderSizePixel = 0
+            }, { New("UICorner", { CornerRadius = UDim.new(0, 6) }) }),
             New("TextButton", {
                 Name = "OkBtn",
-                Size = UDim2.new(0, 90, 0, 34),
-                Position = UDim2.new(0.5, 10, 0, 100),
-                BackgroundColor3 = Color3.fromRGB(50, 50, 60),
+                Size = UDim2.new(0, 80, 0, 30),
+                Position = UDim2.new(0.5, 15, 0, 90),
+                BackgroundColor3 = Color3.fromRGB(50, 50, 55),
                 AutoButtonColor = false,
                 Text = "OK",
                 Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
-                BorderSizePixel = 0,
-                ZIndex = 1000
-            }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
+                BorderSizePixel = 0
+            }, { New("UICorner", { CornerRadius = UDim.new(0, 6) }) })
         })
 
         Dialog.Parent = MainFrame
+        Dialog.Visible = true
         local dScale = Instance.new("UIScale")
         dScale.Scale = 0.8
         dScale.Parent = Dialog
-        Tween(Dialog, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { BackgroundTransparency = 0 })
-        Tween(dScale, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 })
+        Tween(Dialog, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { BackgroundTransparency = 0 })
+        Tween(dScale, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { Scale = 1 })
 
         local noBtn = Dialog.NoBtn
         noBtn.MouseEnter:Connect(function()
-            Tween(noBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(255, 100, 100) })
+            noBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
         end)
         noBtn.MouseLeave:Connect(function()
-            Tween(noBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(255, 80, 80) })
-        end)
-        noBtn.MouseButton1Click:Connect(function()
-            Tween(Dialog, TweenInfo.new(0.2), { BackgroundTransparency = 1 })
-            Tween(dScale, TweenInfo.new(0.2), { Scale = 0.8 }, function()
-                Dialog:Destroy()
-                overlay:Destroy()
-            end)
+            noBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
         end)
 
         local okBtn = Dialog.OkBtn
         okBtn.MouseEnter:Connect(function()
-            Tween(okBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(70, 70, 85) })
+            okBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 75)
         end)
         okBtn.MouseLeave:Connect(function()
-            Tween(okBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(50, 50, 60) })
+            okBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+        end)
+
+        noBtn.MouseButton1Click:Connect(function()
+            Dialog:Destroy()
         end)
         okBtn.MouseButton1Click:Connect(function()
-            Tween(MainFrame, TweenInfo.new(0.3), { Size = UDim2.new(0, 0, 0, 0), BackgroundTransparency = 1 })
-            Tween(scaleFrame, TweenInfo.new(0.3), { Scale = 0.8 }, function()
-                MainFrame:Destroy()
-                if MiniBar then MiniBar:Destroy() end
-            end)
+            MainFrame:Destroy()
+            if MiniBar then MiniBar:Destroy() end
         end)
     end
     CloseBtn.MouseButton1Click:Connect(ShowConfirmDialog)
@@ -753,7 +628,7 @@ function SuperLib:Win(config)
     -- Window object
     local Window = {
         MainFrame = MainFrame,
-        MainPanel = PanelScroll,
+        MainPanel = MainPanel,
         Sidebar = Sidebar,
         Tabs = {},
         _configId = configId,
@@ -780,45 +655,23 @@ function SuperLib:Win(config)
 
     -- ========== NOTIFY ==========
     function Window:Notify(config)
-        local title = config.title or "Notification"
+        local title = config.title or "Thông báo"
         local content = config.content or ""
         local dur = config.dur or 5
-        local notifType = config.type or "info"
-
-        local typeColors = {
-            info = Color3.fromRGB(80, 180, 255),
-            success = Color3.fromRGB(80, 220, 120),
-            warning = Color3.fromRGB(255, 200, 80),
-            error = Color3.fromRGB(255, 100, 100)
-        }
-        local accent = typeColors[notifType] or typeColors.info
 
         local NotifyFrame = New("Frame", {
-            Size = UDim2.new(0, 260, 0, 0),
-            BackgroundColor3 = Color3.fromRGB(32, 32, 40),
+            Size = UDim2.new(0, 200, 0, 0),
+            BackgroundColor3 = Color3.fromRGB(30, 30, 35),
             BorderSizePixel = 0,
-            Position = UDim2.new(0, -280, 1, -80),
+            Position = UDim2.new(0, 10, 1, -60),
             AutomaticSize = Enum.AutomaticSize.Y,
-            ZIndex = 200
+            ZIndex = 100
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 10) }),
-            New("UIStroke", { Color = Color3.fromRGB(50, 50, 65), Thickness = 1 }),
-            New("Frame", {
-                Name = "Accent",
-                Size = UDim2.new(0, 4, 1, 0),
-                BackgroundColor3 = accent,
-                BorderSizePixel = 0,
-                ZIndex = 201
-            }, { New("UICorner", { CornerRadius = UDim.new(0, 10) }) }),
+            New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+            New("UIStroke", { Color = Color3.fromRGB(60, 60, 70), Thickness = 1.5 }),
             New("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 6),
-            }),
-            New("UIPadding", {
-                PaddingTop = UDim.new(0, 12),
-                PaddingLeft = UDim.new(0, 16),
-                PaddingRight = UDim.new(0, 12),
-                PaddingBottom = UDim.new(0, 12)
+                Padding = UDim.new(0, 4),
             }),
             New("TextLabel", {
                 Name = "Title",
@@ -827,118 +680,75 @@ function SuperLib:Win(config)
                 Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -20, 0, 0),
+                Size = UDim2.new(1, -12, 0, 0),
                 AutomaticSize = Enum.AutomaticSize.Y,
                 TextWrapped = true,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 LayoutOrder = 1,
-                ZIndex = 201
             }),
             New("TextLabel", {
                 Name = "Content",
                 Text = content,
-                TextColor3 = Color3.fromRGB(180, 180, 200),
+                TextColor3 = Color3.fromRGB(180, 180, 190),
                 Font = Enum.Font.Gotham,
                 TextSize = 12,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -20, 0, 0),
+                Size = UDim2.new(1, -12, 0, 0),
                 AutomaticSize = Enum.AutomaticSize.Y,
                 TextWrapped = true,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 LayoutOrder = 2,
-                ZIndex = 201
             }),
             New("Frame", {
                 Name = "ProgressBar",
                 Size = UDim2.new(0, 0, 0, 3),
-                Position = UDim2.new(0, 0, 1, -3),
-                BackgroundColor3 = accent,
+                BackgroundColor3 = Color3.fromRGB(50, 200, 100),
                 BorderSizePixel = 0,
-                ZIndex = 202,
-                LayoutOrder = 3
+                ZIndex = 101,
+                LayoutOrder = 3,
             }, { New("UICorner", { CornerRadius = UDim.new(0, 1.5) }) })
         })
         NotifyFrame.Parent = ScreenGui
-
-        Tween(NotifyFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.new(0, 20, 1, -NotifyFrame.AbsoluteSize.Y - 20) })
-
         local pb = NotifyFrame.ProgressBar
         local tween = TweenService:Create(pb, TweenInfo.new(dur, Enum.EasingStyle.Linear), {
             Size = UDim2.new(1, 0, 0, 3)
         })
         tween:Play()
-
         task.delay(dur, function()
             pcall(function() tween:Cancel() end)
-            Tween(NotifyFrame, TweenInfo.new(0.3), { Position = UDim2.new(0, -280, 1, -80), BackgroundTransparency = 1 }, function()
-                if NotifyFrame and NotifyFrame.Destroy then
-                    NotifyFrame:Destroy()
-                end
-            end)
+            if NotifyFrame and NotifyFrame.Destroy then
+                NotifyFrame:Destroy()
+            end
         end)
     end
 
     -- ========== TAB SYSTEM ==========
     function Window:Tab(tabConfig)
         local tabTitle = tabConfig.title or "Tab"
-        local tabIcon = tabConfig.icon
-
         local TabButton = New("TextButton", {
-            Size = UDim2.new(1, -8, 0, 38),
-            BackgroundColor3 = Color3.fromRGB(40, 40, 50),
+            Size = UDim2.new(1, -8, 0, 36),
+            BackgroundColor3 = Color3.fromRGB(40, 40, 45),
             AutoButtonColor = false,
             Text = "",
-            BorderSizePixel = 0,
-            ZIndex = 11
+            BorderSizePixel = 0
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 8) })
-        })
-
-        local TabBtnLabel = New("TextLabel", {
-            Text = tabTitle,
-            TextColor3 = Color3.fromRGB(200, 200, 215),
-            Font = Enum.Font.GothamSemibold,
-            TextSize = 14,
-            BackgroundTransparency = 1,
-            Size = UDim2.new(1, tabIcon and -28 or 0, 1, 0),
-            Position = tabIcon and UDim2.new(0, 28, 0, 0) or UDim2.new(0, 0, 0, 0),
-            TextXAlignment = Enum.TextXAlignment.Center,
-            ZIndex = 12
-        })
-        TabBtnLabel.Parent = TabButton
-
-        if tabIcon then
-            local TabBtnIcon = New("ImageLabel", {
-                Size = UDim2.new(0, 18, 0, 18),
-                Position = UDim2.new(0, 8, 0.5, -9),
+            New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+            New("TextLabel", {
+                Text = tabTitle,
+                TextColor3 = Color3.fromRGB(220, 220, 230),
+                Font = Enum.Font.GothamSemibold,
+                TextSize = 15,
                 BackgroundTransparency = 1,
-                Image = tabIcon,
-                ImageColor3 = Color3.fromRGB(180, 180, 200),
-                ZIndex = 12
+                Size = UDim2.new(1, 0, 1, 0),
+                TextXAlignment = Enum.TextXAlignment.Center
             })
-            TabBtnIcon.Parent = TabButton
-        end
-
-        local SelectIndicator = New("Frame", {
-            Size = UDim2.new(0, 3, 0, 0),
-            Position = UDim2.new(0, 0, 0.5, 0),
-            AnchorPoint = Vector2.new(0, 0.5),
-            BackgroundColor3 = Color3.fromRGB(80, 180, 255),
-            BorderSizePixel = 0,
-            ZIndex = 11,
-            BackgroundTransparency = 1
-        }, { New("UICorner", { CornerRadius = UDim.new(0, 2) }) })
-        SelectIndicator.Parent = TabButton
+        })
 
         TabButton.MouseEnter:Connect(function()
-            if not TabButton:GetAttribute("Selected") then
-                Tween(TabButton, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(50, 50, 65) })
-            end
+            TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
         end)
         TabButton.MouseLeave:Connect(function()
-            if not TabButton:GetAttribute("Selected") then
-                Tween(TabButton, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(40, 40, 50) })
-            end
+            TabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
         end)
 
         TabButton.Parent = Sidebar
@@ -949,8 +759,7 @@ function SuperLib:Win(config)
             ScrollBarThickness = 4,
             CanvasSize = UDim2.new(0, 0, 0, 0),
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
-            Visible = #Window.Tabs == 0,
-            ZIndex = 10
+            Visible = #Window.Tabs == 0
         }, {
             New("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder,
@@ -963,37 +772,22 @@ function SuperLib:Win(config)
                 PaddingBottom = UDim.new(0, 6)
             })
         })
-        TabContent.Parent = PanelScroll
 
-        if #Window.Tabs == 0 then
-            TabButton:SetAttribute("Selected", true)
-            TabButton.BackgroundColor3 = Color3.fromRGB(55, 55, 70)
-            SelectIndicator.BackgroundTransparency = 0
-            Tween(SelectIndicator, TweenInfo.new(0.2), { Size = UDim2.new(0, 3, 0, 20) })
-        end
+        TabContent.Parent = MainPanel
 
         TabButton.MouseButton1Click:Connect(function()
             for _, t in ipairs(Window.Tabs) do
                 t.Content.Visible = false
-                t.Button:SetAttribute("Selected", false)
-                Tween(t.Button, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(40, 40, 50) })
-                Tween(t.Indicator, TweenInfo.new(0.15), { Size = UDim2.new(0, 3, 0, 0), BackgroundTransparency = 1 })
             end
             TabContent.Visible = true
-            TabButton:SetAttribute("Selected", true)
-            Tween(TabButton, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(55, 55, 70) })
-            SelectIndicator.BackgroundTransparency = 0
-            Tween(SelectIndicator, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Size = UDim2.new(0, 3, 0, 20) })
         end)
 
         local Tab = {
-            Content = TabContent,
-            Button = TabButton,
-            Indicator = SelectIndicator
+            Content = TabContent
         }
 
+        -- ========== SECTION ==========
         function Tab:Section(sectionConfig)
-            sectionConfig = sectionConfig or {}
             local sectionTitle = sectionConfig.title or "Section"
             local collapsed = sectionConfig.collapsed or false
             local def = sectionConfig.Def
@@ -1001,17 +795,16 @@ function SuperLib:Win(config)
             if def == false then collapsed = true end
 
             local SectionFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 36),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 34),
+                Size = UDim2.new(1, 0, 0, 32),
+                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
                 BorderSizePixel = 0,
-                ClipsDescendants = false,
-                ZIndex = 10
+                ClipsDescendants = false
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("UIPadding", {
                     PaddingTop = UDim.new(0, 6),
-                    PaddingLeft = UDim.new(0, 10),
-                    PaddingRight = UDim.new(0, 10),
+                    PaddingLeft = UDim.new(0, 8),
+                    PaddingRight = UDim.new(0, 8),
                     PaddingBottom = UDim.new(0, 6)
                 }),
                 New("UIListLayout", {
@@ -1023,14 +816,13 @@ function SuperLib:Win(config)
             })
 
             local ArrowButton = New("TextButton", {
-                Size = UDim2.new(0, 22, 0, 22),
+                Size = UDim2.new(0, 20, 0, 20),
                 BackgroundTransparency = 1,
                 Text = collapsed and ">" or "v",
-                TextColor3 = Color3.fromRGB(180, 180, 200),
+                TextColor3 = Color3.fromRGB(255, 255, 255),
                 Font = Enum.Font.GothamBold,
-                TextSize = 12,
-                BorderSizePixel = 0,
-                ZIndex = 11
+                TextSize = 14,
+                BorderSizePixel = 0
             })
 
             local SectionTitle = New("TextLabel", {
@@ -1039,9 +831,8 @@ function SuperLib:Win(config)
                 Font = Enum.Font.GothamBold,
                 TextSize = 15,
                 BackgroundTransparency = 1,
-                Size = UDim2.new(1, -32, 1, 0),
-                TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 11
+                Size = UDim2.new(1, -30, 1, 0),
+                TextXAlignment = Enum.TextXAlignment.Left
             })
 
             ArrowButton.Parent = SectionFrame
@@ -1051,62 +842,45 @@ function SuperLib:Win(config)
             local ContentFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 0),
                 BackgroundTransparency = 1,
-                Visible = not collapsed,
-                AutomaticSize = Enum.AutomaticSize.Y,
-                ZIndex = 10
+                Visible = false,
+                AutomaticSize = Enum.AutomaticSize.Y
             }, {
                 New("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
                     Padding = UDim.new(0, 8)
                 }),
                 New("UIPadding", {
-                    PaddingTop = UDim.new(0, 4),
+                    PaddingTop = UDim.new(0, 6),
                     PaddingLeft = UDim.new(0, 6),
                     PaddingRight = UDim.new(0, 6),
                     PaddingBottom = UDim.new(0, 6)
                 })
             })
+
             ContentFrame.Parent = Tab.Content
 
-            local IsOpen = not collapsed
+            local IsOpen = false
             local _dropdownsInSection = {}
 
-            local function UpdateSection(animate)
-                animate = animate ~= false
+            local function UpdateSection()
                 if IsOpen then
-                    if animate then
-                        Tween(ArrowButton, TweenInfo.new(0.2), { Rotation = 0, Text = "v" })
-                    else
-                        ArrowButton.Text = "v"
-                        ArrowButton.Rotation = 0
-                    end
+                    ArrowButton.Text = "v"
                     ContentFrame.Visible = true
-                    if animate then
-                        ContentFrame.Size = UDim2.new(1, 0, 0, 0)
-                        Tween(ContentFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad), { Size = UDim2.new(1, 0, 0, ContentFrame.AbsoluteSize.Y) })
-                    end
                 else
+                    ArrowButton.Text = ">"
+                    ContentFrame.Visible = false
+                    -- Hide all dropdowns in this section
                     for _, dd in ipairs(_dropdownsInSection) do
                         if dd and dd.Visible then
                             dd.Visible = false
                         end
-                    end
-                    if animate then
-                        Tween(ArrowButton, TweenInfo.new(0.2), { Rotation = -90, Text = ">" })
-                        Tween(ContentFrame, TweenInfo.new(0.2), { Size = UDim2.new(1, 0, 0, 0) }, function()
-                            ContentFrame.Visible = false
-                        end)
-                    else
-                        ArrowButton.Text = ">"
-                        ArrowButton.Rotation = -90
-                        ContentFrame.Visible = false
                     end
                 end
             end
 
             ArrowButton.MouseButton1Click:Connect(function()
                 IsOpen = not IsOpen
-                UpdateSection(true)
+                UpdateSection()
             end)
 
             local Section = {
@@ -1115,7 +889,7 @@ function SuperLib:Win(config)
                 IsOpen = function() return IsOpen end,
                 SetOpen = function(_, open)
                     IsOpen = open
-                    UpdateSection(true)
+                    UpdateSection()
                 end
             }
 
@@ -1147,65 +921,43 @@ function SuperLib:Win(config)
                 end
             end
 
-            UpdateSection(false)
+            IsOpen = not collapsed
+            UpdateSection()
             return Section
         end
 
         function Tab:Btn(btnConfig)
-            btnConfig = btnConfig or {}
             local btnTitle = btnConfig.title or "Button"
             local callback = btnConfig[1] or function() end
-
             local Button = New("TextButton", {
-                Size = UDim2.new(1, 0, 0, 38),
-                BackgroundColor3 = Color3.fromRGB(50, 50, 60),
+                Size = UDim2.new(1, 0, 0, 36),
+                BackgroundColor3 = Color3.fromRGB(50, 50, 55),
                 AutoButtonColor = false,
                 Text = "",
-                BorderSizePixel = 0,
-                ZIndex = 11
+                BorderSizePixel = 0
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-                New("UIGradient", {
-                    Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Color3.fromRGB(55, 55, 68)),
-                        ColorSequenceKeypoint.new(1, Color3.fromRGB(48, 48, 58))
-                    }),
-                    Rotation = 90
-                }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("TextLabel", {
                     Text = btnTitle,
                     TextColor3 = Color3.fromRGB(255, 255, 255),
                     Font = Enum.Font.GothamBold,
-                    TextSize = 14,
+                    TextSize = 15,
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1, 0, 1, 0),
-                    TextXAlignment = Enum.TextXAlignment.Center,
-                    ZIndex = 12
+                    TextXAlignment = Enum.TextXAlignment.Center
                 })
             })
-
             Button.MouseEnter:Connect(function()
-                Tween(Button, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(65, 65, 80) })
+                Button.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
             end)
             Button.MouseLeave:Connect(function()
-                Tween(Button, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(50, 50, 60) })
+                Button.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
             end)
-            Button.MouseButton1Down:Connect(function()
-                Tween(Button, TweenInfo.new(0.1), { Size = UDim2.new(1, -4, 0, 36) })
-            end)
-            Button.MouseButton1Up:Connect(function()
-                Tween(Button, TweenInfo.new(0.15, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Size = UDim2.new(1, 0, 0, 38) })
-            end)
-            Button.MouseButton1Click:Connect(function(x, y)
-                Ripple(Button, x or Button.AbsolutePosition.X + Button.AbsoluteSize.X / 2, y or Button.AbsolutePosition.Y + Button.AbsoluteSize.Y / 2)
-                callback()
-            end)
-
+            Button.MouseButton1Click:Connect(callback)
             Button.Parent = Tab.Content
         end
 
         function Tab:Tog(togConfig)
-            togConfig = togConfig or {}
             local togTitle = togConfig.title or "Toggle"
             local togDesc = togConfig.desc or ""
             local callback = togConfig[1] or function() end
@@ -1219,61 +971,49 @@ function SuperLib:Win(config)
             local IsToggled = savedValue ~= nil and savedValue or (def == true)
 
             local ToggleFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 52),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 34),
-                BorderSizePixel = 0,
-                ZIndex = 10
+                Size = UDim2.new(1, 0, 0, 48),
+                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+                BorderSizePixel = 0
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("TextLabel", {
                     Name = "Title",
                     Text = togTitle,
                     TextColor3 = Color3.fromRGB(255, 255, 255),
                     Font = Enum.Font.GothamBold,
-                    TextSize = 14,
+                    TextSize = 15,
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 12, 0, 6),
-                    Size = UDim2.new(1, -80, 0, 18),
-                    ZIndex = 11
+                    Size = UDim2.new(1, -80, 0, 18)
                 }),
                 New("TextLabel", {
                     Name = "Desc",
                     Text = togDesc,
-                    TextColor3 = Color3.fromRGB(160, 160, 180),
+                    TextColor3 = Color3.fromRGB(180, 180, 190),
                     Font = Enum.Font.Gotham,
-                    TextSize = 11,
+                    TextSize = 12,
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 12, 0, 24),
-                    Size = UDim2.new(1, -80, 0, 14),
-                    ZIndex = 11
+                    Size = UDim2.new(1, -80, 0, 14)
                 }),
                 New("TextButton", {
                     Name = "ToggleBtn",
-                    Size = UDim2.new(0, 48, 0, 24),
-                    Position = UDim2.new(1, -62, 0, 14),
-                    BackgroundColor3 = Color3.fromRGB(55, 55, 68),
+                    Size = UDim2.new(0, 44, 0, 20),
+                    Position = UDim2.new(1, -56, 0, 14),
+                    BackgroundColor3 = Color3.fromRGB(60, 60, 70),
                     AutoButtonColor = false,
                     BorderSizePixel = 0,
-                    Text = "",
-                    ZIndex = 11
+                    Text = ""
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(1, 0) }),
                     New("Frame", {
                         Name = "Indicator",
-                        Size = UDim2.new(0, 18, 0, 18),
+                        Size = UDim2.new(0, 14, 0, 14),
                         Position = UDim2.new(0, 3, 0, 3),
-                        BackgroundColor3 = Color3.fromRGB(200, 200, 215),
-                        BorderSizePixel = 0,
-                        ZIndex = 12
+                        BackgroundColor3 = Color3.fromRGB(180, 180, 190),
+                        BorderSizePixel = 0
                     }, {
-                        New("UICorner", { CornerRadius = UDim.new(1, 0) }),
-                        New("UIGradient", {
-                            Color = ColorSequence.new({
-                                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-                                ColorSequenceKeypoint.new(1, Color3.fromRGB(220, 220, 230))
-                            }),
-                            Rotation = 90
-                        })
+                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
                     })
                 })
             })
@@ -1281,32 +1021,22 @@ function SuperLib:Win(config)
             local ToggleBtn = ToggleFrame.ToggleBtn
             local Indicator = ToggleBtn.Indicator
 
-            local function UpdateVisual(animate)
-                animate = animate ~= false
+            local function UpdateVisual()
                 if IsToggled then
-                    if animate then
-                        Tween(ToggleBtn, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(60, 200, 120) })
-                        Tween(Indicator, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.new(0, 27, 0, 3), BackgroundColor3 = Color3.fromRGB(255, 255, 255) })
-                    else
-                        ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 120)
-                        Indicator.Position = UDim2.new(0, 27, 0, 3)
-                        Indicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                    end
+                    ToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+                    Indicator.Position = UDim2.new(0, 27, 0, 3)
+                    Indicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 else
-                    if animate then
-                        Tween(ToggleBtn, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(55, 55, 68) })
-                        Tween(Indicator, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.new(0, 3, 0, 3), BackgroundColor3 = Color3.fromRGB(200, 200, 215) })
-                    else
-                        ToggleBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 68)
-                        Indicator.Position = UDim2.new(0, 3, 0, 3)
-                        Indicator.BackgroundColor3 = Color3.fromRGB(200, 200, 215)
-                    end
+                    ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+                    Indicator.Position = UDim2.new(0, 3, 0, 3)
+                    Indicator.BackgroundColor3 = Color3.fromRGB(180, 180, 190)
                 end
             end
+            UpdateVisual()
 
             ToggleBtn.MouseButton1Click:Connect(function()
                 IsToggled = not IsToggled
-                UpdateVisual(true)
+                UpdateVisual()
                 if configKey then
                     Window:_saveElement(configKey, IsToggled)
                 end
@@ -1315,17 +1045,16 @@ function SuperLib:Win(config)
 
             ToggleBtn.MouseEnter:Connect(function()
                 if IsToggled then
-                    Tween(ToggleBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(50, 180, 110) })
+                    ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 180, 90)
                 else
-                    Tween(ToggleBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(65, 65, 80) })
+                    ToggleBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
                 end
             end)
             ToggleBtn.MouseLeave:Connect(function()
-                UpdateVisual(true)
+                UpdateVisual()
             end)
 
             ToggleFrame.Parent = Tab.Content
-            UpdateVisual(false)
 
             if def == true and savedValue == nil then
                 task.delay(0.1, function()
@@ -1338,7 +1067,7 @@ function SuperLib:Win(config)
                 GetValue = function() return IsToggled end,
                 SetValue = function(_, val)
                     IsToggled = val
-                    UpdateVisual(true)
+                    UpdateVisual()
                     if configKey then
                         Window:_saveElement(configKey, IsToggled)
                     end
@@ -1348,9 +1077,8 @@ function SuperLib:Win(config)
         end
 
         function Tab:Input(inputConfig)
-            inputConfig = inputConfig or {}
             local title = inputConfig.title or "Input"
-            local desc = inputConfig.desc or "Enter text..."
+            local desc = inputConfig.desc or "Nhập dữ liệu"
             local callback = inputConfig[1] or function() end
             local configKey = inputConfig.configKey
 
@@ -1360,54 +1088,40 @@ function SuperLib:Win(config)
             end
 
             local InputFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 58),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 34),
-                BorderSizePixel = 0,
-                ZIndex = 10
+                Size = UDim2.new(1, 0, 0, 52),
+                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+                BorderSizePixel = 0
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("TextLabel", {
                     Name = "Title",
                     Text = title,
                     TextColor3 = Color3.fromRGB(255, 255, 255),
                     Font = Enum.Font.GothamBold,
-                    TextSize = 14,
+                    TextSize = 15,
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 12, 0, 6),
-                    Size = UDim2.new(1, -24, 0, 18),
-                    ZIndex = 11
+                    Size = UDim2.new(1, -24, 0, 18)
                 }),
                 New("TextBox", {
                     Name = "TextBox",
-                    Size = UDim2.new(1, -24, 0, 26),
+                    Size = UDim2.new(1, -24, 0, 20),
                     Position = UDim2.new(0, 12, 0, 28),
-                    BackgroundColor3 = Color3.fromRGB(38, 38, 48),
+                    BackgroundColor3 = Color3.fromRGB(40, 40, 45),
                     BorderSizePixel = 0,
                     Text = savedText,
                     PlaceholderText = desc,
                     TextColor3 = Color3.fromRGB(255, 255, 255),
-                    PlaceholderColor3 = Color3.fromRGB(130, 130, 150),
+                    PlaceholderColor3 = Color3.fromRGB(180, 180, 190),
                     Font = Enum.Font.Gotham,
-                    TextSize = 13,
-                    ClearTextOnFocus = false,
-                    ZIndex = 11
+                    TextSize = 14
                 }, {
-                    New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-                    New("UIPadding", {
-                        PaddingLeft = UDim.new(0, 10),
-                        PaddingRight = UDim.new(0, 10)
-                    })
+                    New("UICorner", { CornerRadius = UDim.new(0, 4) })
                 })
             })
 
             local TextBox = InputFrame.TextBox
-            TextBox.Focused:Connect(function()
-                Tween(InputFrame, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(32, 32, 40) })
-                Tween(TextBox, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(45, 45, 58) })
-            end)
             TextBox.FocusLost:Connect(function()
-                Tween(InputFrame, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(28, 28, 34) })
-                Tween(TextBox, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(38, 38, 48) })
                 if configKey then
                     Window:_saveElement(configKey, TextBox.Text)
                 end
@@ -1418,7 +1132,6 @@ function SuperLib:Win(config)
         end
 
         function Tab:DD(ddConfig)
-            ddConfig = ddConfig or {}
             local title = ddConfig.title or "Dropdown"
             local items = ddConfig.item or {}
             local callback = ddConfig[1] or function() end
@@ -1431,22 +1144,21 @@ function SuperLib:Win(config)
             local SelectedItem = savedItem or (items[1] ~= nil and tostring(items[1]) or "None")
 
             local DDFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 56),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 34),
+                Size = UDim2.new(1, 0, 0, 52),
+                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
                 BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.Y,
-                ZIndex = 10
+                AutomaticSize = Enum.AutomaticSize.Y
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 6)
+                    Padding = UDim.new(0, 4)
                 }),
                 New("UIPadding", {
-                    PaddingTop = UDim.new(0, 10),
-                    PaddingLeft = UDim.new(0, 12),
-                    PaddingRight = UDim.new(0, 12),
-                    PaddingBottom = UDim.new(0, 10)
+                    PaddingTop = UDim.new(0, 8),
+                    PaddingLeft = UDim.new(0, 10),
+                    PaddingRight = UDim.new(0, 10),
+                    PaddingBottom = UDim.new(0, 8)
                 })
             })
 
@@ -1454,53 +1166,36 @@ function SuperLib:Win(config)
                 Text = title,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 Font = Enum.Font.GothamBold,
-                TextSize = 14,
+                TextSize = 15,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 0, 18),
-                TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 11
+                TextXAlignment = Enum.TextXAlignment.Left
             })
             TitleLabel.Parent = DDFrame
 
             local SelectorFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 28),
-                BackgroundTransparency = 1,
-                ZIndex = 11
+                Size = UDim2.new(1, 0, 0, 26),
+                BackgroundTransparency = 1
             })
             SelectorFrame.Parent = DDFrame
 
             local SelectedBtn = New("TextButton", {
-                Size = UDim2.new(1, 0, 0, 28),
-                BackgroundColor3 = Color3.fromRGB(45, 45, 58),
+                Size = UDim2.new(1, 0, 0, 26),
+                BackgroundColor3 = Color3.fromRGB(50, 50, 55),
                 AutoButtonColor = false,
                 Text = tostring(SelectedItem),
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 Font = Enum.Font.Gotham,
-                TextSize = 13,
-                BorderSizePixel = 0,
-                ZIndex = 12
+                TextSize = 14,
+                BorderSizePixel = 0
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-                New("UIPadding", {
-                    PaddingLeft = UDim.new(0, 10),
-                    PaddingRight = UDim.new(0, 10)
-                })
+                New("UICorner", { CornerRadius = UDim.new(0, 6) })
             })
             SelectedBtn.Parent = SelectorFrame
 
-            local ArrowIcon = New("ImageLabel", {
-                Size = UDim2.new(0, 14, 0, 14),
-                Position = UDim2.new(1, -22, 0.5, -7),
-                BackgroundTransparency = 1,
-                Image = "rbxassetid://7072706620",
-                ImageColor3 = Color3.fromRGB(180, 180, 200),
-                ZIndex = 13
-            })
-            ArrowIcon.Parent = SelectedBtn
-
             local DropdownMenu = New("ScrollingFrame", {
-                Size = UDim2.new(0, 0, 0, 0),
-                BackgroundColor3 = Color3.fromRGB(35, 35, 45),
+                Size = UDim2.new(0, 120, 0, 0),
+                BackgroundColor3 = Color3.fromRGB(35, 35, 40),
                 BorderSizePixel = 0,
                 Visible = false,
                 ScrollBarThickness = 4,
@@ -1508,41 +1203,27 @@ function SuperLib:Win(config)
                 AutomaticCanvasSize = Enum.AutomaticSize.Y,
                 ZIndex = 999
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-                New("UIStroke", { Color = Color3.fromRGB(55, 55, 70), Thickness = 1 }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
                     Padding = UDim.new(0, 2)
-                }),
-                New("UIPadding", {
-                    PaddingTop = UDim.new(0, 4),
-                    PaddingBottom = UDim.new(0, 4),
-                    PaddingLeft = UDim.new(0, 4),
-                    PaddingRight = UDim.new(0, 4)
                 })
             })
             DropdownMenu.Parent = ScreenGui
 
             for _, item in ipairs(items) do
                 local ItemBtn = New("TextButton", {
-                    Size = UDim2.new(1, 0, 0, 26),
-                    BackgroundColor3 = Color3.fromRGB(40, 40, 50),
+                    Size = UDim2.new(1, 0, 0, 24),
+                    BackgroundColor3 = Color3.fromRGB(40, 40, 45),
                     AutoButtonColor = false,
                     Text = item,
                     TextColor3 = Color3.fromRGB(255, 255, 255),
                     Font = Enum.Font.Gotham,
-                    TextSize = 13,
-                    BorderSizePixel = 0,
-                    ZIndex = 1000
+                    TextSize = 14,
+                    BorderSizePixel = 0
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 4) })
                 })
-                ItemBtn.MouseEnter:Connect(function()
-                    Tween(ItemBtn, TweenInfo.new(0.1), { BackgroundColor3 = Color3.fromRGB(55, 55, 70) })
-                end)
-                ItemBtn.MouseLeave:Connect(function()
-                    Tween(ItemBtn, TweenInfo.new(0.1), { BackgroundColor3 = Color3.fromRGB(40, 40, 50) })
-                end)
                 ItemBtn.MouseButton1Click:Connect(function()
                     SelectedItem = item
                     SelectedBtn.Text = tostring(item)
@@ -1557,21 +1238,15 @@ function SuperLib:Win(config)
 
             SelectedBtn.MouseButton1Click:Connect(function()
                 if DropdownMenu.Visible then
-                    Tween(DropdownMenu, TweenInfo.new(0.15), { Size = UDim2.new(0, SelectedBtn.AbsoluteSize.X, 0, 0) }, function()
-                        DropdownMenu.Visible = false
-                    end)
-                    Tween(ArrowIcon, TweenInfo.new(0.2), { Rotation = 0 })
+                    DropdownMenu.Visible = false
                     return
                 end
 
                 local absPos = SelectedBtn.AbsolutePosition
                 local absSize = SelectedBtn.AbsoluteSize
-                DropdownMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y + 4)
-                DropdownMenu.Size = UDim2.new(0, 0, 0, 0)
+                DropdownMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y)
+                DropdownMenu.Size = UDim2.new(0, absSize.X, 0, math.min(#items * 26, 150))
                 DropdownMenu.Visible = true
-                local targetHeight = math.min(#items * 28 + 8, 180)
-                Tween(DropdownMenu, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { Size = UDim2.new(0, absSize.X, 0, targetHeight) })
-                Tween(ArrowIcon, TweenInfo.new(0.2), { Rotation = 180 })
             end)
 
             UserInputService.InputBegan:Connect(function(input)
@@ -1582,10 +1257,7 @@ function SuperLib:Win(config)
                     local menuSize = DropdownMenu.AbsoluteSize
                     if not (mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
                            mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y) then
-                        Tween(DropdownMenu, TweenInfo.new(0.15), { Size = UDim2.new(0, menuSize.X, 0, 0) }, function()
-                            DropdownMenu.Visible = false
-                        end)
-                        Tween(ArrowIcon, TweenInfo.new(0.2), { Rotation = 0 })
+                        DropdownMenu.Visible = false
                     end
                 end
             end)
@@ -1607,7 +1279,6 @@ function SuperLib:Win(config)
         end
 
         function Tab:DDM(ddmConfig)
-            ddmConfig = ddmConfig or {}
             local title = ddmConfig.title or "Multi Dropdown"
             local items = ddmConfig.item or {}
             local callbacks = ddmConfig
@@ -1622,22 +1293,21 @@ function SuperLib:Win(config)
             end
 
             local DDMFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 56),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 34),
+                Size = UDim2.new(1, 0, 0, 52),
+                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
                 BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.Y,
-                ZIndex = 10
+                AutomaticSize = Enum.AutomaticSize.Y
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 6)
+                    Padding = UDim.new(0, 4)
                 }),
                 New("UIPadding", {
-                    PaddingTop = UDim.new(0, 10),
-                    PaddingLeft = UDim.new(0, 12),
-                    PaddingRight = UDim.new(0, 12),
-                    PaddingBottom = UDim.new(0, 10)
+                    PaddingTop = UDim.new(0, 8),
+                    PaddingLeft = UDim.new(0, 10),
+                    PaddingRight = UDim.new(0, 10),
+                    PaddingBottom = UDim.new(0, 8)
                 })
             })
 
@@ -1645,53 +1315,36 @@ function SuperLib:Win(config)
                 Text = title,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 Font = Enum.Font.GothamBold,
-                TextSize = 14,
+                TextSize = 15,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 0, 18),
-                TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 11
+                TextXAlignment = Enum.TextXAlignment.Left
             })
             TitleLabel.Parent = DDMFrame
 
             local SelectorFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 28),
-                BackgroundTransparency = 1,
-                ZIndex = 11
+                Size = UDim2.new(1, 0, 0, 26),
+                BackgroundTransparency = 1
             })
             SelectorFrame.Parent = DDMFrame
 
             local SelectedBtn = New("TextButton", {
-                Size = UDim2.new(1, 0, 0, 28),
-                BackgroundColor3 = Color3.fromRGB(45, 45, 58),
+                Size = UDim2.new(1, 0, 0, 26),
+                BackgroundColor3 = Color3.fromRGB(50, 50, 55),
                 AutoButtonColor = false,
                 Text = #SelectedItems > 0 and tostring(#SelectedItems) .. " selected" or "Select...",
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 Font = Enum.Font.Gotham,
-                TextSize = 13,
-                BorderSizePixel = 0,
-                ZIndex = 12
+                TextSize = 14,
+                BorderSizePixel = 0
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-                New("UIPadding", {
-                    PaddingLeft = UDim.new(0, 10),
-                    PaddingRight = UDim.new(0, 10)
-                })
+                New("UICorner", { CornerRadius = UDim.new(0, 6) })
             })
             SelectedBtn.Parent = SelectorFrame
 
-            local ArrowIcon = New("ImageLabel", {
-                Size = UDim2.new(0, 14, 0, 14),
-                Position = UDim2.new(1, -22, 0.5, -7),
-                BackgroundTransparency = 1,
-                Image = "rbxassetid://7072706620",
-                ImageColor3 = Color3.fromRGB(180, 180, 200),
-                ZIndex = 13
-            })
-            ArrowIcon.Parent = SelectedBtn
-
             local DropdownMenu = New("ScrollingFrame", {
-                Size = UDim2.new(0, 0, 0, 0),
-                BackgroundColor3 = Color3.fromRGB(35, 35, 45),
+                Size = UDim2.new(0, 120, 0, 0),
+                BackgroundColor3 = Color3.fromRGB(35, 35, 40),
                 BorderSizePixel = 0,
                 Visible = false,
                 ScrollBarThickness = 4,
@@ -1699,55 +1352,40 @@ function SuperLib:Win(config)
                 AutomaticCanvasSize = Enum.AutomaticSize.Y,
                 ZIndex = 999
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-                New("UIStroke", { Color = Color3.fromRGB(55, 55, 70), Thickness = 1 }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
                     Padding = UDim.new(0, 2)
-                }),
-                New("UIPadding", {
-                    PaddingTop = UDim.new(0, 4),
-                    PaddingBottom = UDim.new(0, 4),
-                    PaddingLeft = UDim.new(0, 4),
-                    PaddingRight = UDim.new(0, 4)
                 })
             })
             DropdownMenu.Parent = ScreenGui
 
             for _, item in ipairs(items) do
-                local IsSelected = table.find(SelectedItems, item) ~= nil
+                local IsSelected = false
+                for _, v in ipairs(SelectedItems) do
+                    if v == item then IsSelected = true break end
+                end
                 local ItemBtn = New("TextButton", {
-                    Size = UDim2.new(1, 0, 0, 26),
-                    BackgroundColor3 = IsSelected and Color3.fromRGB(55, 55, 70) or Color3.fromRGB(40, 40, 50),
+                    Size = UDim2.new(1, 0, 0, 24),
+                    BackgroundColor3 = Color3.fromRGB(40, 40, 45),
                     AutoButtonColor = false,
                     Text = (IsSelected and "✓ " or "  ") .. item,
                     TextColor3 = Color3.fromRGB(255, 255, 255),
                     Font = Enum.Font.Gotham,
-                    TextSize = 13,
-                    BorderSizePixel = 0,
-                    ZIndex = 1000
+                    TextSize = 14,
+                    BorderSizePixel = 0
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 4) })
                 })
-
-                ItemBtn.MouseEnter:Connect(function()
-                    Tween(ItemBtn, TweenInfo.new(0.1), { BackgroundColor3 = Color3.fromRGB(60, 60, 75) })
-                end)
-                ItemBtn.MouseLeave:Connect(function()
-                    local isSel = table.find(SelectedItems, item) ~= nil
-                    Tween(ItemBtn, TweenInfo.new(0.1), { BackgroundColor3 = isSel and Color3.fromRGB(55, 55, 70) or Color3.fromRGB(40, 40, 50) })
-                end)
 
                 ItemBtn.MouseButton1Click:Connect(function()
                     local idx = table.find(SelectedItems, item)
                     if idx then
                         table.remove(SelectedItems, idx)
                         ItemBtn.Text = "  " .. item
-                        Tween(ItemBtn, TweenInfo.new(0.1), { BackgroundColor3 = Color3.fromRGB(40, 40, 50) })
                     else
                         table.insert(SelectedItems, item)
                         ItemBtn.Text = "✓ " .. item
-                        Tween(ItemBtn, TweenInfo.new(0.1), { BackgroundColor3 = Color3.fromRGB(55, 55, 70) })
                         if callbacks[item] then
                             callbacks[item]()
                         end
@@ -1763,21 +1401,15 @@ function SuperLib:Win(config)
 
             SelectedBtn.MouseButton1Click:Connect(function()
                 if DropdownMenu.Visible then
-                    Tween(DropdownMenu, TweenInfo.new(0.15), { Size = UDim2.new(0, SelectedBtn.AbsoluteSize.X, 0, 0) }, function()
-                        DropdownMenu.Visible = false
-                    end)
-                    Tween(ArrowIcon, TweenInfo.new(0.2), { Rotation = 0 })
+                    DropdownMenu.Visible = false
                     return
                 end
 
                 local absPos = SelectedBtn.AbsolutePosition
                 local absSize = SelectedBtn.AbsoluteSize
-                DropdownMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y + 4)
-                DropdownMenu.Size = UDim2.new(0, 0, 0, 0)
+                DropdownMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y)
+                DropdownMenu.Size = UDim2.new(0, absSize.X, 0, math.min(#items * 26, 150))
                 DropdownMenu.Visible = true
-                local targetHeight = math.min(#items * 28 + 8, 180)
-                Tween(DropdownMenu, TweenInfo.new(0.2, Enum.EasingStyle.Quad), { Size = UDim2.new(0, absSize.X, 0, targetHeight) })
-                Tween(ArrowIcon, TweenInfo.new(0.2), { Rotation = 180 })
             end)
 
             UserInputService.InputBegan:Connect(function(input)
@@ -1788,10 +1420,7 @@ function SuperLib:Win(config)
                     local menuSize = DropdownMenu.AbsoluteSize
                     if not (mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
                            mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y) then
-                        Tween(DropdownMenu, TweenInfo.new(0.15), { Size = UDim2.new(0, menuSize.X, 0, 0) }, function()
-                            DropdownMenu.Visible = false
-                        end)
-                        Tween(ArrowIcon, TweenInfo.new(0.2), { Rotation = 0 })
+                        DropdownMenu.Visible = false
                     end
                 end
             end)
@@ -1812,26 +1441,23 @@ function SuperLib:Win(config)
         end
 
         function Tab:SLable(config)
-            config = config or {}
             local content = config.content or "Simple Label"
             local SLabel = New("TextLabel", {
                 Size = UDim2.new(1, 0, 0, 0),
                 BackgroundTransparency = 1,
                 Text = content,
-                TextSize = 13,
+                TextSize = 14,
                 Font = Enum.Font.Gotham,
-                TextColor3 = Color3.fromRGB(170, 170, 190),
+                TextColor3 = Color3.fromRGB(180, 180, 190),
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextYAlignment = Enum.TextYAlignment.Center,
                 AutomaticSize = Enum.AutomaticSize.Y,
-                TextWrapped = true,
-                ZIndex = 11
+                TextWrapped = true
             })
             SLabel.Parent = Tab.Content
         end
 
         function Tab:SLBig(config)
-            config = config or {}
             local content = config.content or "Simple Label Big"
             local SLabelBig = New("TextLabel", {
                 Size = UDim2.new(1, 0, 0, 0),
@@ -1843,30 +1469,27 @@ function SuperLib:Win(config)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextYAlignment = Enum.TextYAlignment.Center,
                 AutomaticSize = Enum.AutomaticSize.Y,
-                TextWrapped = true,
-                ZIndex = 11
+                TextWrapped = true
             })
             SLabelBig.Parent = Tab.Content
         end
 
         function Tab:Label(config)
-            config = config or {}
             local labelTitle = config.title or "Label"
             local labelDesc = config.desc or ""
 
             local LabelFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 0),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 34),
+                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
                 BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.Y,
-                ZIndex = 10
+                AutomaticSize = Enum.AutomaticSize.Y
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("UIPadding", {
-                    PaddingTop = UDim.new(0, 10),
-                    PaddingLeft = UDim.new(0, 14),
-                    PaddingRight = UDim.new(0, 14),
-                    PaddingBottom = UDim.new(0, 10)
+                    PaddingTop = UDim.new(0, 8),
+                    PaddingLeft = UDim.new(0, 12),
+                    PaddingRight = UDim.new(0, 12),
+                    PaddingBottom = UDim.new(0, 8)
                 }),
                 New("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
@@ -1878,19 +1501,19 @@ function SuperLib:Win(config)
                 Text = labelTitle,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 Font = Enum.Font.GothamBold,
-                TextSize = 16,
+                TextSize = 18,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 0, 0),
                 AutomaticSize = Enum.AutomaticSize.Y,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextWrapped = true,
-                ZIndex = 11
+                TextScaled = false
             })
             Title.Parent = LabelFrame
 
             local Desc = New("TextLabel", {
                 Text = labelDesc,
-                TextColor3 = Color3.fromRGB(160, 160, 180),
+                TextColor3 = Color3.fromRGB(180, 180, 190),
                 Font = Enum.Font.Gotham,
                 TextSize = 12,
                 BackgroundTransparency = 1,
@@ -1899,7 +1522,7 @@ function SuperLib:Win(config)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Visible = labelDesc ~= "",
                 TextWrapped = true,
-                ZIndex = 11
+                TextScaled = false
             })
             Desc.Parent = LabelFrame
 
@@ -1935,7 +1558,6 @@ function SuperLib:Win(config)
         end
 
         function Tab:Slider(sliderConfig)
-            sliderConfig = sliderConfig or {}
             local title = sliderConfig.title or "Slider"
             local desc = sliderConfig.desc or ""
             local min = sliderConfig.min or 0
@@ -1954,83 +1576,68 @@ function SuperLib:Win(config)
             local CurrentValue = savedValue ~= nil and math.clamp(savedValue, minVal, maxVal) or math.clamp(default, minVal, maxVal)
 
             local SliderFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 58),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 34),
-                BorderSizePixel = 0,
-                ZIndex = 10
+                Size = UDim2.new(1, 0, 0, 52),
+                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+                BorderSizePixel = 0
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("TextLabel", {
                     Name = "Title",
                     Text = title,
                     TextColor3 = Color3.fromRGB(255, 255, 255),
                     Font = Enum.Font.GothamBold,
-                    TextSize = 14,
+                    TextSize = 15,
                     BackgroundTransparency = 1,
-                    Position = UDim2.new(0, 12, 0, 6),
-                    Size = UDim2.new(1, -24, 0, 16),
-                    ZIndex = 11
+                    Position = UDim2.new(0, 12, 0, 4),
+                    Size = UDim2.new(1, -24, 0, 16)
                 }),
                 New("TextLabel", {
                     Name = "Desc",
                     Text = desc,
-                    TextColor3 = Color3.fromRGB(160, 160, 180),
+                    TextColor3 = Color3.fromRGB(180, 180, 190),
                     Font = Enum.Font.Gotham,
-                    TextSize = 11,
+                    TextSize = 12,
                     BackgroundTransparency = 1,
-                    Position = UDim2.new(0, 12, 0, 22),
-                    Size = UDim2.new(1, -24, 0, 14),
-                    ZIndex = 11
+                    Position = UDim2.new(0, 12, 0, 20),
+                    Size = UDim2.new(1, -24, 0, 14)
                 }),
                 New("TextLabel", {
                     Name = "ValueLabel",
                     Text = tostring(CurrentValue),
-                    TextColor3 = Color3.fromRGB(220, 220, 235),
-                    Font = Enum.Font.GothamBold,
-                    TextSize = 13,
+                    TextColor3 = Color3.fromRGB(220, 220, 230),
+                    Font = Enum.Font.GothamSemibold,
+                    TextSize = 14,
                     BackgroundTransparency = 1,
-                    Position = UDim2.new(1, -50, 0, 6),
-                    Size = UDim2.new(0, 40, 0, 16),
-                    TextXAlignment = Enum.TextXAlignment.Right,
-                    ZIndex = 11
+                    Position = UDim2.new(1, -40, 0, 36),
+                    Size = UDim2.new(0, 40, 0, 14),
+                    TextXAlignment = Enum.TextXAlignment.Right
                 }),
                 New("Frame", {
                     Name = "Track",
-                    Size = UDim2.new(1, -24, 0, 6),
-                    Position = UDim2.new(0, 12, 0, 40),
-                    BackgroundColor3 = Color3.fromRGB(45, 45, 58),
-                    BorderSizePixel = 0,
-                    ZIndex = 11
+                    Size = UDim2.new(1, -24, 0, 4),
+                    Position = UDim2.new(0, 12, 0, 36),
+                    BackgroundColor3 = Color3.fromRGB(60, 60, 70),
+                    BorderSizePixel = 0
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(1, 0) }),
                     New("Frame", {
                         Name = "Fill",
                         Size = UDim2.new((CurrentValue - minVal) / (math.max(1, (maxVal - minVal))), 0, 1, 0),
-                        BackgroundColor3 = Color3.fromRGB(80, 180, 255),
+                        BackgroundColor3 = Color3.fromRGB(50, 200, 100),
                         BorderSizePixel = 0,
-                        Active = false,
-                        ZIndex = 12
+                        Active = false
                     }, {
-                        New("UICorner", { CornerRadius = UDim.new(1, 0) }),
-                        New("UIGradient", {
-                            Color = ColorSequence.new({
-                                ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 200, 255)),
-                                ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 150, 240))
-                            }),
-                            Rotation = 0
-                        })
+                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
                     }),
                     New("Frame", {
                         Name = "Thumb",
-                        Size = UDim2.new(0, 18, 0, 18),
-                        Position = UDim2.new((CurrentValue - minVal) / (math.max(1, (maxVal - minVal))), -9, 0.5, -9),
+                        Size = UDim2.new(0, 16, 0, 16),
+                        Position = UDim2.new((CurrentValue - minVal) / (math.max(1, (maxVal - minVal))), -8, 0.5, -8),
                         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                         BorderSizePixel = 0,
-                        Active = false,
-                        ZIndex = 13
+                        Active = false
                     }, {
-                        New("UICorner", { CornerRadius = UDim.new(1, 0) }),
-                        New("UIStroke", { Color = Color3.fromRGB(80, 180, 255), Thickness = 2 })
+                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
                     })
                 })
             })
@@ -2050,14 +1657,13 @@ function SuperLib:Win(config)
                 ValueLabel.Text = tostring(CurrentValue)
                 local fillRatio = (CurrentValue - minVal) / denom
                 Fill.Size = UDim2.new(fillRatio, 0, 1, 0)
-                Thumb.Position = UDim2.new(fillRatio, -9, 0.5, -9)
+                Thumb.Position = UDim2.new(fillRatio, -8, 0.5, -8)
             end
 
             Track.InputBegan:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                     dragging = true
                     UpdateSlider(input.Position.X)
-                    Tween(Thumb, TweenInfo.new(0.1), { Size = UDim2.new(0, 22, 0, 22), Position = UDim2.new(Thumb.Position.X.Scale, -11, 0.5, -11) })
                 end
             end)
 
@@ -2071,7 +1677,6 @@ function SuperLib:Win(config)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                     if dragging then
                         dragging = false
-                        Tween(Thumb, TweenInfo.new(0.1), { Size = UDim2.new(0, 18, 0, 18), Position = UDim2.new(Thumb.Position.X.Scale, -9, 0.5, -9) })
                         if configKey then
                             Window:_saveElement(configKey, CurrentValue)
                         end
@@ -2089,7 +1694,7 @@ function SuperLib:Win(config)
                     ValueLabel.Text = tostring(CurrentValue)
                     local fillRatio = (CurrentValue - minVal) / math.max(1, (maxVal - minVal))
                     Fill.Size = UDim2.new(fillRatio, 0, 1, 0)
-                    Thumb.Position = UDim2.new(fillRatio, -9, 0.5, -9)
+                    Thumb.Position = UDim2.new(fillRatio, -8, 0.5, -8)
                     if configKey then
                         Window:_saveElement(configKey, CurrentValue)
                     end
@@ -2112,65 +1717,53 @@ function SuperLib:Win(config)
         if def == false then collapsed = true end
 
         local SectionFrame = New("Frame", {
-            Size = UDim2.new(1, -8, 0, 34),
-            BackgroundColor3 = Color3.fromRGB(28, 28, 36),
+            Size = UDim2.new(1, -8, 0, 32),
+            BackgroundColor3 = Color3.fromRGB(30, 30, 35),
             BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            ZIndex = 11
+            AutomaticSize = Enum.AutomaticSize.Y
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+            New("UICorner", { CornerRadius = UDim.new(0, 6) }),
             New("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 4)
+                Padding = UDim.new(0, 2)
             })
         })
 
         local Header = New("TextButton", {
-            Size = UDim2.new(1, 0, 0, 32),
-            BackgroundColor3 = Color3.fromRGB(32, 32, 42),
+            Size = UDim2.new(1, 0, 0, 28),
+            BackgroundColor3 = Color3.fromRGB(35, 35, 40),
             AutoButtonColor = false,
             Text = "",
-            BorderSizePixel = 0,
-            ZIndex = 12
+            BorderSizePixel = 0
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+            New("UICorner", { CornerRadius = UDim.new(0, 4) }),
             New("TextLabel", {
                 Text = sectionTitle,
                 TextColor3 = Color3.fromRGB(255, 255, 255),
                 Font = Enum.Font.GothamSemibold,
-                TextSize = 13,
+                TextSize = 14,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 10, 0, 0),
-                Size = UDim2.new(1, -36, 1, 0),
-                TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 13
+                Position = UDim2.new(0, 8, 0, 0),
+                Size = UDim2.new(1, -30, 1, 0),
+                TextXAlignment = Enum.TextXAlignment.Left
             }),
             New("TextLabel", {
                 Name = "Arrow",
                 Text = collapsed and ">" or "v",
-                TextColor3 = Color3.fromRGB(160, 160, 180),
-                Font = Enum.Font.GothamBold,
-                TextSize = 12,
+                TextColor3 = Color3.fromRGB(180, 180, 190),
+                Font = Enum.Font.Gotham,
+                TextSize = 14,
                 BackgroundTransparency = 1,
-                Position = UDim2.new(1, -22, 0, 0),
-                Size = UDim2.new(0, 20, 1, 0),
-                ZIndex = 13
+                Position = UDim2.new(1, -20, 0, 0),
+                Size = UDim2.new(0, 20, 1, 0)
             })
         })
-
-        Header.MouseEnter:Connect(function()
-            Tween(Header, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(38, 38, 50) })
-        end)
-        Header.MouseLeave:Connect(function()
-            Tween(Header, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(32, 32, 42) })
-        end)
 
         local TabContainer = New("Frame", {
             Size = UDim2.new(1, 0, 0, 0),
             BackgroundTransparency = 1,
             Visible = not collapsed,
-            AutomaticSize = Enum.AutomaticSize.Y,
-            ZIndex = 11
+            AutomaticSize = Enum.AutomaticSize.Y
         }, {
             New("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder,
@@ -2190,11 +1783,7 @@ function SuperLib:Win(config)
         Header.MouseButton1Click:Connect(function()
             isCollapsed = not isCollapsed
             TabContainer.Visible = not isCollapsed
-            if isCollapsed then
-                Tween(Header.Arrow, TweenInfo.new(0.2), { Rotation = -90, Text = ">" })
-            else
-                Tween(Header.Arrow, TweenInfo.new(0.2), { Rotation = 0, Text = "v" })
-            end
+            Header.Arrow.Text = isCollapsed and ">" or "v"
         end)
 
         local Section = {
@@ -2203,34 +1792,28 @@ function SuperLib:Win(config)
                 local tabTitle = tabConfig.title or "Tab"
                 local TabButton = New("TextButton", {
                     Size = UDim2.new(1, 0, 0, 32),
-                    BackgroundColor3 = Color3.fromRGB(40, 40, 50),
+                    BackgroundColor3 = Color3.fromRGB(40, 40, 45),
                     AutoButtonColor = false,
                     Text = "",
-                    BorderSizePixel = 0,
-                    ZIndex = 12
+                    BorderSizePixel = 0
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                     New("TextLabel", {
                         Text = tabTitle,
-                        TextColor3 = Color3.fromRGB(200, 200, 215),
+                        TextColor3 = Color3.fromRGB(220, 220, 230),
                         Font = Enum.Font.GothamSemibold,
-                        TextSize = 13,
+                        TextSize = 14,
                         BackgroundTransparency = 1,
                         Size = UDim2.new(1, 0, 1, 0),
-                        TextXAlignment = Enum.TextXAlignment.Center,
-                        ZIndex = 13
+                        TextXAlignment = Enum.TextXAlignment.Center
                     })
                 })
 
                 TabButton.MouseEnter:Connect(function()
-                    if not TabButton:GetAttribute("Selected") then
-                        Tween(TabButton, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(50, 50, 62) })
-                    end
+                    TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
                 end)
                 TabButton.MouseLeave:Connect(function()
-                    if not TabButton:GetAttribute("Selected") then
-                        Tween(TabButton, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(40, 40, 50) })
-                    end
+                    TabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
                 end)
 
                 TabButton.Parent = TabContainer
@@ -2241,8 +1824,7 @@ function SuperLib:Win(config)
                     ScrollBarThickness = 4,
                     CanvasSize = UDim2.new(0, 0, 0, 0),
                     AutomaticCanvasSize = Enum.AutomaticSize.Y,
-                    Visible = #Window.Tabs == 0,
-                    ZIndex = 10
+                    Visible = #Window.Tabs == 0
                 }, {
                     New("UIListLayout", {
                         SortOrder = Enum.SortOrder.LayoutOrder,
@@ -2255,27 +1837,18 @@ function SuperLib:Win(config)
                         PaddingBottom = UDim.new(0, 6)
                     })
                 })
-                TabContent.Parent = PanelScroll
 
-                if #Window.Tabs == 0 then
-                    TabButton:SetAttribute("Selected", true)
-                    TabButton.BackgroundColor3 = Color3.fromRGB(55, 55, 68)
-                end
+                TabContent.Parent = MainPanel
 
                 TabButton.MouseButton1Click:Connect(function()
                     for _, t in ipairs(Window.Tabs) do
                         t.Content.Visible = false
-                        t.Button:SetAttribute("Selected", false)
-                        Tween(t.Button, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(40, 40, 50) })
                     end
                     TabContent.Visible = true
-                    TabButton:SetAttribute("Selected", true)
-                    Tween(TabButton, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(55, 55, 68) })
                 end)
 
                 local Tab = {
-                    Content = TabContent,
-                    Button = TabButton
+                    Content = TabContent
                 }
 
                 -- Copy methods from main Tab
