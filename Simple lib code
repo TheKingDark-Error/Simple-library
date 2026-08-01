@@ -1,10 +1,51 @@
 -- SuperLib.lua
--- Version 2.0.1 (Old UI Restored + New Features + Resize Handle)
+-- Version 2.1.0 (Full Features + Theme System + Resize Handle + Image + All Elements)
 
 local SuperLib = {
-    Version = "2.0.1",
+    Version = "2.1.0",
     _configCache = nil,
-    _configPath = "SuperLib_Config.json"
+    _configPath = "SuperLib_Config.json",
+    _configVersion = 1,
+    _activeDropdowns = {},
+    _theme = {
+        primary = Color3.fromRGB(50, 200, 100),
+        background = Color3.fromRGB(35, 35, 40),
+        sidebar = Color3.fromRGB(25, 25, 30),
+        panel = Color3.fromRGB(22, 22, 26),
+        topbar = Color3.fromRGB(30, 30, 35),
+        elementBg = Color3.fromRGB(28, 28, 32),
+        button = Color3.fromRGB(50, 50, 55),
+        buttonHover = Color3.fromRGB(60, 60, 65),
+        text = Color3.fromRGB(255, 255, 255),
+        textSecondary = Color3.fromRGB(180, 180, 190),
+        stroke = Color3.fromRGB(60, 60, 70),
+        loadingBar = Color3.fromRGB(50, 220, 120),
+        notifyBar = Color3.fromRGB(50, 200, 100),
+        accent = Color3.fromRGB(80, 180, 255),
+        toggleOff = Color3.fromRGB(60, 60, 70),
+        toggleIndicatorOff = Color3.fromRGB(180, 180, 190),
+        track = Color3.fromRGB(60, 60, 70),
+        sliderFill = Color3.fromRGB(50, 200, 100),
+        thumb = Color3.fromRGB(255, 255, 255),
+        dropdownBg = Color3.fromRGB(35, 35, 40),
+        dropdownItem = Color3.fromRGB(40, 40, 45),
+        dropdownItemHover = Color3.fromRGB(50, 50, 55),
+        inputBg = Color3.fromRGB(40, 40, 45),
+        confirmNo = Color3.fromRGB(255, 80, 80),
+        confirmNoHover = Color3.fromRGB(255, 100, 100),
+        confirmOk = Color3.fromRGB(50, 50, 55),
+        confirmOkHover = Color3.fromRGB(70, 70, 75),
+        tooltipBg = Color3.fromRGB(30, 30, 35),
+        tooltipText = Color3.fromRGB(255, 255, 255),
+        separator = Color3.fromRGB(60, 60, 70),
+        tabButton = Color3.fromRGB(40, 40, 45),
+        tabButtonHover = Color3.fromRGB(50, 50, 55),
+        tabButtonActive = Color3.fromRGB(50, 200, 100),
+        minimiBtn = Color3.fromRGB(60, 200, 100),
+        resizeHandle = Color3.fromRGB(170, 170, 180),
+        minimiBar = Color3.fromRGB(35, 35, 40),
+        minimiBarStroke = Color3.fromRGB(60, 60, 70),
+    }
 }
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -39,26 +80,100 @@ local function Tween(obj, info, props, callback)
     return tween
 end
 
+-- ========== THEME SYSTEM ==========
+function SuperLib:SetTheme(newTheme)
+    for k, v in pairs(newTheme or {}) do
+        self._theme[k] = v
+    end
+end
+
+function SuperLib:GetThemeColor(key)
+    return self._theme[key] or self._theme.primary
+end
+
+function SuperLib:GetTheme()
+    return self._theme
+end
+
+-- ========== TOOLTIP SYSTEM ==========
+local TooltipFrame = New("Frame", {
+    Name = "SuperLibTooltip",
+    Size = UDim2.new(0, 0, 0, 0),
+    BackgroundColor3 = SuperLib._theme.tooltipBg,
+    BorderSizePixel = 0,
+    Visible = false,
+    ZIndex = 9999,
+    AutomaticSize = Enum.AutomaticSize.XY
+}, {
+    New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+    New("UIStroke", { Color = SuperLib._theme.stroke, Thickness = 1 }),
+    New("UIPadding", {
+        PaddingTop = UDim.new(0, 6),
+        PaddingBottom = UDim.new(0, 6),
+        PaddingLeft = UDim.new(0, 10),
+        PaddingRight = UDim.new(0, 10)
+    }),
+    New("TextLabel", {
+        Name = "Text",
+        Text = "",
+        TextColor3 = SuperLib._theme.tooltipText,
+        Font = Enum.Font.Gotham,
+        TextSize = 13,
+        BackgroundTransparency = 1,
+        AutomaticSize = Enum.AutomaticSize.XY,
+        TextWrapped = true
+    })
+})
+TooltipFrame.Parent = ScreenGui
+
+local function ShowTooltip(text)
+    if not text or text == "" then return end
+    TooltipFrame.Text.Text = text
+    TooltipFrame.Visible = true
+end
+
+local function HideTooltip()
+    TooltipFrame.Visible = false
+end
+
+local function AttachTooltip(element, text)
+    if not text or text == "" then return end
+    element.MouseEnter:Connect(function()
+        ShowTooltip(text)
+    end)
+    element.MouseLeave:Connect(function()
+        HideTooltip()
+    end)
+    element.MouseMoved:Connect(function()
+        local mousePos = UserInputService:GetMouseLocation()
+        TooltipFrame.Position = UDim2.new(0, mousePos.X + 15, 0, mousePos.Y + 15)
+    end)
+end
+
 -- ========== CONFIG SYSTEM ==========
 function SuperLib:LoadConfig()
     local success, result = pcall(function()
         if writefile and readfile and isfile then
             if isfile(self._configPath) then
-                return HttpService:JSONDecode(readfile(self._configPath))
+                local data = HttpService:JSONDecode(readfile(self._configPath))
+                if type(data) == "table" and data._version == self._configVersion then
+                    return data
+                end
             end
         end
-        return {}
+        return { _version = self._configVersion }
     end)
     if success then
-        self._configCache = result or {}
+        self._configCache = result or { _version = self._configVersion }
     else
-        self._configCache = {}
+        self._configCache = { _version = self._configVersion }
     end
     return self._configCache
 end
 
 function SuperLib:SaveConfig(data)
-    self._configCache = data or self._configCache or {}
+    self._configCache = data or self._configCache or { _version = self._configVersion }
+    self._configCache._version = self._configVersion
     pcall(function()
         if writefile then
             writefile(self._configPath, HttpService:JSONEncode(self._configCache))
@@ -100,13 +215,17 @@ function SuperLib:Win(config)
     local size = config.size and UDim2.new(unpack(config.size)) or UDim2.new(0, 500, 0, 350)
     local autoSave = config.autoSave ~= false
     local configId = config.configId or title
+    local keybind = config.keybind or Enum.KeyCode.RightShift
 
-    -- MainFrame old UI style
+    local theme = self._theme
+
+    -- MainFrame
     local MainFrame = New("Frame", {
+        Name = "MainFrame",
         Size = UDim2.new(0, 0, 0, 0),
         Position = UDim2.new(0.5, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = Color3.fromRGB(35, 35, 40),
+        BackgroundColor3 = theme.background,
         BorderSizePixel = 0,
         BackgroundTransparency = 1,
         ZIndex = 10,
@@ -114,7 +233,7 @@ function SuperLib:Win(config)
     }, {
         New("UICorner", { CornerRadius = UDim.new(0, 10) }),
         New("UIStroke", {
-            Color = Color3.fromRGB(60, 60, 70),
+            Color = theme.stroke,
             Thickness = 1.5
         })
     })
@@ -133,10 +252,11 @@ function SuperLib:Win(config)
         Scale = 1
     })
 
-    -- Topbar old style
+    -- Topbar
     local Topbar = New("Frame", {
+        Name = "Topbar",
         Size = UDim2.new(1, 0, 0, 48),
-        BackgroundColor3 = Color3.fromRGB(30, 30, 35),
+        BackgroundColor3 = theme.topbar,
         BorderSizePixel = 0,
         ZIndex = 11
     }, {
@@ -146,6 +266,7 @@ function SuperLib:Win(config)
     local IconLabel
     if icon then
         IconLabel = New("ImageLabel", {
+            Name = "Icon",
             Size = UDim2.new(0, 24, 0, 24),
             Position = UDim2.new(0, 16, 0, 12),
             BackgroundTransparency = 1,
@@ -162,7 +283,7 @@ function SuperLib:Win(config)
         Text = title,
         TextSize = 20,
         Font = Enum.Font.GothamBold,
-        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextColor3 = theme.text,
         BackgroundTransparency = 1,
         Position = icon and UDim2.new(0, 16 + 24 + 4, 0, 8) or UDim2.new(0, 16, 0, 8),
         Size = UDim2.new(0, 200, 0, 24),
@@ -173,7 +294,7 @@ function SuperLib:Win(config)
         Text = desc,
         TextSize = 13,
         Font = Enum.Font.Gotham,
-        TextColor3 = Color3.fromRGB(180, 180, 190),
+        TextColor3 = theme.textSecondary,
         BackgroundTransparency = 1,
         Position = icon and UDim2.new(0, 16 + 24 + 4, 0, 32) or UDim2.new(0, 16, 0, 32),
         Size = UDim2.new(0, 200, 0, 16),
@@ -182,16 +303,17 @@ function SuperLib:Win(config)
     TitleLabel.Parent = Topbar
     DescLabel.Parent = Topbar
 
-    -- Minimize/Close buttons old style
+    -- Minimize/Close buttons
     local MinimizeBtn = New("TextButton", {
+        Name = "MinimizeBtn",
         Size = UDim2.new(0, 30, 0, 30),
         Position = UDim2.new(1, -40, 0, 9),
-        BackgroundColor3 = Color3.fromRGB(50, 50, 55),
+        BackgroundColor3 = theme.button,
         AutoButtonColor = false,
         Text = "—",
         Font = Enum.Font.GothamBold,
         TextSize = 24,
-        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextColor3 = theme.text,
         BorderSizePixel = 0,
         ZIndex = 12
     }, {
@@ -199,14 +321,15 @@ function SuperLib:Win(config)
     })
 
     local CloseBtn = New("TextButton", {
+        Name = "CloseBtn",
         Size = UDim2.new(0, 30, 0, 30),
         Position = UDim2.new(1, -75, 0, 9),
-        BackgroundColor3 = Color3.fromRGB(50, 50, 55),
+        BackgroundColor3 = theme.button,
         AutoButtonColor = false,
         Text = "✕",
         Font = Enum.Font.GothamBold,
         TextSize = 20,
-        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextColor3 = theme.text,
         BorderSizePixel = 0,
         ZIndex = 12
     }, {
@@ -218,18 +341,19 @@ function SuperLib:Win(config)
 
     for _, btn in ipairs({ MinimizeBtn, CloseBtn }) do
         btn.MouseEnter:Connect(function()
-            Tween(btn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(60, 60, 65) })
+            Tween(btn, TweenInfo.new(0.15), { BackgroundColor3 = theme.buttonHover })
         end)
         btn.MouseLeave:Connect(function()
-            Tween(btn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(50, 50, 55) })
+            Tween(btn, TweenInfo.new(0.15), { BackgroundColor3 = theme.button })
         end)
     end
 
-    -- Sidebar old style
+    -- Sidebar
     local Sidebar = New("ScrollingFrame", {
+        Name = "Sidebar",
         Position = UDim2.new(0, 0, 0, 48),
         Size = UDim2.new(0, 140, 1, -48),
-        BackgroundColor3 = Color3.fromRGB(25, 25, 30),
+        BackgroundColor3 = theme.sidebar,
         BorderSizePixel = 0,
         ScrollBarThickness = 4,
         CanvasSize = UDim2.new(0, 0, 0, 0),
@@ -248,10 +372,12 @@ function SuperLib:Win(config)
         })
     })
 
+    -- MainPanel
     local MainPanel = New("Frame", {
+        Name = "MainPanel",
         Position = UDim2.new(0, 140, 0, 48),
         Size = UDim2.new(1, -140, 1, -48),
-        BackgroundColor3 = Color3.fromRGB(22, 22, 26),
+        BackgroundColor3 = theme.panel,
         BorderSizePixel = 0,
         ZIndex = 10
     }, {
@@ -272,18 +398,39 @@ function SuperLib:Win(config)
     Sidebar.Parent = MainFrame
     MainPanel.Parent = MainFrame
 
-    -- ========== RESIZE HANDLE ==========
+    -- ========== RESIZE HANDLE (Beautiful corner curve) ==========
     local ResizeHandle = New("Frame", {
         Name = "ResizeHandle",
-        Size = UDim2.new(0, 18, 0, 18),
-        Position = UDim2.new(1, -18, 1, -18),
-        BackgroundColor3 = Color3.fromRGB(220, 220, 230),
-        BorderSizePixel = 0,
+        Size = UDim2.new(0, 20, 0, 20),
+        Position = UDim2.new(1, -20, 1, -20),
+        BackgroundTransparency = 1,
         ZIndex = 20,
         Active = true
     }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-        New("UIStroke", { Color = Color3.fromRGB(150, 150, 160), Thickness = 1 })
+        -- Line 1 (outer)
+        New("Frame", {
+            Size = UDim2.new(0, 12, 0, 2),
+            Position = UDim2.new(0, 4, 0, 14),
+            BackgroundColor3 = theme.resizeHandle,
+            BorderSizePixel = 0,
+            Rotation = 45
+        }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) }),
+        -- Line 2 (middle)
+        New("Frame", {
+            Size = UDim2.new(0, 8, 0, 2),
+            Position = UDim2.new(0, 8, 0, 10),
+            BackgroundColor3 = theme.resizeHandle,
+            BorderSizePixel = 0,
+            Rotation = 45
+        }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) }),
+        -- Line 3 (inner)
+        New("Frame", {
+            Size = UDim2.new(0, 4, 0, 2),
+            Position = UDim2.new(0, 12, 0, 6),
+            BackgroundColor3 = theme.resizeHandle,
+            BorderSizePixel = 0,
+            Rotation = 45
+        }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
     })
     ResizeHandle.Parent = MainFrame
 
@@ -306,6 +453,12 @@ function SuperLib:Win(config)
             local newWidth = math.clamp(startSize.X.Offset + delta.X, 350, 900)
             local newHeight = math.clamp(startSize.Y.Offset + delta.Y, 250, 700)
             MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
+            -- Update dropdown positions
+            for _, dd in ipairs(SuperLib._activeDropdowns) do
+                if dd and dd.Visible then
+                    dd.Visible = false
+                end
+            end
         end
     end)
 
@@ -315,10 +468,11 @@ function SuperLib:Win(config)
         end
     end)
 
-    -- Loading overlay (improved but old style compatible)
+    -- ========== LOADING OVERLAY ==========
     local function ShowLoadingOverlay(libName, subTitle, duration)
         duration = tonumber(duration) or 2.5
         local loading = New("Frame", {
+            Name = "LoadingOverlay",
             Size = UDim2.new(1, 0, 1, 0),
             Position = UDim2.new(0, 0, 0, 0),
             BackgroundColor3 = Color3.fromRGB(12, 12, 12),
@@ -326,7 +480,7 @@ function SuperLib:Win(config)
             ZIndex = 999
         }, {
             New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-            New("UIStroke", { Color = Color3.fromRGB(40, 180, 80), Thickness = 1 })
+            New("UIStroke", { Color = theme.primary, Thickness = 1 })
         })
 
         local center = New("Frame", {
@@ -343,7 +497,7 @@ function SuperLib:Win(config)
             Text = libName,
             Font = Enum.Font.GothamBold,
             TextSize = 22,
-            TextColor3 = Color3.fromRGB(50, 220, 120),
+            TextColor3 = theme.loadingBar,
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 12, 0, 8),
             Size = UDim2.new(1, -24, 0, 30),
@@ -374,7 +528,7 @@ function SuperLib:Win(config)
         local barFill = New("Frame", {
             Size = UDim2.new(0, 0, 1, 0),
             Position = UDim2.new(0, 0, 0, 0),
-            BackgroundColor3 = Color3.fromRGB(50, 220, 120),
+            BackgroundColor3 = theme.loadingBar,
             BorderSizePixel = 0,
             ZIndex = 1001
         }, {
@@ -434,7 +588,7 @@ function SuperLib:Win(config)
         ShowLoadingOverlay(title_load, subtitle_load, load_time)
     end
 
-    -- DRAG SYSTEM
+    -- ========== DRAG SYSTEM ==========
     local dragging = false
     local dragStart = Vector2.new(0, 0)
     local startPos = MainFrame.Position
@@ -454,6 +608,12 @@ function SuperLib:Win(config)
                 startPos.X.Scale, startPos.X.Offset + delta.X,
                 startPos.Y.Scale, startPos.Y.Offset + delta.Y
             )
+            -- Close dropdowns when dragging
+            for _, dd in ipairs(SuperLib._activeDropdowns) do
+                if dd and dd.Visible then
+                    dd.Visible = false
+                end
+            end
         end
     end)
 
@@ -463,7 +623,7 @@ function SuperLib:Win(config)
         end
     end)
 
-    -- MINIMIZE/RESTORE SYSTEM
+    -- ========== MINIMIZE/RESTORE SYSTEM ==========
     local MiniBar = nil
     local isMinimized = false
 
@@ -473,17 +633,17 @@ function SuperLib:Win(config)
             Size = UDim2.new(0, 200, 0, 40),
             Position = UDim2.new(0.5, 0, 0, 0),
             AnchorPoint = Vector2.new(0.5, 0),
-            BackgroundColor3 = Color3.fromRGB(35, 35, 40),
+            BackgroundColor3 = theme.minimiBar,
             BorderSizePixel = 0,
             Text = title,
-            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextColor3 = theme.text,
             Font = Enum.Font.GothamBold,
             TextSize = 14,
             AutoButtonColor = false,
             ZIndex = 100
         }, {
             New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-            New("UIStroke", { Color = Color3.fromRGB(60, 60, 70), Thickness = 1 })
+            New("UIStroke", { Color = theme.minimiBarStroke, Thickness = 1 })
         })
         MiniBar.Parent = ScreenGui
         MiniBar.MouseButton1Click:Connect(function()
@@ -519,7 +679,7 @@ function SuperLib:Win(config)
 
     MinimizeBtn.MouseButton1Click:Connect(function()
         if isMinimized then
-            -- nothing
+            return
         else
             isMinimized = true
             Sidebar.Visible = false
@@ -535,16 +695,17 @@ function SuperLib:Win(config)
             MinimizeBtn.Text = "❐"
             MinimizeBtn.Size = UDim2.new(0, 36, 0, 36)
             MinimizeBtn.Position = UDim2.new(1, -42, 0.5, -18)
-            MinimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 100)
+            MinimizeBtn.BackgroundColor3 = theme.minimiBtn
             CloseBtn.Visible = false
             MainFrame.Visible = false
             CreateMiniBar()
         end
     end)
 
-    -- Confirm dialog
-    local function ShowConfirmDialog()
+    -- ========== CONFIRM DIALOG ==========
+    local function ShowConfirmDialog(onConfirm)
         local Dialog = New("Frame", {
+            Name = "ConfirmDialog",
             Size = UDim2.new(0, 300, 0, 150),
             Position = UDim2.new(0.5, 0, 0.5, 0),
             AnchorPoint = Vector2.new(0.5, 0.5),
@@ -555,12 +716,12 @@ function SuperLib:Win(config)
             ZIndex = 999
         }, {
             New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-            New("UIStroke", { Color = Color3.fromRGB(60, 60, 70), Thickness = 1.5 }),
+            New("UIStroke", { Color = theme.stroke, Thickness = 1.5 }),
             New("TextLabel", {
-                Text = "Are you sure to close GUI?",
+                Text = "Are you sure?",
                 TextSize = 18,
                 Font = Enum.Font.GothamBold,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0, 16, 0, 16),
                 Size = UDim2.new(1, -32, 0, 30)
@@ -569,24 +730,24 @@ function SuperLib:Win(config)
                 Name = "NoBtn",
                 Size = UDim2.new(0, 80, 0, 30),
                 Position = UDim2.new(0.5, -95, 0, 90),
-                BackgroundColor3 = Color3.fromRGB(255, 80, 80),
+                BackgroundColor3 = theme.confirmNo,
                 AutoButtonColor = false,
                 Text = "No",
                 Font = Enum.Font.GothamBold,
                 TextSize = 14,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 BorderSizePixel = 0
             }, { New("UICorner", { CornerRadius = UDim.new(0, 6) }) }),
             New("TextButton", {
                 Name = "OkBtn",
                 Size = UDim2.new(0, 80, 0, 30),
                 Position = UDim2.new(0.5, 15, 0, 90),
-                BackgroundColor3 = Color3.fromRGB(50, 50, 55),
+                BackgroundColor3 = theme.confirmOk,
                 AutoButtonColor = false,
                 Text = "OK",
                 Font = Enum.Font.GothamBold,
                 TextSize = 14,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 BorderSizePixel = 0
             }, { New("UICorner", { CornerRadius = UDim.new(0, 6) }) })
         })
@@ -601,31 +762,64 @@ function SuperLib:Win(config)
 
         local noBtn = Dialog.NoBtn
         noBtn.MouseEnter:Connect(function()
-            noBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+            noBtn.BackgroundColor3 = theme.confirmNoHover
         end)
         noBtn.MouseLeave:Connect(function()
-            noBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+            noBtn.BackgroundColor3 = theme.confirmNo
         end)
 
         local okBtn = Dialog.OkBtn
         okBtn.MouseEnter:Connect(function()
-            okBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 75)
+            okBtn.BackgroundColor3 = theme.confirmOkHover
         end)
         okBtn.MouseLeave:Connect(function()
-            okBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+            okBtn.BackgroundColor3 = theme.confirmOk
         end)
 
         noBtn.MouseButton1Click:Connect(function()
             Dialog:Destroy()
         end)
         okBtn.MouseButton1Click:Connect(function()
+            Dialog:Destroy()
+            if onConfirm then onConfirm() end
+        end)
+    end
+
+    CloseBtn.MouseButton1Click:Connect(function()
+        ShowConfirmDialog(function()
             MainFrame:Destroy()
             if MiniBar then MiniBar:Destroy() end
         end)
-    end
-    CloseBtn.MouseButton1Click:Connect(ShowConfirmDialog)
+    end)
 
-    -- Window object
+    -- ========== KEYBIND TOGGLE UI ==========
+    local uiVisible = true
+    local keybindConnection = nil
+
+    local function SetupKeybind(kb)
+        if keybindConnection then
+            keybindConnection:Disconnect()
+            keybindConnection = nil
+        end
+        keybindConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if gameProcessed then return end
+            if input.KeyCode == kb then
+                uiVisible = not uiVisible
+                MainFrame.Visible = uiVisible
+                if not uiVisible and MiniBar then
+                    MiniBar.Visible = false
+                elseif uiVisible and MiniBar then
+                    MiniBar.Visible = true
+                end
+            end
+        end)
+    end
+
+    if keybind then
+        SetupKeybind(keybind)
+    end
+
+    -- ========== WINDOW OBJECT ==========
     local Window = {
         MainFrame = MainFrame,
         MainPanel = MainPanel,
@@ -633,7 +827,8 @@ function SuperLib:Win(config)
         Tabs = {},
         _configId = configId,
         _autoSave = autoSave,
-        _elements = {}
+        _elements = {},
+        _activeDropdowns = {}
     }
 
     function Window:_saveElement(key, value)
@@ -653,6 +848,19 @@ function SuperLib:Win(config)
         return val
     end
 
+    function Window:Destroy()
+        if keybindConnection then
+            keybindConnection:Disconnect()
+            keybindConnection = nil
+        end
+        if MiniBar then MiniBar:Destroy() end
+        MainFrame:Destroy()
+    end
+
+    function Window:SetKeybind(kb)
+        SetupKeybind(kb)
+    end
+
     -- ========== NOTIFY ==========
     function Window:Notify(config)
         local title = config.title or "Thông báo"
@@ -668,15 +876,21 @@ function SuperLib:Win(config)
             ZIndex = 100
         }, {
             New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-            New("UIStroke", { Color = Color3.fromRGB(60, 60, 70), Thickness = 1.5 }),
+            New("UIStroke", { Color = theme.stroke, Thickness = 1.5 }),
             New("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 Padding = UDim.new(0, 4),
             }),
+            New("UIPadding", {
+                PaddingTop = UDim.new(0, 8),
+                PaddingLeft = UDim.new(0, 10),
+                PaddingRight = UDim.new(0, 10),
+                PaddingBottom = UDim.new(0, 8)
+            }),
             New("TextLabel", {
                 Name = "Title",
                 Text = title,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 BackgroundTransparency = 1,
@@ -689,7 +903,7 @@ function SuperLib:Win(config)
             New("TextLabel", {
                 Name = "Content",
                 Text = content,
-                TextColor3 = Color3.fromRGB(180, 180, 190),
+                TextColor3 = theme.textSecondary,
                 Font = Enum.Font.Gotham,
                 TextSize = 12,
                 BackgroundTransparency = 1,
@@ -702,7 +916,7 @@ function SuperLib:Win(config)
             New("Frame", {
                 Name = "ProgressBar",
                 Size = UDim2.new(0, 0, 0, 3),
-                BackgroundColor3 = Color3.fromRGB(50, 200, 100),
+                BackgroundColor3 = theme.notifyBar,
                 BorderSizePixel = 0,
                 ZIndex = 101,
                 LayoutOrder = 3,
@@ -727,7 +941,7 @@ function SuperLib:Win(config)
         local tabTitle = tabConfig.title or "Tab"
         local TabButton = New("TextButton", {
             Size = UDim2.new(1, -8, 0, 36),
-            BackgroundColor3 = Color3.fromRGB(40, 40, 45),
+            BackgroundColor3 = theme.tabButton,
             AutoButtonColor = false,
             Text = "",
             BorderSizePixel = 0
@@ -745,10 +959,10 @@ function SuperLib:Win(config)
         })
 
         TabButton.MouseEnter:Connect(function()
-            TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+            TabButton.BackgroundColor3 = theme.tabButtonHover
         end)
         TabButton.MouseLeave:Connect(function()
-            TabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+            TabButton.BackgroundColor3 = theme.tabButton
         end)
 
         TabButton.Parent = Sidebar
@@ -796,7 +1010,7 @@ function SuperLib:Win(config)
 
             local SectionFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 32),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+                BackgroundColor3 = theme.elementBg,
                 BorderSizePixel = 0,
                 ClipsDescendants = false
             }, {
@@ -819,7 +1033,7 @@ function SuperLib:Win(config)
                 Size = UDim2.new(0, 20, 0, 20),
                 BackgroundTransparency = 1,
                 Text = collapsed and ">" or "v",
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 Font = Enum.Font.GothamBold,
                 TextSize = 14,
                 BorderSizePixel = 0
@@ -827,7 +1041,7 @@ function SuperLib:Win(config)
 
             local SectionTitle = New("TextLabel", {
                 Text = sectionTitle,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 Font = Enum.Font.GothamBold,
                 TextSize = 15,
                 BackgroundTransparency = 1,
@@ -869,7 +1083,6 @@ function SuperLib:Win(config)
                 else
                     ArrowButton.Text = ">"
                     ContentFrame.Visible = false
-                    -- Hide all dropdowns in this section
                     for _, dd in ipairs(_dropdownsInSection) do
                         if dd and dd.Visible then
                             dd.Visible = false
@@ -926,12 +1139,16 @@ function SuperLib:Win(config)
             return Section
         end
 
+        -- ========== BTN ==========
         function Tab:Btn(btnConfig)
             local btnTitle = btnConfig.title or "Button"
             local callback = btnConfig[1] or function() end
+            local confirm = btnConfig.confirm or false
+            local tooltipText = btnConfig.tooltip or ""
+
             local Button = New("TextButton", {
                 Size = UDim2.new(1, 0, 0, 36),
-                BackgroundColor3 = Color3.fromRGB(50, 50, 55),
+                BackgroundColor3 = theme.button,
                 AutoButtonColor = false,
                 Text = "",
                 BorderSizePixel = 0
@@ -939,7 +1156,7 @@ function SuperLib:Win(config)
                 New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("TextLabel", {
                     Text = btnTitle,
-                    TextColor3 = Color3.fromRGB(255, 255, 255),
+                    TextColor3 = theme.text,
                     Font = Enum.Font.GothamBold,
                     TextSize = 15,
                     BackgroundTransparency = 1,
@@ -948,21 +1165,32 @@ function SuperLib:Win(config)
                 })
             })
             Button.MouseEnter:Connect(function()
-                Button.BackgroundColor3 = Color3.fromRGB(60, 60, 65)
+                Button.BackgroundColor3 = theme.buttonHover
             end)
             Button.MouseLeave:Connect(function()
-                Button.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+                Button.BackgroundColor3 = theme.button
             end)
-            Button.MouseButton1Click:Connect(callback)
+            Button.MouseButton1Click:Connect(function()
+                if confirm then
+                    ShowConfirmDialog(function()
+                        callback()
+                    end)
+                else
+                    callback()
+                end
+            end)
+            AttachTooltip(Button, tooltipText)
             Button.Parent = Tab.Content
         end
 
+        -- ========== TOG ==========
         function Tab:Tog(togConfig)
             local togTitle = togConfig.title or "Toggle"
             local togDesc = togConfig.desc or ""
             local callback = togConfig[1] or function() end
             local configKey = togConfig.configKey
             local def = togConfig.Def
+            local tooltipText = togConfig.tooltip or ""
 
             local savedValue = nil
             if configKey and Window._autoSave then
@@ -972,14 +1200,14 @@ function SuperLib:Win(config)
 
             local ToggleFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 48),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+                BackgroundColor3 = theme.elementBg,
                 BorderSizePixel = 0
             }, {
                 New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("TextLabel", {
                     Name = "Title",
                     Text = togTitle,
-                    TextColor3 = Color3.fromRGB(255, 255, 255),
+                    TextColor3 = theme.text,
                     Font = Enum.Font.GothamBold,
                     TextSize = 15,
                     BackgroundTransparency = 1,
@@ -989,7 +1217,7 @@ function SuperLib:Win(config)
                 New("TextLabel", {
                     Name = "Desc",
                     Text = togDesc,
-                    TextColor3 = Color3.fromRGB(180, 180, 190),
+                    TextColor3 = theme.textSecondary,
                     Font = Enum.Font.Gotham,
                     TextSize = 12,
                     BackgroundTransparency = 1,
@@ -1000,7 +1228,7 @@ function SuperLib:Win(config)
                     Name = "ToggleBtn",
                     Size = UDim2.new(0, 44, 0, 20),
                     Position = UDim2.new(1, -56, 0, 14),
-                    BackgroundColor3 = Color3.fromRGB(60, 60, 70),
+                    BackgroundColor3 = theme.toggleOff,
                     AutoButtonColor = false,
                     BorderSizePixel = 0,
                     Text = ""
@@ -1010,7 +1238,7 @@ function SuperLib:Win(config)
                         Name = "Indicator",
                         Size = UDim2.new(0, 14, 0, 14),
                         Position = UDim2.new(0, 3, 0, 3),
-                        BackgroundColor3 = Color3.fromRGB(180, 180, 190),
+                        BackgroundColor3 = theme.toggleIndicatorOff,
                         BorderSizePixel = 0
                     }, {
                         New("UICorner", { CornerRadius = UDim.new(1, 0) })
@@ -1023,13 +1251,13 @@ function SuperLib:Win(config)
 
             local function UpdateVisual()
                 if IsToggled then
-                    ToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+                    ToggleBtn.BackgroundColor3 = theme.primary
                     Indicator.Position = UDim2.new(0, 27, 0, 3)
-                    Indicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    Indicator.BackgroundColor3 = theme.thumb
                 else
-                    ToggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 70)
+                    ToggleBtn.BackgroundColor3 = theme.toggleOff
                     Indicator.Position = UDim2.new(0, 3, 0, 3)
-                    Indicator.BackgroundColor3 = Color3.fromRGB(180, 180, 190)
+                    Indicator.BackgroundColor3 = theme.toggleIndicatorOff
                 end
             end
             UpdateVisual()
@@ -1054,6 +1282,7 @@ function SuperLib:Win(config)
                 UpdateVisual()
             end)
 
+            AttachTooltip(ToggleFrame, tooltipText)
             ToggleFrame.Parent = Tab.Content
 
             if def == true and savedValue == nil then
@@ -1076,11 +1305,13 @@ function SuperLib:Win(config)
             }
         end
 
+        -- ========== INPUT ==========
         function Tab:Input(inputConfig)
             local title = inputConfig.title or "Input"
             local desc = inputConfig.desc or "Nhập dữ liệu"
             local callback = inputConfig[1] or function() end
             local configKey = inputConfig.configKey
+            local tooltipText = inputConfig.tooltip or ""
 
             local savedText = ""
             if configKey and Window._autoSave then
@@ -1089,14 +1320,14 @@ function SuperLib:Win(config)
 
             local InputFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 52),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+                BackgroundColor3 = theme.elementBg,
                 BorderSizePixel = 0
             }, {
                 New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("TextLabel", {
                     Name = "Title",
                     Text = title,
-                    TextColor3 = Color3.fromRGB(255, 255, 255),
+                    TextColor3 = theme.text,
                     Font = Enum.Font.GothamBold,
                     TextSize = 15,
                     BackgroundTransparency = 1,
@@ -1107,12 +1338,12 @@ function SuperLib:Win(config)
                     Name = "TextBox",
                     Size = UDim2.new(1, -24, 0, 20),
                     Position = UDim2.new(0, 12, 0, 28),
-                    BackgroundColor3 = Color3.fromRGB(40, 40, 45),
+                    BackgroundColor3 = theme.inputBg,
                     BorderSizePixel = 0,
                     Text = savedText,
                     PlaceholderText = desc,
-                    TextColor3 = Color3.fromRGB(255, 255, 255),
-                    PlaceholderColor3 = Color3.fromRGB(180, 180, 190),
+                    TextColor3 = theme.text,
+                    PlaceholderColor3 = theme.textSecondary,
                     Font = Enum.Font.Gotham,
                     TextSize = 14
                 }, {
@@ -1128,14 +1359,18 @@ function SuperLib:Win(config)
                 callback(TextBox.Text)
             end)
 
+            AttachTooltip(InputFrame, tooltipText)
             InputFrame.Parent = Tab.Content
         end
 
+        -- ========== DD (Dropdown) ==========
         function Tab:DD(ddConfig)
             local title = ddConfig.title or "Dropdown"
             local items = ddConfig.item or {}
             local callback = ddConfig[1] or function() end
             local configKey = ddConfig.configKey
+            local search = ddConfig.search or false
+            local tooltipText = ddConfig.tooltip or ""
 
             local savedItem = nil
             if configKey and Window._autoSave then
@@ -1145,7 +1380,7 @@ function SuperLib:Win(config)
 
             local DDFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 52),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+                BackgroundColor3 = theme.elementBg,
                 BorderSizePixel = 0,
                 AutomaticSize = Enum.AutomaticSize.Y
             }, {
@@ -1164,7 +1399,7 @@ function SuperLib:Win(config)
 
             local TitleLabel = New("TextLabel", {
                 Text = title,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 Font = Enum.Font.GothamBold,
                 TextSize = 15,
                 BackgroundTransparency = 1,
@@ -1181,10 +1416,10 @@ function SuperLib:Win(config)
 
             local SelectedBtn = New("TextButton", {
                 Size = UDim2.new(1, 0, 0, 26),
-                BackgroundColor3 = Color3.fromRGB(50, 50, 55),
+                BackgroundColor3 = theme.button,
                 AutoButtonColor = false,
                 Text = tostring(SelectedItem),
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 BorderSizePixel = 0
@@ -1195,7 +1430,7 @@ function SuperLib:Win(config)
 
             local DropdownMenu = New("ScrollingFrame", {
                 Size = UDim2.new(0, 120, 0, 0),
-                BackgroundColor3 = Color3.fromRGB(35, 35, 40),
+                BackgroundColor3 = theme.dropdownBg,
                 BorderSizePixel = 0,
                 Visible = false,
                 ScrollBarThickness = 4,
@@ -1210,42 +1445,97 @@ function SuperLib:Win(config)
                 })
             })
             DropdownMenu.Parent = ScreenGui
+            table.insert(SuperLib._activeDropdowns, DropdownMenu)
+            table.insert(Window._activeDropdowns, DropdownMenu)
 
-            for _, item in ipairs(items) do
-                local ItemBtn = New("TextButton", {
-                    Size = UDim2.new(1, 0, 0, 24),
-                    BackgroundColor3 = Color3.fromRGB(40, 40, 45),
-                    AutoButtonColor = false,
-                    Text = item,
-                    TextColor3 = Color3.fromRGB(255, 255, 255),
+            local SearchBox
+            if search then
+                SearchBox = New("TextBox", {
+                    Size = UDim2.new(1, -8, 0, 24),
+                    BackgroundColor3 = theme.inputBg,
+                    BorderSizePixel = 0,
+                    Text = "",
+                    PlaceholderText = "Search...",
+                    TextColor3 = theme.text,
+                    PlaceholderColor3 = theme.textSecondary,
                     Font = Enum.Font.Gotham,
-                    TextSize = 14,
-                    BorderSizePixel = 0
+                    TextSize = 13,
+                    ZIndex = 1000
                 }, {
-                    New("UICorner", { CornerRadius = UDim.new(0, 4) })
+                    New("UICorner", { CornerRadius = UDim.new(0, 4) }),
+                    New("UIPadding", {
+                        PaddingLeft = UDim.new(0, 6),
+                        PaddingRight = UDim.new(0, 6)
+                    })
                 })
-                ItemBtn.MouseButton1Click:Connect(function()
-                    SelectedItem = item
-                    SelectedBtn.Text = tostring(item)
-                    DropdownMenu.Visible = false
-                    if configKey then
-                        Window:_saveElement(configKey, SelectedItem)
+                SearchBox.Parent = DropdownMenu
+            end
+
+            local ItemButtons = {}
+
+            local function BuildItems(filter)
+                for _, btn in ipairs(ItemButtons) do
+                    btn:Destroy()
+                end
+                ItemButtons = {}
+                for _, item in ipairs(items) do
+                    if not filter or string.find(string.lower(tostring(item)), string.lower(filter), 1, true) then
+                        local ItemBtn = New("TextButton", {
+                            Size = UDim2.new(1, 0, 0, 24),
+                            BackgroundColor3 = theme.dropdownItem,
+                            AutoButtonColor = false,
+                            Text = item,
+                            TextColor3 = theme.text,
+                            Font = Enum.Font.Gotham,
+                            TextSize = 14,
+                            BorderSizePixel = 0,
+                            ZIndex = 1000
+                        }, {
+                            New("UICorner", { CornerRadius = UDim.new(0, 4) })
+                        })
+                        ItemBtn.MouseEnter:Connect(function()
+                            ItemBtn.BackgroundColor3 = theme.dropdownItemHover
+                        end)
+                        ItemBtn.MouseLeave:Connect(function()
+                            ItemBtn.BackgroundColor3 = theme.dropdownItem
+                        end)
+                        ItemBtn.MouseButton1Click:Connect(function()
+                            SelectedItem = item
+                            SelectedBtn.Text = tostring(item)
+                            DropdownMenu.Visible = false
+                            if configKey then
+                                Window:_saveElement(configKey, SelectedItem)
+                            end
+                            callback(item)
+                        end)
+                        ItemBtn.Parent = DropdownMenu
+                        table.insert(ItemButtons, ItemBtn)
                     end
-                    callback(item)
+                end
+            end
+            BuildItems(nil)
+
+            if SearchBox then
+                SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+                    BuildItems(SearchBox.Text)
                 end)
-                ItemBtn.Parent = DropdownMenu
             end
 
             SelectedBtn.MouseButton1Click:Connect(function()
+                -- Close other dropdowns
+                for _, dd in ipairs(SuperLib._activeDropdowns) do
+                    if dd ~= DropdownMenu and dd.Visible then
+                        dd.Visible = false
+                    end
+                end
                 if DropdownMenu.Visible then
                     DropdownMenu.Visible = false
                     return
                 end
-
                 local absPos = SelectedBtn.AbsolutePosition
                 local absSize = SelectedBtn.AbsoluteSize
                 DropdownMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y)
-                DropdownMenu.Size = UDim2.new(0, absSize.X, 0, math.min(#items * 26, 150))
+                DropdownMenu.Size = UDim2.new(0, absSize.X, 0, math.min(#items * 26 + (search and 30 or 0), 180))
                 DropdownMenu.Visible = true
             end)
 
@@ -1256,12 +1546,18 @@ function SuperLib:Win(config)
                     local menuAbs = DropdownMenu.AbsolutePosition
                     local menuSize = DropdownMenu.AbsoluteSize
                     if not (mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
-                           mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y) then
-                        DropdownMenu.Visible = false
+                            mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y) then
+                        local btnAbs = SelectedBtn.AbsolutePosition
+                        local btnSize = SelectedBtn.AbsoluteSize
+                        if not (mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
+                                mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y) then
+                            DropdownMenu.Visible = false
+                        end
                     end
                 end
             end)
 
+            AttachTooltip(DDFrame, tooltipText)
             DDFrame.Parent = Tab.Content
             return {
                 ElementFrame = DDFrame,
@@ -1278,12 +1574,14 @@ function SuperLib:Win(config)
             }
         end
 
+        -- ========== DDM (Multi Dropdown) ==========
         function Tab:DDM(ddmConfig)
             local title = ddmConfig.title or "Multi Dropdown"
             local items = ddmConfig.item or {}
             local callbacks = ddmConfig
             local SelectedItems = {}
             local configKey = ddmConfig.configKey
+            local tooltipText = ddmConfig.tooltip or ""
 
             if configKey and Window._autoSave then
                 local saved = Window:_getElement(configKey, nil)
@@ -1294,7 +1592,7 @@ function SuperLib:Win(config)
 
             local DDMFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 52),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+                BackgroundColor3 = theme.elementBg,
                 BorderSizePixel = 0,
                 AutomaticSize = Enum.AutomaticSize.Y
             }, {
@@ -1313,7 +1611,7 @@ function SuperLib:Win(config)
 
             local TitleLabel = New("TextLabel", {
                 Text = title,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 Font = Enum.Font.GothamBold,
                 TextSize = 15,
                 BackgroundTransparency = 1,
@@ -1330,10 +1628,10 @@ function SuperLib:Win(config)
 
             local SelectedBtn = New("TextButton", {
                 Size = UDim2.new(1, 0, 0, 26),
-                BackgroundColor3 = Color3.fromRGB(50, 50, 55),
+                BackgroundColor3 = theme.button,
                 AutoButtonColor = false,
                 Text = #SelectedItems > 0 and tostring(#SelectedItems) .. " selected" or "Select...",
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
                 BorderSizePixel = 0
@@ -1344,7 +1642,7 @@ function SuperLib:Win(config)
 
             local DropdownMenu = New("ScrollingFrame", {
                 Size = UDim2.new(0, 120, 0, 0),
-                BackgroundColor3 = Color3.fromRGB(35, 35, 40),
+                BackgroundColor3 = theme.dropdownBg,
                 BorderSizePixel = 0,
                 Visible = false,
                 ScrollBarThickness = 4,
@@ -1359,6 +1657,8 @@ function SuperLib:Win(config)
                 })
             })
             DropdownMenu.Parent = ScreenGui
+            table.insert(SuperLib._activeDropdowns, DropdownMenu)
+            table.insert(Window._activeDropdowns, DropdownMenu)
 
             for _, item in ipairs(items) do
                 local IsSelected = false
@@ -1367,13 +1667,14 @@ function SuperLib:Win(config)
                 end
                 local ItemBtn = New("TextButton", {
                     Size = UDim2.new(1, 0, 0, 24),
-                    BackgroundColor3 = Color3.fromRGB(40, 40, 45),
+                    BackgroundColor3 = theme.dropdownItem,
                     AutoButtonColor = false,
-                    Text = (IsSelected and "✓ " or "  ") .. item,
-                    TextColor3 = Color3.fromRGB(255, 255, 255),
+                    Text = (IsSelected and "✓ " or " ") .. item,
+                    TextColor3 = theme.text,
                     Font = Enum.Font.Gotham,
                     TextSize = 14,
-                    BorderSizePixel = 0
+                    BorderSizePixel = 0,
+                    ZIndex = 1000
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 4) })
                 })
@@ -1382,7 +1683,7 @@ function SuperLib:Win(config)
                     local idx = table.find(SelectedItems, item)
                     if idx then
                         table.remove(SelectedItems, idx)
-                        ItemBtn.Text = "  " .. item
+                        ItemBtn.Text = " " .. item
                     else
                         table.insert(SelectedItems, item)
                         ItemBtn.Text = "✓ " .. item
@@ -1400,11 +1701,15 @@ function SuperLib:Win(config)
             end
 
             SelectedBtn.MouseButton1Click:Connect(function()
+                for _, dd in ipairs(SuperLib._activeDropdowns) do
+                    if dd ~= DropdownMenu and dd.Visible then
+                        dd.Visible = false
+                    end
+                end
                 if DropdownMenu.Visible then
                     DropdownMenu.Visible = false
                     return
                 end
-
                 local absPos = SelectedBtn.AbsolutePosition
                 local absSize = SelectedBtn.AbsoluteSize
                 DropdownMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y)
@@ -1419,12 +1724,18 @@ function SuperLib:Win(config)
                     local menuAbs = DropdownMenu.AbsolutePosition
                     local menuSize = DropdownMenu.AbsoluteSize
                     if not (mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
-                           mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y) then
-                        DropdownMenu.Visible = false
+                            mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y) then
+                        local btnAbs = SelectedBtn.AbsolutePosition
+                        local btnSize = SelectedBtn.AbsoluteSize
+                        if not (mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
+                                mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y) then
+                            DropdownMenu.Visible = false
+                        end
                     end
                 end
             end)
 
+            AttachTooltip(DDMFrame, tooltipText)
             DDMFrame.Parent = Tab.Content
             return {
                 ElementFrame = DDMFrame,
@@ -1440,47 +1751,360 @@ function SuperLib:Win(config)
             }
         end
 
+        -- ========== SLIDER (Integer) ==========
+        function Tab:Slider(sliderConfig)
+            local sTitle = sliderConfig.title or "Slider"
+            local sDesc = sliderConfig.desc or ""
+            local min = sliderConfig.min or 0
+            local max = sliderConfig.max or 100
+            local default = sliderConfig.default or min
+            local callback = sliderConfig[1] or function() end
+            local configKey = sliderConfig.configKey
+            local tooltipText = sliderConfig.tooltip or ""
+            local minVal = tonumber(min) or 0
+            local maxVal = tonumber(max) or 0
+            if maxVal < minVal then maxVal = minVal end
+
+            local savedValue = nil
+            if configKey and Window._autoSave then
+                savedValue = Window:_getElement(configKey, nil)
+            end
+            local CurrentValue = savedValue ~= nil and math.clamp(savedValue, minVal, maxVal) or math.clamp(default, minVal, maxVal)
+
+            local SliderFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 52),
+                BackgroundColor3 = theme.elementBg,
+                BorderSizePixel = 0
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                New("TextLabel", {
+                    Name = "Title",
+                    Text = sTitle,
+                    TextColor3 = theme.text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 15,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 12, 0, 4),
+                    Size = UDim2.new(1, -24, 0, 16)
+                }),
+                New("TextLabel", {
+                    Name = "Desc",
+                    Text = sDesc,
+                    TextColor3 = theme.textSecondary,
+                    Font = Enum.Font.Gotham,
+                    TextSize = 12,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 12, 0, 20),
+                    Size = UDim2.new(1, -24, 0, 14)
+                }),
+                New("TextLabel", {
+                    Name = "ValueLabel",
+                    Text = tostring(CurrentValue),
+                    TextColor3 = Color3.fromRGB(220, 220, 230),
+                    Font = Enum.Font.GothamSemibold,
+                    TextSize = 14,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(1, -40, 0, 36),
+                    Size = UDim2.new(0, 40, 0, 14),
+                    TextXAlignment = Enum.TextXAlignment.Right
+                }),
+                New("Frame", {
+                    Name = "Track",
+                    Size = UDim2.new(1, -24, 0, 4),
+                    Position = UDim2.new(0, 12, 0, 36),
+                    BackgroundColor3 = theme.track,
+                    BorderSizePixel = 0
+                }, {
+                    New("UICorner", { CornerRadius = UDim.new(1, 0) }),
+                    New("Frame", {
+                        Name = "Fill",
+                        Size = UDim2.new((CurrentValue - minVal) / (math.max(1, (maxVal - minVal))), 0, 1, 0),
+                        BackgroundColor3 = theme.sliderFill,
+                        BorderSizePixel = 0,
+                        Active = false
+                    }, {
+                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
+                    }),
+                    New("Frame", {
+                        Name = "Thumb",
+                        Size = UDim2.new(0, 16, 0, 16),
+                        Position = UDim2.new((CurrentValue - minVal) / (math.max(1, (maxVal - minVal))), -8, 0.5, -8),
+                        BackgroundColor3 = theme.thumb,
+                        BorderSizePixel = 0,
+                        Active = false
+                    }, {
+                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
+                    })
+                })
+            })
+
+            local Track = SliderFrame.Track
+            local Fill = Track.Fill
+            local Thumb = Track.Thumb
+            local ValueLabel = SliderFrame.ValueLabel
+            local sDragging = false
+
+            local function UpdateSlider(mouseX)
+                local trackX = Track.AbsolutePosition.X
+                local trackWidth = Track.AbsoluteSize.X
+                local relX = math.clamp(mouseX - trackX, 0, trackWidth)
+                local denom = math.max(1, (maxVal - minVal))
+                CurrentValue = math.floor(minVal + denom * (relX / trackWidth) + 0.5)
+                ValueLabel.Text = tostring(CurrentValue)
+                local fillRatio = (CurrentValue - minVal) / denom
+                Fill.Size = UDim2.new(fillRatio, 0, 1, 0)
+                Thumb.Position = UDim2.new(fillRatio, -8, 0.5, -8)
+            end
+
+            Track.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    sDragging = true
+                    UpdateSlider(input.Position.X)
+                end
+            end)
+
+            UserInputService.InputChanged:Connect(function(input)
+                if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) and sDragging then
+                    UpdateSlider(input.Position.X)
+                end
+            end)
+
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    if sDragging then
+                        sDragging = false
+                        if configKey then
+                            Window:_saveElement(configKey, CurrentValue)
+                        end
+                        callback(CurrentValue)
+                    end
+                end
+            end)
+
+            AttachTooltip(SliderFrame, tooltipText)
+            SliderFrame.Parent = Tab.Content
+            return {
+                ElementFrame = SliderFrame,
+                GetValue = function() return CurrentValue end,
+                SetValue = function(_, val)
+                    CurrentValue = math.clamp(val, minVal, maxVal)
+                    ValueLabel.Text = tostring(CurrentValue)
+                    local fillRatio = (CurrentValue - minVal) / math.max(1, (maxVal - minVal))
+                    Fill.Size = UDim2.new(fillRatio, 0, 1, 0)
+                    Thumb.Position = UDim2.new(fillRatio, -8, 0.5, -8)
+                    if configKey then
+                        Window:_saveElement(configKey, CurrentValue)
+                    end
+                    callback(CurrentValue)
+                end
+            }
+        end
+
+        -- ========== SLIDER FLOAT ==========
+        function Tab:SliderFloat(sliderConfig)
+            local sTitle = sliderConfig.title or "Slider Float"
+            local sDesc = sliderConfig.desc or ""
+            local min = sliderConfig.min or 0
+            local max = sliderConfig.max or 1
+            local default = sliderConfig.default or min
+            local step = sliderConfig.step or 0.01
+            local decimal = sliderConfig.decimal or 2
+            local callback = sliderConfig[1] or function() end
+            local configKey = sliderConfig.configKey
+            local tooltipText = sliderConfig.tooltip or ""
+            local minVal = tonumber(min) or 0
+            local maxVal = tonumber(max) or 0
+            if maxVal < minVal then maxVal = minVal end
+            local stepVal = tonumber(step) or 0.01
+
+            local savedValue = nil
+            if configKey and Window._autoSave then
+                savedValue = Window:_getElement(configKey, nil)
+            end
+            local CurrentValue = savedValue ~= nil and math.clamp(savedValue, minVal, maxVal) or math.clamp(default, minVal, maxVal)
+            CurrentValue = math.floor(CurrentValue / stepVal + 0.5) * stepVal
+
+            local SliderFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 52),
+                BackgroundColor3 = theme.elementBg,
+                BorderSizePixel = 0
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                New("TextLabel", {
+                    Name = "Title",
+                    Text = sTitle,
+                    TextColor3 = theme.text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 15,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 12, 0, 4),
+                    Size = UDim2.new(1, -24, 0, 16)
+                }),
+                New("TextLabel", {
+                    Name = "Desc",
+                    Text = sDesc,
+                    TextColor3 = theme.textSecondary,
+                    Font = Enum.Font.Gotham,
+                    TextSize = 12,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 12, 0, 20),
+                    Size = UDim2.new(1, -24, 0, 14)
+                }),
+                New("TextLabel", {
+                    Name = "ValueLabel",
+                    Text = string.format("%." .. decimal .. "f", CurrentValue),
+                    TextColor3 = Color3.fromRGB(220, 220, 230),
+                    Font = Enum.Font.GothamSemibold,
+                    TextSize = 14,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(1, -50, 0, 36),
+                    Size = UDim2.new(0, 50, 0, 14),
+                    TextXAlignment = Enum.TextXAlignment.Right
+                }),
+                New("Frame", {
+                    Name = "Track",
+                    Size = UDim2.new(1, -24, 0, 4),
+                    Position = UDim2.new(0, 12, 0, 36),
+                    BackgroundColor3 = theme.track,
+                    BorderSizePixel = 0
+                }, {
+                    New("UICorner", { CornerRadius = UDim.new(1, 0) }),
+                    New("Frame", {
+                        Name = "Fill",
+                        Size = UDim2.new((CurrentValue - minVal) / (math.max(0.001, (maxVal - minVal))), 0, 1, 0),
+                        BackgroundColor3 = theme.sliderFill,
+                        BorderSizePixel = 0,
+                        Active = false
+                    }, {
+                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
+                    }),
+                    New("Frame", {
+                        Name = "Thumb",
+                        Size = UDim2.new(0, 16, 0, 16),
+                        Position = UDim2.new((CurrentValue - minVal) / (math.max(0.001, (maxVal - minVal))), -8, 0.5, -8),
+                        BackgroundColor3 = theme.thumb,
+                        BorderSizePixel = 0,
+                        Active = false
+                    }, {
+                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
+                    })
+                })
+            })
+
+            local Track = SliderFrame.Track
+            local Fill = Track.Fill
+            local Thumb = Track.Thumb
+            local ValueLabel = SliderFrame.ValueLabel
+            local sDragging = false
+
+            local function UpdateSlider(mouseX)
+                local trackX = Track.AbsolutePosition.X
+                local trackWidth = Track.AbsoluteSize.X
+                local relX = math.clamp(mouseX - trackX, 0, trackWidth)
+                local denom = math.max(0.001, (maxVal - minVal))
+                local raw = minVal + denom * (relX / trackWidth)
+                CurrentValue = math.floor(raw / stepVal + 0.5) * stepVal
+                CurrentValue = math.clamp(CurrentValue, minVal, maxVal)
+                ValueLabel.Text = string.format("%." .. decimal .. "f", CurrentValue)
+                local fillRatio = (CurrentValue - minVal) / denom
+                Fill.Size = UDim2.new(fillRatio, 0, 1, 0)
+                Thumb.Position = UDim2.new(fillRatio, -8, 0.5, -8)
+            end
+
+            Track.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    sDragging = true
+                    UpdateSlider(input.Position.X)
+                end
+            end)
+
+            UserInputService.InputChanged:Connect(function(input)
+                if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) and sDragging then
+                    UpdateSlider(input.Position.X)
+                end
+            end)
+
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                    if sDragging then
+                        sDragging = false
+                        if configKey then
+                            Window:_saveElement(configKey, CurrentValue)
+                        end
+                        callback(CurrentValue)
+                    end
+                end
+            end)
+
+            AttachTooltip(SliderFrame, tooltipText)
+            SliderFrame.Parent = Tab.Content
+            return {
+                ElementFrame = SliderFrame,
+                GetValue = function() return CurrentValue end,
+                SetValue = function(_, val)
+                    CurrentValue = math.clamp(val, minVal, maxVal)
+                    CurrentValue = math.floor(CurrentValue / stepVal + 0.5) * stepVal
+                    ValueLabel.Text = string.format("%." .. decimal .. "f", CurrentValue)
+                    local fillRatio = (CurrentValue - minVal) / math.max(0.001, (maxVal - minVal))
+                    Fill.Size = UDim2.new(fillRatio, 0, 1, 0)
+                    Thumb.Position = UDim2.new(fillRatio, -8, 0.5, -8)
+                    if configKey then
+                        Window:_saveElement(configKey, CurrentValue)
+                    end
+                    callback(CurrentValue)
+                end
+            }
+        end
+
+        -- ========== SLABLE ==========
         function Tab:SLable(config)
             local content = config.content or "Simple Label"
+            local tooltipText = config.tooltip or ""
             local SLabel = New("TextLabel", {
                 Size = UDim2.new(1, 0, 0, 0),
                 BackgroundTransparency = 1,
                 Text = content,
                 TextSize = 14,
                 Font = Enum.Font.Gotham,
-                TextColor3 = Color3.fromRGB(180, 180, 190),
+                TextColor3 = theme.textSecondary,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextYAlignment = Enum.TextYAlignment.Center,
                 AutomaticSize = Enum.AutomaticSize.Y,
                 TextWrapped = true
             })
+            AttachTooltip(SLabel, tooltipText)
             SLabel.Parent = Tab.Content
         end
 
+        -- ========== SLBIG ==========
         function Tab:SLBig(config)
             local content = config.content or "Simple Label Big"
+            local tooltipText = config.tooltip or ""
             local SLabelBig = New("TextLabel", {
                 Size = UDim2.new(1, 0, 0, 0),
                 BackgroundTransparency = 1,
                 Text = content,
                 TextSize = 18,
                 Font = Enum.Font.GothamBold,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextYAlignment = Enum.TextYAlignment.Center,
                 AutomaticSize = Enum.AutomaticSize.Y,
                 TextWrapped = true
             })
+            AttachTooltip(SLabelBig, tooltipText)
             SLabelBig.Parent = Tab.Content
         end
 
+        -- ========== LABEL ==========
         function Tab:Label(config)
             local labelTitle = config.title or "Label"
             local labelDesc = config.desc or ""
+            local tooltipText = config.tooltip or ""
 
             local LabelFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 0),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+                BackgroundColor3 = theme.elementBg,
                 BorderSizePixel = 0,
                 AutomaticSize = Enum.AutomaticSize.Y
             }, {
@@ -1499,7 +2123,7 @@ function SuperLib:Win(config)
 
             local Title = New("TextLabel", {
                 Text = labelTitle,
-                TextColor3 = Color3.fromRGB(255, 255, 255),
+                TextColor3 = theme.text,
                 Font = Enum.Font.GothamBold,
                 TextSize = 18,
                 BackgroundTransparency = 1,
@@ -1513,7 +2137,7 @@ function SuperLib:Win(config)
 
             local Desc = New("TextLabel", {
                 Text = labelDesc,
-                TextColor3 = Color3.fromRGB(180, 180, 190),
+                TextColor3 = theme.textSecondary,
                 Font = Enum.Font.Gotham,
                 TextSize = 12,
                 BackgroundTransparency = 1,
@@ -1526,6 +2150,7 @@ function SuperLib:Win(config)
             })
             Desc.Parent = LabelFrame
 
+            AttachTooltip(LabelFrame, tooltipText)
             LabelFrame.Parent = Tab.Content
 
             local LabelObj = {
@@ -1557,148 +2182,751 @@ function SuperLib:Win(config)
             return LabelObj
         end
 
-        function Tab:Slider(sliderConfig)
-            local title = sliderConfig.title or "Slider"
-            local desc = sliderConfig.desc or ""
-            local min = sliderConfig.min or 0
-            local max = sliderConfig.max or 100
-            local default = sliderConfig.default or min
-            local callback = sliderConfig[1] or function() end
-            local configKey = sliderConfig.configKey
-            local minVal = tonumber(min) or 0
-            local maxVal = tonumber(max) or 0
-            if maxVal < minVal then maxVal = minVal end
+        -- ========== IMAGE ==========
+        function Tab:Image(config)
+            local imgTitle = config.title or ""
+            local imgDesc = config.desc or ""
+            local imgId = config.id or ""
+            local imgSize = config.size or {0, 120, 0, 120}
+            local tooltipText = config.tooltip or ""
 
-            local savedValue = nil
-            if configKey and Window._autoSave then
-                savedValue = Window:_getElement(configKey, nil)
+            local ImageFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 0),
+                BackgroundColor3 = theme.elementBg,
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.Y
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                New("UIPadding", {
+                    PaddingTop = UDim.new(0, 10),
+                    PaddingLeft = UDim.new(0, 10),
+                    PaddingRight = UDim.new(0, 10),
+                    PaddingBottom = UDim.new(0, 10)
+                }),
+                New("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    Padding = UDim.new(0, 6),
+                    HorizontalAlignment = Enum.HorizontalAlignment.Center
+                })
+            })
+
+            local ImageLabel = New("ImageLabel", {
+                Size = UDim2.new(0, imgSize[3], 0, imgSize[4]),
+                BackgroundTransparency = 1,
+                Image = imgId,
+                ScaleType = Enum.ScaleType.Fit,
+                LayoutOrder = 1
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 8) })
+            })
+            ImageLabel.Parent = ImageFrame
+
+            if imgTitle ~= "" then
+                local Title = New("TextLabel", {
+                    Text = imgTitle,
+                    TextColor3 = theme.text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 16,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 20),
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                    LayoutOrder = 2
+                })
+                Title.Parent = ImageFrame
             end
-            local CurrentValue = savedValue ~= nil and math.clamp(savedValue, minVal, maxVal) or math.clamp(default, minVal, maxVal)
 
-            local SliderFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 52),
-                BackgroundColor3 = Color3.fromRGB(28, 28, 32),
+            if imgDesc ~= "" then
+                local Desc = New("TextLabel", {
+                    Text = imgDesc,
+                    TextColor3 = theme.textSecondary,
+                    Font = Enum.Font.Gotham,
+                    TextSize = 12,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 0),
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                    TextWrapped = true,
+                    LayoutOrder = 3
+                })
+                Desc.Parent = ImageFrame
+            end
+
+            AttachTooltip(ImageFrame, tooltipText)
+            ImageFrame.Parent = Tab.Content
+            return {
+                ElementFrame = ImageFrame,
+                SetImage = function(_, newId)
+                    ImageLabel.Image = newId
+                end
+            }
+        end
+
+        -- ========== COLOR PICKER ==========
+        function Tab:ColorPicker(config)
+            local cpTitle = config.title or "Color Picker"
+            local cpDefault = config.default or Color3.fromRGB(255, 0, 0)
+            local callback = config[1] or function() end
+            local configKey = config.configKey
+            local tooltipText = config.tooltip or ""
+
+            local savedColor = nil
+            if configKey and Window._autoSave then
+                savedColor = Window:_getElement(configKey, nil)
+                if savedColor and type(savedColor) == "table" and savedColor.R then
+                    cpDefault = Color3.new(savedColor.R, savedColor.G, savedColor.B)
+                end
+            end
+            local CurrentColor = cpDefault
+
+            local CPFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 48),
+                BackgroundColor3 = theme.elementBg,
                 BorderSizePixel = 0
             }, {
                 New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                 New("TextLabel", {
-                    Name = "Title",
-                    Text = title,
-                    TextColor3 = Color3.fromRGB(255, 255, 255),
+                    Text = cpTitle,
+                    TextColor3 = theme.text,
                     Font = Enum.Font.GothamBold,
                     TextSize = 15,
                     BackgroundTransparency = 1,
-                    Position = UDim2.new(0, 12, 0, 4),
-                    Size = UDim2.new(1, -24, 0, 16)
+                    Position = UDim2.new(0, 12, 0, 0),
+                    Size = UDim2.new(1, -60, 1, 0),
+                    TextXAlignment = Enum.TextXAlignment.Left
                 }),
-                New("TextLabel", {
-                    Name = "Desc",
-                    Text = desc,
-                    TextColor3 = Color3.fromRGB(180, 180, 190),
-                    Font = Enum.Font.Gotham,
-                    TextSize = 12,
-                    BackgroundTransparency = 1,
-                    Position = UDim2.new(0, 12, 0, 20),
-                    Size = UDim2.new(1, -24, 0, 14)
-                }),
-                New("TextLabel", {
-                    Name = "ValueLabel",
-                    Text = tostring(CurrentValue),
-                    TextColor3 = Color3.fromRGB(220, 220, 230),
-                    Font = Enum.Font.GothamSemibold,
-                    TextSize = 14,
-                    BackgroundTransparency = 1,
-                    Position = UDim2.new(1, -40, 0, 36),
-                    Size = UDim2.new(0, 40, 0, 14),
-                    TextXAlignment = Enum.TextXAlignment.Right
-                }),
-                New("Frame", {
-                    Name = "Track",
-                    Size = UDim2.new(1, -24, 0, 4),
-                    Position = UDim2.new(0, 12, 0, 36),
-                    BackgroundColor3 = Color3.fromRGB(60, 60, 70),
+                New("TextButton", {
+                    Name = "ColorBtn",
+                    Size = UDim2.new(0, 32, 0, 32),
+                    Position = UDim2.new(1, -44, 0, 8),
+                    BackgroundColor3 = CurrentColor,
+                    AutoButtonColor = false,
+                    Text = "",
                     BorderSizePixel = 0
                 }, {
-                    New("UICorner", { CornerRadius = UDim.new(1, 0) }),
-                    New("Frame", {
-                        Name = "Fill",
-                        Size = UDim2.new((CurrentValue - minVal) / (math.max(1, (maxVal - minVal))), 0, 1, 0),
-                        BackgroundColor3 = Color3.fromRGB(50, 200, 100),
-                        BorderSizePixel = 0,
-                        Active = false
-                    }, {
-                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
-                    }),
-                    New("Frame", {
-                        Name = "Thumb",
-                        Size = UDim2.new(0, 16, 0, 16),
-                        Position = UDim2.new((CurrentValue - minVal) / (math.max(1, (maxVal - minVal))), -8, 0.5, -8),
-                        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                        BorderSizePixel = 0,
-                        Active = false
-                    }, {
-                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
-                    })
+                    New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                    New("UIStroke", { Color = theme.stroke, Thickness = 1 })
                 })
             })
 
-            local Track = SliderFrame.Track
-            local Fill = Track.Fill
-            local Thumb = Track.Thumb
-            local ValueLabel = SliderFrame.ValueLabel
-            local dragging = false
+            local ColorBtn = CPFrame.ColorBtn
+            local PopupOpen = false
+            local PopupFrame
 
-            local function UpdateSlider(mouseX)
-                local trackX = Track.AbsolutePosition.X
-                local trackWidth = Track.AbsoluteSize.X
-                local relX = math.clamp(mouseX - trackX, 0, trackWidth)
-                local denom = math.max(1, (maxVal - minVal))
-                CurrentValue = math.floor(minVal + denom * (relX / trackWidth) + 0.5)
-                ValueLabel.Text = tostring(CurrentValue)
-                local fillRatio = (CurrentValue - minVal) / denom
-                Fill.Size = UDim2.new(fillRatio, 0, 1, 0)
-                Thumb.Position = UDim2.new(fillRatio, -8, 0.5, -8)
+            local presets = {
+                Color3.fromRGB(255, 0, 0), Color3.fromRGB(0, 255, 0), Color3.fromRGB(0, 0, 255),
+                Color3.fromRGB(255, 255, 0), Color3.fromRGB(255, 0, 255), Color3.fromRGB(0, 255, 255),
+                Color3.fromRGB(255, 255, 255), Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 165, 0),
+                Color3.fromRGB(128, 0, 128), Color3.fromRGB(255, 192, 203), Color3.fromRGB(50, 200, 100)
+            }
+
+            ColorBtn.MouseButton1Click:Connect(function()
+                if PopupOpen and PopupFrame then
+                    PopupFrame:Destroy()
+                    PopupOpen = false
+                    return
+                end
+
+                PopupFrame = New("Frame", {
+                    Size = UDim2.new(0, 200, 0, 0),
+                    BackgroundColor3 = theme.dropdownBg,
+                    BorderSizePixel = 0,
+                    ZIndex = 999,
+                    AutomaticSize = Enum.AutomaticSize.Y
+                }, {
+                    New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                    New("UIStroke", { Color = theme.stroke, Thickness = 1 }),
+                    New("UIPadding", {
+                        PaddingTop = UDim.new(0, 8),
+                        PaddingLeft = UDim.new(0, 8),
+                        PaddingRight = UDim.new(0, 8),
+                        PaddingBottom = UDim.new(0, 8)
+                    }),
+                    New("UIListLayout", {
+                        SortOrder = Enum.SortOrder.LayoutOrder,
+                        Padding = UDim.new(0, 6)
+                    })
+                })
+
+                -- Preset grid
+                local Grid = New("Frame", {
+                    Size = UDim2.new(1, 0, 0, 0),
+                    BackgroundTransparency = 1,
+                    AutomaticSize = Enum.AutomaticSize.Y
+                }, {
+                    New("UIGridLayout", {
+                        CellSize = UDim2.new(0, 28, 0, 28),
+                        CellPadding = UDim2.new(0, 6, 0, 6),
+                        FillDirection = Enum.FillDirection.Horizontal,
+                        SortOrder = Enum.SortOrder.LayoutOrder
+                    })
+                })
+                Grid.Parent = PopupFrame
+
+                for _, color in ipairs(presets) do
+                    local PresetBtn = New("TextButton", {
+                        Size = UDim2.new(0, 28, 0, 28),
+                        BackgroundColor3 = color,
+                        AutoButtonColor = false,
+                        Text = "",
+                        BorderSizePixel = 0,
+                        ZIndex = 1000
+                    }, {
+                        New("UICorner", { CornerRadius = UDim.new(0, 4) }),
+                        New("UIStroke", { Color = theme.stroke, Thickness = 1 })
+                    })
+                    PresetBtn.MouseButton1Click:Connect(function()
+                        CurrentColor = color
+                        ColorBtn.BackgroundColor3 = CurrentColor
+                        if configKey then
+                            Window:_saveElement(configKey, {R = CurrentColor.R, G = CurrentColor.G, B = CurrentColor.B})
+                        end
+                        callback(CurrentColor)
+                        PopupFrame:Destroy()
+                        PopupOpen = false
+                    end)
+                    PresetBtn.Parent = Grid
+                end
+
+                -- RGB inputs
+                local RGBFrame = New("Frame", {
+                    Size = UDim2.new(1, 0, 0, 28),
+                    BackgroundTransparency = 1,
+                    LayoutOrder = 100
+                }, {
+                    New("UIListLayout", {
+                        FillDirection = Enum.FillDirection.Horizontal,
+                        Padding = UDim.new(0, 4),
+                        SortOrder = Enum.SortOrder.LayoutOrder
+                    })
+                })
+                RGBFrame.Parent = PopupFrame
+
+                local rVal = math.floor(CurrentColor.R * 255)
+                local gVal = math.floor(CurrentColor.G * 255)
+                local bVal = math.floor(CurrentColor.B * 255)
+
+                local function makeRGBInput(label, val, layoutOrder, onChange)
+                    local f = New("Frame", {
+                        Size = UDim2.new(0.33, -3, 1, 0),
+                        BackgroundTransparency = 1,
+                        LayoutOrder = layoutOrder
+                    })
+                    local lbl = New("TextLabel", {
+                        Size = UDim2.new(1, 0, 0, 14),
+                        Text = label,
+                        TextColor3 = theme.textSecondary,
+                        Font = Enum.Font.Gotham,
+                        TextSize = 10,
+                        BackgroundTransparency = 1,
+                        TextXAlignment = Enum.TextXAlignment.Center
+                    })
+                    local box = New("TextBox", {
+                        Size = UDim2.new(1, 0, 0, 20),
+                        Position = UDim2.new(0, 0, 0, 14),
+                        BackgroundColor3 = theme.inputBg,
+                        BorderSizePixel = 0,
+                        Text = tostring(val),
+                        TextColor3 = theme.text,
+                        Font = Enum.Font.Gotham,
+                        TextSize = 12,
+                        TextXAlignment = Enum.TextXAlignment.Center
+                    }, {
+                        New("UICorner", { CornerRadius = UDim.new(0, 4) })
+                    })
+                    lbl.Parent = f
+                    box.Parent = f
+                    box.FocusLost:Connect(function()
+                        local n = tonumber(box.Text) or 0
+                        n = math.clamp(math.floor(n), 0, 255)
+                        box.Text = tostring(n)
+                        onChange(n)
+                    end)
+                    return f
+                end
+
+                local rBox, gBox, bBox
+                local rInput = makeRGBInput("R", rVal, 1, function(v)
+                    rVal = v
+                    CurrentColor = Color3.fromRGB(rVal, gVal, bVal)
+                    ColorBtn.BackgroundColor3 = CurrentColor
+                    if configKey then
+                        Window:_saveElement(configKey, {R = CurrentColor.R, G = CurrentColor.G, B = CurrentColor.B})
+                    end
+                    callback(CurrentColor)
+                end)
+                local gInput = makeRGBInput("G", gVal, 2, function(v)
+                    gVal = v
+                    CurrentColor = Color3.fromRGB(rVal, gVal, bVal)
+                    ColorBtn.BackgroundColor3 = CurrentColor
+                    if configKey then
+                        Window:_saveElement(configKey, {R = CurrentColor.R, G = CurrentColor.G, B = CurrentColor.B})
+                    end
+                    callback(CurrentColor)
+                end)
+                local bInput = makeRGBInput("B", bVal, 3, function(v)
+                    bVal = v
+                    CurrentColor = Color3.fromRGB(rVal, gVal, bVal)
+                    ColorBtn.BackgroundColor3 = CurrentColor
+                    if configKey then
+                        Window:_saveElement(configKey, {R = CurrentColor.R, G = CurrentColor.G, B = CurrentColor.B})
+                    end
+                    callback(CurrentColor)
+                end)
+
+                rInput.Parent = RGBFrame
+                gInput.Parent = RGBFrame
+                bInput.Parent = RGBFrame
+
+                local absPos = ColorBtn.AbsolutePosition
+                local absSize = ColorBtn.AbsoluteSize
+                PopupFrame.Position = UDim2.new(0, absPos.X - 160, 0, absPos.Y + absSize.Y + 4)
+                PopupFrame.Parent = ScreenGui
+                PopupOpen = true
+
+                task.delay(0.1, function()
+                    UserInputService.InputBegan:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 and PopupOpen and PopupFrame then
+                            local mousePos = UserInputService:GetMouseLocation()
+                            local pAbs = PopupFrame.AbsolutePosition
+                            local pSize = PopupFrame.AbsoluteSize
+                            if not (mousePos.X >= pAbs.X and mousePos.X <= pAbs.X + pSize.X and
+                                    mousePos.Y >= pAbs.Y and mousePos.Y <= pAbs.Y + pSize.Y) then
+                                if not (mousePos.X >= absPos.X and mousePos.X <= absPos.X + absSize.X and
+                                        mousePos.Y >= absPos.Y and mousePos.Y <= absPos.Y + absSize.Y) then
+                                    PopupFrame:Destroy()
+                                    PopupOpen = false
+                                end
+                            end
+                        end
+                    end)
+                end)
+            end)
+
+            AttachTooltip(CPFrame, tooltipText)
+            CPFrame.Parent = Tab.Content
+            return {
+                ElementFrame = CPFrame,
+                GetValue = function() return CurrentColor end,
+                SetValue = function(_, color)
+                    CurrentColor = color
+                    ColorBtn.BackgroundColor3 = CurrentColor
+                    if configKey then
+                        Window:_saveElement(configKey, {R = CurrentColor.R, G = CurrentColor.G, B = CurrentColor.B})
+                    end
+                    callback(CurrentColor)
+                end
+            }
+        end
+
+        -- ========== BIND (Keybind) ==========
+        function Tab:Bind(config)
+            local bTitle = config.title or "Keybind"
+            local bDefault = config.default or Enum.KeyCode.F
+            local callback = config[1] or function() end
+            local configKey = config.configKey
+            local tooltipText = config.tooltip or ""
+
+            local savedBind = nil
+            if configKey and Window._autoSave then
+                savedBind = Window:_getElement(configKey, nil)
+                if savedBind then
+                    bDefault = Enum.KeyCode[savedBind] or bDefault
+                end
+            end
+            local CurrentKey = bDefault
+
+            local BindFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 40),
+                BackgroundColor3 = theme.elementBg,
+                BorderSizePixel = 0
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                New("TextLabel", {
+                    Text = bTitle,
+                    TextColor3 = theme.text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 15,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 12, 0, 0),
+                    Size = UDim2.new(1, -80, 1, 0),
+                    TextXAlignment = Enum.TextXAlignment.Left
+                }),
+                New("TextButton", {
+                    Name = "BindBtn",
+                    Size = UDim2.new(0, 60, 0, 26),
+                    Position = UDim2.new(1, -72, 0, 7),
+                    BackgroundColor3 = theme.button,
+                    AutoButtonColor = false,
+                    Text = CurrentKey.Name,
+                    TextColor3 = theme.text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 13,
+                    BorderSizePixel = 0
+                }, {
+                    New("UICorner", { CornerRadius = UDim.new(0, 6) })
+                })
+            })
+
+            local BindBtn = BindFrame.BindBtn
+            local Listening = false
+
+            BindBtn.MouseButton1Click:Connect(function()
+                if Listening then return end
+                Listening = true
+                BindBtn.Text = "..."
+                local conn
+                conn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+                    if gameProcessed then return end
+                    if input.UserInputType == Enum.UserInputType.Keyboard then
+                        CurrentKey = input.KeyCode
+                        BindBtn.Text = CurrentKey.Name
+                        Listening = false
+                        if conn then conn:Disconnect() end
+                        if configKey then
+                            Window:_saveElement(configKey, CurrentKey.Name)
+                        end
+                        callback(CurrentKey)
+                    end
+                end)
+            end)
+
+            -- Global listener for bind activation
+            local bindConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+                if gameProcessed then return end
+                if input.KeyCode == CurrentKey and not Listening then
+                    callback(CurrentKey)
+                end
+            end)
+
+            BindBtn.MouseEnter:Connect(function()
+                BindBtn.BackgroundColor3 = theme.buttonHover
+            end)
+            BindBtn.MouseLeave:Connect(function()
+                BindBtn.BackgroundColor3 = theme.button
+            end)
+
+            AttachTooltip(BindFrame, tooltipText)
+            BindFrame.Parent = Tab.Content
+            return {
+                ElementFrame = BindFrame,
+                GetValue = function() return CurrentKey end,
+                SetValue = function(_, key)
+                    CurrentKey = key
+                    BindBtn.Text = CurrentKey.Name
+                    if configKey then
+                        Window:_saveElement(configKey, CurrentKey.Name)
+                    end
+                    callback(CurrentKey)
+                end,
+                _connection = bindConn
+            }
+        end
+
+        -- ========== COPY ==========
+        function Tab:Copy(config)
+            local cTitle = config.title or "Copy"
+            local cDesc = config.desc or ""
+            local cText = config.text or ""
+            local tooltipText = config.tooltip or ""
+
+            local CopyFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 52),
+                BackgroundColor3 = theme.elementBg,
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.Y
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                New("UIPadding", {
+                    PaddingTop = UDim.new(0, 8),
+                    PaddingLeft = UDim.new(0, 10),
+                    PaddingRight = UDim.new(0, 10),
+                    PaddingBottom = UDim.new(0, 8)
+                }),
+                New("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    Padding = UDim.new(0, 4)
+                })
+            })
+
+            if cTitle ~= "" then
+                local Title = New("TextLabel", {
+                    Text = cTitle,
+                    TextColor3 = theme.text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 15,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 18),
+                    TextXAlignment = Enum.TextXAlignment.Left
+                })
+                Title.Parent = CopyFrame
             end
 
-            Track.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    dragging = true
-                    UpdateSlider(input.Position.X)
+            if cDesc ~= "" then
+                local Desc = New("TextLabel", {
+                    Text = cDesc,
+                    TextColor3 = theme.textSecondary,
+                    Font = Enum.Font.Gotham,
+                    TextSize = 12,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 14),
+                    TextXAlignment = Enum.TextXAlignment.Left
+                })
+                Desc.Parent = CopyFrame
+            end
+
+            local Row = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 26),
+                BackgroundTransparency = 1
+            })
+            Row.Parent = CopyFrame
+
+            local TextBox = New("TextBox", {
+                Size = UDim2.new(1, -70, 1, 0),
+                BackgroundColor3 = theme.inputBg,
+                BorderSizePixel = 0,
+                Text = cText,
+                TextColor3 = theme.text,
+                Font = Enum.Font.Gotham,
+                TextSize = 13,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                ClearTextOnFocus = false
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 4) }),
+                New("UIPadding", {
+                    PaddingLeft = UDim.new(0, 8),
+                    PaddingRight = UDim.new(0, 8)
+                })
+            })
+            TextBox.Parent = Row
+
+            local CopyBtn = New("TextButton", {
+                Size = UDim2.new(0, 60, 1, 0),
+                Position = UDim2.new(1, -60, 0, 0),
+                BackgroundColor3 = theme.button,
+                AutoButtonColor = false,
+                Text = "Copy",
+                TextColor3 = theme.text,
+                Font = Enum.Font.GothamBold,
+                TextSize = 13,
+                BorderSizePixel = 0
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 4) })
+            })
+            CopyBtn.Parent = Row
+
+            CopyBtn.MouseEnter:Connect(function()
+                CopyBtn.BackgroundColor3 = theme.buttonHover
+            end)
+            CopyBtn.MouseLeave:Connect(function()
+                CopyBtn.BackgroundColor3 = theme.button
+            end)
+            CopyBtn.MouseButton1Click:Connect(function()
+                if setclipboard then
+                    setclipboard(TextBox.Text)
                 end
+                local oldText = CopyBtn.Text
+                CopyBtn.Text = "Copied!"
+                task.delay(1, function()
+                    CopyBtn.Text = oldText
+                end)
             end)
 
-            UserInputService.InputChanged:Connect(function(input)
-                if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) and dragging then
-                    UpdateSlider(input.Position.X)
-                end
-            end)
-
-            UserInputService.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    if dragging then
-                        dragging = false
-                        if configKey then
-                            Window:_saveElement(configKey, CurrentValue)
-                        end
-                        callback(CurrentValue)
-                    end
-                end
-            end)
-
-            SliderFrame.Parent = Tab.Content
+            AttachTooltip(CopyFrame, tooltipText)
+            CopyFrame.Parent = Tab.Content
             return {
-                ElementFrame = SliderFrame,
-                GetValue = function() return CurrentValue end,
-                SetValue = function(_, val)
-                    CurrentValue = math.clamp(val, minVal, maxVal)
-                    ValueLabel.Text = tostring(CurrentValue)
-                    local fillRatio = (CurrentValue - minVal) / math.max(1, (maxVal - minVal))
-                    Fill.Size = UDim2.new(fillRatio, 0, 1, 0)
-                    Thumb.Position = UDim2.new(fillRatio, -8, 0.5, -8)
+                ElementFrame = CopyFrame,
+                GetText = function() return TextBox.Text end,
+                SetText = function(_, txt)
+                    TextBox.Text = txt
+                end
+            }
+        end
+
+        -- ========== PARAGRAPH ==========
+        function Tab:Paragraph(config)
+            local pTitle = config.title or ""
+            local pContent = config.content or ""
+            local tooltipText = config.tooltip or ""
+
+            local ParaFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 0),
+                BackgroundColor3 = theme.elementBg,
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.Y
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                New("UIPadding", {
+                    PaddingTop = UDim.new(0, 10),
+                    PaddingLeft = UDim.new(0, 12),
+                    PaddingRight = UDim.new(0, 12),
+                    PaddingBottom = UDim.new(0, 10)
+                }),
+                New("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    Padding = UDim.new(0, 4)
+                })
+            })
+
+            if pTitle ~= "" then
+                local Title = New("TextLabel", {
+                    Text = pTitle,
+                    TextColor3 = theme.text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 16,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 0),
+                    AutomaticSize = Enum.AutomaticSize.Y,
+                    TextXAlignment = Enum.TextXAlignment.Left,
+                    TextWrapped = true
+                })
+                Title.Parent = ParaFrame
+            end
+
+            local Content = New("TextLabel", {
+                Text = pContent,
+                TextColor3 = theme.textSecondary,
+                Font = Enum.Font.Gotham,
+                TextSize = 13,
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 0, 0),
+                AutomaticSize = Enum.AutomaticSize.Y,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextWrapped = true
+            })
+            Content.Parent = ParaFrame
+
+            AttachTooltip(ParaFrame, tooltipText)
+            ParaFrame.Parent = Tab.Content
+            return {
+                ElementFrame = ParaFrame,
+                SetContent = function(_, txt)
+                    Content.Text = txt
+                end
+            }
+        end
+
+        -- ========== SEPARATOR ==========
+        function Tab:Seperator(config)
+            config = config or {}
+            local tooltipText = config.tooltip or ""
+            local SepFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 16),
+                BackgroundTransparency = 1
+            })
+            local Line = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 1),
+                Position = UDim2.new(0, 0, 0.5, 0),
+                BackgroundColor3 = theme.separator,
+                BorderSizePixel = 0
+            })
+            Line.Parent = SepFrame
+            AttachTooltip(SepFrame, tooltipText)
+            SepFrame.Parent = Tab.Content
+        end
+
+        -- ========== TEXTAREA ==========
+        function Tab:TextArea(config)
+            local taTitle = config.title or "Text Area"
+            local taDesc = config.desc or ""
+            local taDefault = config.default or ""
+            local callback = config[1] or function() end
+            local configKey = config.configKey
+            local tooltipText = config.tooltip or ""
+
+            local savedText = ""
+            if configKey and Window._autoSave then
+                savedText = Window:_getElement(configKey, "")
+            end
+            if savedText == "" then savedText = taDefault end
+
+            local TAFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 0),
+                BackgroundColor3 = theme.elementBg,
+                BorderSizePixel = 0,
+                AutomaticSize = Enum.AutomaticSize.Y
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 6) }),
+                New("UIPadding", {
+                    PaddingTop = UDim.new(0, 8),
+                    PaddingLeft = UDim.new(0, 10),
+                    PaddingRight = UDim.new(0, 10),
+                    PaddingBottom = UDim.new(0, 8)
+                }),
+                New("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    Padding = UDim.new(0, 4)
+                })
+            })
+
+            if taTitle ~= "" then
+                local Title = New("TextLabel", {
+                    Text = taTitle,
+                    TextColor3 = theme.text,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 15,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 18),
+                    TextXAlignment = Enum.TextXAlignment.Left
+                })
+                Title.Parent = TAFrame
+            end
+
+            if taDesc ~= "" then
+                local Desc = New("TextLabel", {
+                    Text = taDesc,
+                    TextColor3 = theme.textSecondary,
+                    Font = Enum.Font.Gotham,
+                    TextSize = 12,
+                    BackgroundTransparency = 1,
+                    Size = UDim2.new(1, 0, 0, 14),
+                    TextXAlignment = Enum.TextXAlignment.Left
+                })
+                Desc.Parent = TAFrame
+            end
+
+            local TextBox = New("TextBox", {
+                Size = UDim2.new(1, 0, 0, 80),
+                BackgroundColor3 = theme.inputBg,
+                BorderSizePixel = 0,
+                Text = savedText,
+                TextColor3 = theme.text,
+                PlaceholderColor3 = theme.textSecondary,
+                Font = Enum.Font.Gotham,
+                TextSize = 13,
+                TextXAlignment = Enum.TextXAlignment.Left,
+                TextYAlignment = Enum.TextYAlignment.Top,
+                ClearTextOnFocus = false,
+                MultiLine = true,
+                TextWrapped = true
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 4) }),
+                New("UIPadding", {
+                    PaddingTop = UDim.new(0, 6),
+                    PaddingLeft = UDim.new(0, 8),
+                    PaddingRight = UDim.new(0, 8),
+                    PaddingBottom = UDim.new(0, 6)
+                })
+            })
+            TextBox.Parent = TAFrame
+
+            TextBox.FocusLost:Connect(function()
+                if configKey then
+                    Window:_saveElement(configKey, TextBox.Text)
+                end
+                callback(TextBox.Text)
+            end)
+
+            AttachTooltip(TAFrame, tooltipText)
+            TAFrame.Parent = Tab.Content
+            return {
+                ElementFrame = TAFrame,
+                GetText = function() return TextBox.Text end,
+                SetText = function(_, txt)
+                    TextBox.Text = txt
                     if configKey then
-                        Window:_saveElement(configKey, CurrentValue)
+                        Window:_saveElement(configKey, txt)
                     end
-                    callback(CurrentValue)
+                    callback(txt)
                 end
             }
         end
@@ -1852,7 +3080,8 @@ function SuperLib:Win(config)
                 }
 
                 -- Copy methods from main Tab
-                for name, func in pairs(Window:Tab({title = ""})) do
+                local dummyTab = Window:Tab({title = ""})
+                for name, func in pairs(dummyTab) do
                     if type(func) == "function" then
                         Tab[name] = func
                     end
