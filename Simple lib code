@@ -1,382 +1,69 @@
 -- SimpleLib.lua
--- Version 2.1.0 (Fixed MiniBar, Live Themes, ShowOnTop, Renamed Methods, Smaller Notify)
+-- Version 3.0.0 (UI AND FEATURES UPDATE)
+-- Major rewrite with Config System, Stacked Notifications, ColorPicker, Realtime Slider, Animated Dropdown, States, and 13 new themes
 
 local SimpleLib = {
-    Version = "2.1.0",
+    Version = "3.0.0",
     Theme = "Dark",
-    Themes = {
-        Dark = {
-            Background = Color3.fromRGB(35, 35, 40),
-            Topbar = Color3.fromRGB(30, 30, 35),
-            Sidebar = Color3.fromRGB(25, 25, 30),
-            MainPanel = Color3.fromRGB(22, 22, 26),
-            Section = Color3.fromRGB(28, 28, 32),
-            Element = Color3.fromRGB(28, 28, 32),
-            Button = Color3.fromRGB(50, 50, 55),
-            ButtonHover = Color3.fromRGB(60, 60, 65),
-            ToggleOff = Color3.fromRGB(60, 60, 70),
-            ToggleOn = Color3.fromRGB(50, 200, 100),
-            ToggleHoverOn = Color3.fromRGB(40, 180, 90),
-            ToggleHoverOff = Color3.fromRGB(70, 70, 80),
-            Accent = Color3.fromRGB(50, 200, 100),
-            AccentHover = Color3.fromRGB(40, 180, 90),
-            TextPrimary = Color3.fromRGB(255, 255, 255),
-            TextSecondary = Color3.fromRGB(180, 180, 190),
-            TextAccent = Color3.fromRGB(50, 220, 120),
-            Stroke = Color3.fromRGB(60, 60, 70),
-            Track = Color3.fromRGB(60, 60, 70),
-            TrackFill = Color3.fromRGB(50, 200, 100),
-            InputBg = Color3.fromRGB(40, 40, 45),
-            DropdownBg = Color3.fromRGB(35, 35, 40),
-            DropdownItem = Color3.fromRGB(40, 40, 45),
-            DropdownItemHover = Color3.fromRGB(55, 55, 60),
-            LoadingBg = Color3.fromRGB(12, 12, 12),
-            LoadingStroke = Color3.fromRGB(40, 180, 80),
-            LoadingText = Color3.fromRGB(50, 220, 120),
-            LoadingSub = Color3.fromRGB(150, 255, 180),
-            NotifyBg = Color3.fromRGB(30, 30, 35),
-            CloseBtn = Color3.fromRGB(50, 50, 55),
-            CloseBtnHover = Color3.fromRGB(60, 60, 65),
-            MinimizeBtn = Color3.fromRGB(50, 50, 55),
-            MinimizeBtnHover = Color3.fromRGB(60, 60, 65),
-            DialogNo = Color3.fromRGB(255, 80, 80),
-            DialogNoHover = Color3.fromRGB(255, 100, 100),
-            DialogOk = Color3.fromRGB(50, 50, 55),
-            DialogOkHover = Color3.fromRGB(70, 70, 75),
-            SearchBg = Color3.fromRGB(40, 40, 45),
-            SearchPlaceholder = Color3.fromRGB(120, 120, 130),
-            Scrollbar = Color3.fromRGB(80, 80, 90),
-            MiniBarBg = Color3.fromRGB(35, 35, 40),
-            MiniBarStroke = Color3.fromRGB(60, 60, 70),
-            TabBtn = Color3.fromRGB(40, 40, 45),
-            TabBtnHover = Color3.fromRGB(50, 50, 55),
-            TabBtnActive = Color3.fromRGB(55, 55, 65),
-            SectionHeader = Color3.fromRGB(35, 35, 40),
-            ProgressBar = Color3.fromRGB(50, 200, 100),
-        },
-        Light = {
-            Background = Color3.fromRGB(245, 245, 250),
-            Topbar = Color3.fromRGB(235, 235, 240),
-            Sidebar = Color3.fromRGB(225, 225, 230),
-            MainPanel = Color3.fromRGB(240, 240, 245),
-            Section = Color3.fromRGB(230, 230, 235),
-            Element = Color3.fromRGB(230, 230, 235),
-            Button = Color3.fromRGB(200, 200, 210),
-            ButtonHover = Color3.fromRGB(180, 180, 195),
-            ToggleOff = Color3.fromRGB(180, 180, 190),
-            ToggleOn = Color3.fromRGB(50, 180, 100),
-            ToggleHoverOn = Color3.fromRGB(40, 160, 90),
-            ToggleHoverOff = Color3.fromRGB(160, 160, 170),
-            Accent = Color3.fromRGB(50, 180, 100),
-            AccentHover = Color3.fromRGB(40, 160, 90),
-            TextPrimary = Color3.fromRGB(30, 30, 35),
-            TextSecondary = Color3.fromRGB(100, 100, 110),
-            TextAccent = Color3.fromRGB(40, 160, 90),
-            Stroke = Color3.fromRGB(200, 200, 210),
-            Track = Color3.fromRGB(200, 200, 210),
-            TrackFill = Color3.fromRGB(50, 180, 100),
-            InputBg = Color3.fromRGB(220, 220, 225),
-            DropdownBg = Color3.fromRGB(235, 235, 240),
-            DropdownItem = Color3.fromRGB(220, 220, 225),
-            DropdownItemHover = Color3.fromRGB(200, 200, 210),
-            LoadingBg = Color3.fromRGB(240, 240, 245),
-            LoadingStroke = Color3.fromRGB(50, 180, 100),
-            LoadingText = Color3.fromRGB(40, 160, 90),
-            LoadingSub = Color3.fromRGB(80, 180, 120),
-            NotifyBg = Color3.fromRGB(235, 235, 240),
-            CloseBtn = Color3.fromRGB(200, 200, 210),
-            CloseBtnHover = Color3.fromRGB(180, 180, 195),
-            MinimizeBtn = Color3.fromRGB(200, 200, 210),
-            MinimizeBtnHover = Color3.fromRGB(180, 180, 195),
-            DialogNo = Color3.fromRGB(220, 80, 80),
-            DialogNoHover = Color3.fromRGB(200, 60, 60),
-            DialogOk = Color3.fromRGB(200, 200, 210),
-            DialogOkHover = Color3.fromRGB(180, 180, 195),
-            SearchBg = Color3.fromRGB(220, 220, 225),
-            SearchPlaceholder = Color3.fromRGB(150, 150, 160),
-            Scrollbar = Color3.fromRGB(180, 180, 190),
-            MiniBarBg = Color3.fromRGB(235, 235, 240),
-            MiniBarStroke = Color3.fromRGB(200, 200, 210),
-            TabBtn = Color3.fromRGB(210, 210, 220),
-            TabBtnHover = Color3.fromRGB(190, 190, 200),
-            TabBtnActive = Color3.fromRGB(180, 180, 195),
-            SectionHeader = Color3.fromRGB(220, 220, 225),
-            ProgressBar = Color3.fromRGB(50, 180, 100),
-        },
-        Midnight = {
-            Background = Color3.fromRGB(20, 20, 35),
-            Topbar = Color3.fromRGB(15, 15, 30),
-            Sidebar = Color3.fromRGB(12, 12, 25),
-            MainPanel = Color3.fromRGB(18, 18, 30),
-            Section = Color3.fromRGB(22, 22, 38),
-            Element = Color3.fromRGB(22, 22, 38),
-            Button = Color3.fromRGB(40, 40, 65),
-            ButtonHover = Color3.fromRGB(50, 50, 80),
-            ToggleOff = Color3.fromRGB(50, 50, 70),
-            ToggleOn = Color3.fromRGB(100, 80, 220),
-            ToggleHoverOn = Color3.fromRGB(90, 70, 200),
-            ToggleHoverOff = Color3.fromRGB(60, 60, 85),
-            Accent = Color3.fromRGB(100, 80, 220),
-            AccentHover = Color3.fromRGB(90, 70, 200),
-            TextPrimary = Color3.fromRGB(230, 230, 255),
-            TextSecondary = Color3.fromRGB(160, 160, 200),
-            TextAccent = Color3.fromRGB(140, 120, 255),
-            Stroke = Color3.fromRGB(50, 50, 80),
-            Track = Color3.fromRGB(50, 50, 70),
-            TrackFill = Color3.fromRGB(100, 80, 220),
-            InputBg = Color3.fromRGB(30, 30, 50),
-            DropdownBg = Color3.fromRGB(25, 25, 45),
-            DropdownItem = Color3.fromRGB(30, 30, 50),
-            DropdownItemHover = Color3.fromRGB(45, 45, 75),
-            LoadingBg = Color3.fromRGB(10, 10, 20),
-            LoadingStroke = Color3.fromRGB(80, 60, 200),
-            LoadingText = Color3.fromRGB(120, 100, 255),
-            LoadingSub = Color3.fromRGB(160, 140, 255),
-            NotifyBg = Color3.fromRGB(22, 22, 38),
-            CloseBtn = Color3.fromRGB(40, 40, 65),
-            CloseBtnHover = Color3.fromRGB(50, 50, 80),
-            MinimizeBtn = Color3.fromRGB(40, 40, 65),
-            MinimizeBtnHover = Color3.fromRGB(50, 50, 80),
-            DialogNo = Color3.fromRGB(220, 60, 80),
-            DialogNoHover = Color3.fromRGB(240, 80, 100),
-            DialogOk = Color3.fromRGB(40, 40, 65),
-            DialogOkHover = Color3.fromRGB(55, 55, 85),
-            SearchBg = Color3.fromRGB(30, 30, 50),
-            SearchPlaceholder = Color3.fromRGB(100, 100, 140),
-            Scrollbar = Color3.fromRGB(60, 60, 90),
-            MiniBarBg = Color3.fromRGB(20, 20, 35),
-            MiniBarStroke = Color3.fromRGB(50, 50, 80),
-            TabBtn = Color3.fromRGB(30, 30, 55),
-            TabBtnHover = Color3.fromRGB(40, 40, 70),
-            TabBtnActive = Color3.fromRGB(45, 45, 75),
-            SectionHeader = Color3.fromRGB(28, 28, 50),
-            ProgressBar = Color3.fromRGB(100, 80, 220),
-        },
-        Ocean = {
-            Background = Color3.fromRGB(25, 35, 45),
-            Topbar = Color3.fromRGB(20, 30, 40),
-            Sidebar = Color3.fromRGB(18, 28, 38),
-            MainPanel = Color3.fromRGB(22, 32, 42),
-            Section = Color3.fromRGB(28, 38, 48),
-            Element = Color3.fromRGB(28, 38, 48),
-            Button = Color3.fromRGB(40, 60, 80),
-            ButtonHover = Color3.fromRGB(50, 75, 100),
-            ToggleOff = Color3.fromRGB(50, 65, 80),
-            ToggleOn = Color3.fromRGB(40, 160, 200),
-            ToggleHoverOn = Color3.fromRGB(35, 140, 180),
-            ToggleHoverOff = Color3.fromRGB(60, 80, 100),
-            Accent = Color3.fromRGB(40, 160, 200),
-            AccentHover = Color3.fromRGB(35, 140, 180),
-            TextPrimary = Color3.fromRGB(220, 240, 255),
-            TextSecondary = Color3.fromRGB(150, 180, 210),
-            TextAccent = Color3.fromRGB(80, 200, 240),
-            Stroke = Color3.fromRGB(50, 70, 90),
-            Track = Color3.fromRGB(50, 65, 80),
-            TrackFill = Color3.fromRGB(40, 160, 200),
-            InputBg = Color3.fromRGB(30, 45, 60),
-            DropdownBg = Color3.fromRGB(28, 40, 52),
-            DropdownItem = Color3.fromRGB(30, 45, 60),
-            DropdownItemHover = Color3.fromRGB(45, 65, 85),
-            LoadingBg = Color3.fromRGB(15, 25, 35),
-            LoadingStroke = Color3.fromRGB(30, 140, 180),
-            LoadingText = Color3.fromRGB(60, 180, 220),
-            LoadingSub = Color3.fromRGB(100, 200, 240),
-            NotifyBg = Color3.fromRGB(28, 38, 48),
-            CloseBtn = Color3.fromRGB(40, 60, 80),
-            CloseBtnHover = Color3.fromRGB(50, 75, 100),
-            MinimizeBtn = Color3.fromRGB(40, 60, 80),
-            MinimizeBtnHover = Color3.fromRGB(50, 75, 100),
-            DialogNo = Color3.fromRGB(220, 80, 80),
-            DialogNoHover = Color3.fromRGB(240, 100, 100),
-            DialogOk = Color3.fromRGB(40, 60, 80),
-            DialogOkHover = Color3.fromRGB(55, 80, 105),
-            SearchBg = Color3.fromRGB(30, 45, 60),
-            SearchPlaceholder = Color3.fromRGB(120, 150, 180),
-            Scrollbar = Color3.fromRGB(60, 80, 100),
-            MiniBarBg = Color3.fromRGB(25, 35, 45),
-            MiniBarStroke = Color3.fromRGB(50, 70, 90),
-            TabBtn = Color3.fromRGB(30, 45, 60),
-            TabBtnHover = Color3.fromRGB(40, 60, 80),
-            TabBtnActive = Color3.fromRGB(45, 65, 85),
-            SectionHeader = Color3.fromRGB(30, 42, 55),
-            ProgressBar = Color3.fromRGB(40, 160, 200),
-        },
-        Forest = {
-            Background = Color3.fromRGB(28, 38, 28),
-            Topbar = Color3.fromRGB(22, 32, 22),
-            Sidebar = Color3.fromRGB(18, 28, 18),
-            MainPanel = Color3.fromRGB(24, 34, 24),
-            Section = Color3.fromRGB(30, 42, 30),
-            Element = Color3.fromRGB(30, 42, 30),
-            Button = Color3.fromRGB(45, 65, 45),
-            ButtonHover = Color3.fromRGB(55, 80, 55),
-            ToggleOff = Color3.fromRGB(55, 70, 55),
-            ToggleOn = Color3.fromRGB(60, 180, 80),
-            ToggleHoverOn = Color3.fromRGB(50, 160, 70),
-            ToggleHoverOff = Color3.fromRGB(65, 85, 65),
-            Accent = Color3.fromRGB(60, 180, 80),
-            AccentHover = Color3.fromRGB(50, 160, 70),
-            TextPrimary = Color3.fromRGB(230, 255, 230),
-            TextSecondary = Color3.fromRGB(160, 200, 160),
-            TextAccent = Color3.fromRGB(100, 220, 120),
-            Stroke = Color3.fromRGB(55, 75, 55),
-            Track = Color3.fromRGB(55, 70, 55),
-            TrackFill = Color3.fromRGB(60, 180, 80),
-            InputBg = Color3.fromRGB(35, 50, 35),
-            DropdownBg = Color3.fromRGB(30, 42, 30),
-            DropdownItem = Color3.fromRGB(35, 50, 35),
-            DropdownItemHover = Color3.fromRGB(50, 70, 50),
-            LoadingBg = Color3.fromRGB(15, 25, 15),
-            LoadingStroke = Color3.fromRGB(50, 160, 70),
-            LoadingText = Color3.fromRGB(80, 200, 100),
-            LoadingSub = Color3.fromRGB(120, 230, 140),
-            NotifyBg = Color3.fromRGB(30, 42, 30),
-            CloseBtn = Color3.fromRGB(45, 65, 45),
-            CloseBtnHover = Color3.fromRGB(55, 80, 55),
-            MinimizeBtn = Color3.fromRGB(45, 65, 45),
-            MinimizeBtnHover = Color3.fromRGB(55, 80, 55),
-            DialogNo = Color3.fromRGB(220, 80, 80),
-            DialogNoHover = Color3.fromRGB(240, 100, 100),
-            DialogOk = Color3.fromRGB(45, 65, 45),
-            DialogOkHover = Color3.fromRGB(60, 85, 60),
-            SearchBg = Color3.fromRGB(35, 50, 35),
-            SearchPlaceholder = Color3.fromRGB(120, 160, 120),
-            Scrollbar = Color3.fromRGB(65, 85, 65),
-            MiniBarBg = Color3.fromRGB(28, 38, 28),
-            MiniBarStroke = Color3.fromRGB(55, 75, 55),
-            TabBtn = Color3.fromRGB(35, 50, 35),
-            TabBtnHover = Color3.fromRGB(45, 65, 45),
-            TabBtnActive = Color3.fromRGB(50, 70, 50),
-            SectionHeader = Color3.fromRGB(32, 45, 32),
-            ProgressBar = Color3.fromRGB(60, 180, 80),
-        },
-        Crimson = {
-            Background = Color3.fromRGB(40, 25, 25),
-            Topbar = Color3.fromRGB(35, 20, 20),
-            Sidebar = Color3.fromRGB(28, 15, 15),
-            MainPanel = Color3.fromRGB(38, 22, 22),
-            Section = Color3.fromRGB(48, 28, 28),
-            Element = Color3.fromRGB(48, 28, 28),
-            Button = Color3.fromRGB(70, 40, 40),
-            ButtonHover = Color3.fromRGB(85, 50, 50),
-            ToggleOff = Color3.fromRGB(70, 50, 50),
-            ToggleOn = Color3.fromRGB(220, 60, 60),
-            ToggleHoverOn = Color3.fromRGB(200, 50, 50),
-            ToggleHoverOff = Color3.fromRGB(85, 60, 60),
-            Accent = Color3.fromRGB(220, 60, 60),
-            AccentHover = Color3.fromRGB(200, 50, 50),
-            TextPrimary = Color3.fromRGB(255, 230, 230),
-            TextSecondary = Color3.fromRGB(210, 160, 160),
-            TextAccent = Color3.fromRGB(255, 120, 120),
-            Stroke = Color3.fromRGB(80, 50, 50),
-            Track = Color3.fromRGB(70, 50, 50),
-            TrackFill = Color3.fromRGB(220, 60, 60),
-            InputBg = Color3.fromRGB(55, 32, 32),
-            DropdownBg = Color3.fromRGB(48, 28, 28),
-            DropdownItem = Color3.fromRGB(55, 32, 32),
-            DropdownItemHover = Color3.fromRGB(75, 45, 45),
-            LoadingBg = Color3.fromRGB(25, 12, 12),
-            LoadingStroke = Color3.fromRGB(200, 50, 50),
-            LoadingText = Color3.fromRGB(240, 80, 80),
-            LoadingSub = Color3.fromRGB(255, 140, 140),
-            NotifyBg = Color3.fromRGB(48, 28, 28),
-            CloseBtn = Color3.fromRGB(70, 40, 40),
-            CloseBtnHover = Color3.fromRGB(85, 50, 50),
-            MinimizeBtn = Color3.fromRGB(70, 40, 40),
-            MinimizeBtnHover = Color3.fromRGB(85, 50, 50),
-            DialogNo = Color3.fromRGB(220, 60, 60),
-            DialogNoHover = Color3.fromRGB(240, 80, 80),
-            DialogOk = Color3.fromRGB(70, 40, 40),
-            DialogOkHover = Color3.fromRGB(90, 55, 55),
-            SearchBg = Color3.fromRGB(55, 32, 32),
-            SearchPlaceholder = Color3.fromRGB(180, 130, 130),
-            Scrollbar = Color3.fromRGB(90, 60, 60),
-            MiniBarBg = Color3.fromRGB(40, 25, 25),
-            MiniBarStroke = Color3.fromRGB(80, 50, 50),
-            TabBtn = Color3.fromRGB(55, 32, 32),
-            TabBtnHover = Color3.fromRGB(70, 40, 40),
-            TabBtnActive = Color3.fromRGB(75, 45, 45),
-            SectionHeader = Color3.fromRGB(52, 30, 30),
-            ProgressBar = Color3.fromRGB(220, 60, 60),
-        },
-        Cyber = {
-            Background = Color3.fromRGB(15, 15, 25),
-            Topbar = Color3.fromRGB(12, 12, 20),
-            Sidebar = Color3.fromRGB(10, 10, 18),
-            MainPanel = Color3.fromRGB(13, 13, 22),
-            Section = Color3.fromRGB(18, 18, 30),
-            Element = Color3.fromRGB(18, 18, 30),
-            Button = Color3.fromRGB(30, 30, 50),
-            ButtonHover = Color3.fromRGB(40, 40, 70),
-            ToggleOff = Color3.fromRGB(40, 40, 55),
-            ToggleOn = Color3.fromRGB(0, 255, 200),
-            ToggleHoverOn = Color3.fromRGB(0, 230, 180),
-            ToggleHoverOff = Color3.fromRGB(50, 50, 70),
-            Accent = Color3.fromRGB(0, 255, 200),
-            AccentHover = Color3.fromRGB(0, 230, 180),
-            TextPrimary = Color3.fromRGB(220, 255, 250),
-            TextSecondary = Color3.fromRGB(140, 180, 170),
-            TextAccent = Color3.fromRGB(0, 255, 200),
-            Stroke = Color3.fromRGB(40, 40, 70),
-            Track = Color3.fromRGB(40, 40, 55),
-            TrackFill = Color3.fromRGB(0, 255, 200),
-            InputBg = Color3.fromRGB(22, 22, 40),
-            DropdownBg = Color3.fromRGB(18, 18, 32),
-            DropdownItem = Color3.fromRGB(22, 22, 40),
-            DropdownItemHover = Color3.fromRGB(35, 35, 60),
-            LoadingBg = Color3.fromRGB(8, 8, 15),
-            LoadingStroke = Color3.fromRGB(0, 200, 160),
-            LoadingText = Color3.fromRGB(0, 255, 200),
-            LoadingSub = Color3.fromRGB(100, 255, 220),
-            NotifyBg = Color3.fromRGB(18, 18, 30),
-            CloseBtn = Color3.fromRGB(30, 30, 50),
-            CloseBtnHover = Color3.fromRGB(40, 40, 70),
-            MinimizeBtn = Color3.fromRGB(30, 30, 50),
-            MinimizeBtnHover = Color3.fromRGB(40, 40, 70),
-            DialogNo = Color3.fromRGB(255, 60, 100),
-            DialogNoHover = Color3.fromRGB(255, 80, 120),
-            DialogOk = Color3.fromRGB(30, 30, 50),
-            DialogOkHover = Color3.fromRGB(45, 45, 75),
-            SearchBg = Color3.fromRGB(22, 22, 40),
-            SearchPlaceholder = Color3.fromRGB(100, 140, 130),
-            Scrollbar = Color3.fromRGB(50, 50, 80),
-            MiniBarBg = Color3.fromRGB(15, 15, 25),
-            MiniBarStroke = Color3.fromRGB(40, 40, 70),
-            TabBtn = Color3.fromRGB(22, 22, 40),
-            TabBtnHover = Color3.fromRGB(32, 32, 55),
-            TabBtnActive = Color3.fromRGB(38, 38, 65),
-            SectionHeader = Color3.fromRGB(20, 20, 35),
-            ProgressBar = Color3.fromRGB(0, 255, 200),
-        }
-    }
+    Themes = {},
+    Configs = {},
+    AutoLoadConfig = nil,
 }
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "SimpleLib"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.Parent = game:GetService("CoreGui")
+-- ========== ALIAS TABLE ==========
+local Aliases = {
+    Win = "Window",
+    Tab = "Tab",
+    Sec = "Section",
+    Btn = "Button",
+    Tog = "Toggle",
+    DD = "DropDown",
+    DDM = "MultiDropDown",
+    SL = "SLable",
+    SLB = "SLBig",
+    CP = "ColorPicker",
+    Slider = "Slider",
+    Input = "Input",
+    Label = "Label",
+    Notify = "Notify",
+}
 
+-- ========== SERVICES ==========
+local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local GuiService = game:GetService("GuiService")
+local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
 
--- ========== THEME REGISTRY (for live theme switching) ==========
+-- ========== SCREEN GUI ==========
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SimpleLibV3"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = CoreGui
+
+-- ========== THEME REGISTRY ==========
 local ThemeRegistry = {}
 local function RegisterThemeObject(obj, prop, themeKey)
-    table.insert(ThemeRegistry, { Object = obj, Property = prop, ThemeKey = themeKey })
+    if obj and prop and themeKey then
+        table.insert(ThemeRegistry, { Object = obj, Property = prop, ThemeKey = themeKey })
+    end
 end
+
 local function ApplyTheme()
     local theme = SimpleLib.Themes[SimpleLib.Theme] or SimpleLib.Themes.Dark
+    if not theme then return end
     for _, entry in ipairs(ThemeRegistry) do
         if entry.Object and entry.Object.Parent then
-            entry.Object[entry.Property] = theme[entry.ThemeKey]
+            pcall(function()
+                entry.Object[entry.Property] = theme[entry.ThemeKey]
+            end)
         end
     end
 end
 
--- ========== UTILITY FUNCTIONS ==========
+-- ========== UTILITY ==========
 local function New(Class, Props, Children)
     local obj = Instance.new(Class)
     for k, v in pairs(Props or {}) do
@@ -408,155 +95,724 @@ local function GetTheme()
     return SimpleLib.Themes[SimpleLib.Theme] or SimpleLib.Themes.Dark
 end
 
--- ========== NOTIFICATION SYSTEM ==========
-local NotifyQueue = {}
-local NotifyActive = false
+-- ========== CONFIG SYSTEM ==========
+local ConfigFolder = "SimpleLibConfigs"
+local function GetConfigPath(name)
+    return ConfigFolder .. "/" .. name .. ".json"
+end
 
-local function ProcessNotifyQueue()
-    if NotifyActive or #NotifyQueue == 0 then return end
-    NotifyActive = true
-    local data = table.remove(NotifyQueue, 1)
+function SimpleLib:CreateConfig(name, data)
+    if not name then return false end
+    local json = HttpService:JSONEncode(data or {})
+    pcall(function()
+        if not isfolder(ConfigFolder) then makefolder(ConfigFolder) end
+        writefile(GetConfigPath(name), json)
+    end)
+    return true
+end
 
+function SimpleLib:LoadConfig(name)
+    if not name then return nil end
+    local success, result = pcall(function()
+        return HttpService:JSONDecode(readfile(GetConfigPath(name)))
+    end)
+    if success then return result end
+    return nil
+end
+
+function SimpleLib:DeleteConfig(name)
+    if not name then return false end
+    return pcall(function() delfile(GetConfigPath(name)) end)
+end
+
+function SimpleLib:OverwriteConfig(name, data)
+    return self:CreateConfig(name, data)
+end
+
+function SimpleLib:ListConfigs()
+    local list = {}
+    pcall(function()
+        if isfolder(ConfigFolder) then
+            for _, file in ipairs(listfiles(ConfigFolder)) do
+                local name = file:match("([^/\\]+)%.json$")
+                if name then table.insert(list, name) end
+            end
+        end
+    end)
+    return list
+end
+
+function SimpleLib:SetAutoLoadConfig(name)
+    self.AutoLoadConfig = name
+end
+
+function SimpleLib:GetAutoLoadConfig()
+    return self.AutoLoadConfig
+end
+
+-- ========== NOTIFICATION SYSTEM (STACKED, ANIMATED, 200px) ==========
+local NotifyStacks = {
+    TopRight = {},
+    TopLeft = {},
+    BottomRight = {},
+    BottomLeft = {},
+}
+local NotifyMaxStack = 5
+local NotifySpacing = 8
+local NotifyWidth = 200
+
+local function GetStackPosition(position, index)
+    local offset = (index - 1) * (70 + NotifySpacing)
+    if position == "TopRight" then
+        return UDim2.new(1, -NotifyWidth - 10, 0, 10 + offset)
+    elseif position == "TopLeft" then
+        return UDim2.new(0, 10, 0, 10 + offset)
+    elseif position == "BottomRight" then
+        return UDim2.new(1, -NotifyWidth - 10, 1, -70 - offset)
+    else
+        return UDim2.new(0, 10, 1, -70 - offset)
+    end
+end
+
+local function RebuildStack(position)
+    local stack = NotifyStacks[position]
+    for i, notify in ipairs(stack) do
+        if notify and notify.Frame and notify.Frame.Parent then
+            local targetPos = GetStackPosition(position, i)
+            Tween(notify.Frame, { Position = targetPos }, 0.3, Enum.EasingStyle.Quad)
+        end
+    end
+end
+
+local function ShowNotification(data)
     local theme = GetTheme()
+    local position = data.position or "TopRight"
+    local stack = NotifyStacks[position]
+
+    while #stack >= NotifyMaxStack do
+        local old = table.remove(stack, 1)
+        if old and old.Frame then
+            pcall(function()
+                Tween(old.Frame, { Position = old.Frame.Position + UDim2.new(0, 300, 0, 0) }, 0.25)
+                Tween(old.Frame, { BackgroundTransparency = 1 }, 0.25)
+                task.delay(0.3, function() if old.Frame then old.Frame:Destroy() end end)
+            end)
+        end
+    end
+
+    local notifyIndex = #stack + 1
+
     local NotifyFrame = New("Frame", {
-        Size = UDim2.new(0, 240, 0, 0),
+        Size = UDim2.new(0, NotifyWidth, 0, 0),
         BackgroundColor3 = theme.NotifyBg,
         BorderSizePixel = 0,
-        Position = UDim2.new(0, -260, 1, -60),
+        Position = GetStackPosition(position, notifyIndex) + UDim2.new(0, 300, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         ZIndex = 200,
         BackgroundTransparency = 1,
-        ClipsDescendants = true
+        ClipsDescendants = true,
     }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+        New("UICorner", { CornerRadius = UDim.new(0, 10) }),
         New("UIStroke", { Color = theme.Stroke, Thickness = 1 }),
         New("UIPadding", {
-            PaddingTop = UDim.new(0, 10),
-            PaddingLeft = UDim.new(0, 12),
-            PaddingRight = UDim.new(0, 12),
-            PaddingBottom = UDim.new(0, 10)
+            PaddingTop = UDim.new(0, 8),
+            PaddingLeft = UDim.new(0, 10),
+            PaddingRight = UDim.new(0, 10),
+            PaddingBottom = UDim.new(0, 8),
         }),
         New("UIListLayout", {
             SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 4)
-        })
+            Padding = UDim.new(0, 3),
+        }),
     })
     RegisterThemeObject(NotifyFrame, "BackgroundColor3", "NotifyBg")
 
     local IconFrame = New("Frame", {
-        Size = UDim2.new(0, 3, 0, 0),
-        BackgroundColor3 = theme.Accent,
-        BorderSizePixel = 0,
-        AutomaticSize = Enum.AutomaticSize.Y,
-        LayoutOrder = 0
+        Size = UDim2.new(0, 22, 0, 22),
+        BackgroundTransparency = 1,
+        LayoutOrder = 0,
     }, {
-        New("UICorner", { CornerRadius = UDim.new(1, 0) })
+        New("TextLabel", {
+            Size = UDim2.new(1, 0, 1, 0),
+            BackgroundTransparency = 1,
+            Text = data.icon or "🔔",
+            Font = Enum.Font.GothamBold,
+            TextSize = 14,
+            TextColor3 = theme.Accent,
+        }),
     })
-    RegisterThemeObject(IconFrame, "BackgroundColor3", "Accent")
+    RegisterThemeObject(IconFrame.TextLabel, "TextColor3", "Accent")
+    IconFrame.Parent = NotifyFrame
 
     local ContentFrame = New("Frame", {
         Size = UDim2.new(1, 0, 0, 0),
         BackgroundTransparency = 1,
         AutomaticSize = Enum.AutomaticSize.Y,
-        LayoutOrder = 1
+        LayoutOrder = 1,
     }, {
         New("UIListLayout", {
             SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 3)
-        })
+            Padding = UDim.new(0, 2),
+        }),
     })
 
     local TitleLabel = New("TextLabel", {
         Name = "Title",
-        Text = data.title,
+        Text = data.title or "Notification",
         TextColor3 = theme.TextPrimary,
         Font = Enum.Font.GothamBold,
-        TextSize = 14,
+        TextSize = 13,
         BackgroundTransparency = 1,
         Size = UDim2.new(1, 0, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
-        LayoutOrder = 1
+        LayoutOrder = 1,
     })
     RegisterThemeObject(TitleLabel, "TextColor3", "TextPrimary")
 
     local ContentLabel = New("TextLabel", {
         Name = "Content",
-        Text = data.content,
+        Text = data.content or "",
         TextColor3 = theme.TextSecondary,
         Font = Enum.Font.Gotham,
-        TextSize = 12,
+        TextSize = 11,
         BackgroundTransparency = 1,
         Size = UDim2.new(1, 0, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         TextWrapped = true,
         TextXAlignment = Enum.TextXAlignment.Left,
-        LayoutOrder = 2
+        LayoutOrder = 2,
     })
     RegisterThemeObject(ContentLabel, "TextColor3", "TextSecondary")
 
-    local ProgressBar = New("Frame", {
-        Name = "ProgressBar",
-        Size = UDim2.new(0, 0, 0, 2),
-        BackgroundColor3 = theme.ProgressBar,
-        BorderSizePixel = 0,
-        ZIndex = 201,
-        LayoutOrder = 3
-    }, { New("UICorner", { CornerRadius = UDim.new(0, 1) }) })
-    RegisterThemeObject(ProgressBar, "BackgroundColor3", "ProgressBar")
-
     TitleLabel.Parent = ContentFrame
     ContentLabel.Parent = ContentFrame
-    IconFrame.Parent = NotifyFrame
     ContentFrame.Parent = NotifyFrame
-    ProgressBar.Parent = NotifyFrame
+
+    local DurBar = New("Frame", {
+        Name = "DurBar",
+        Size = UDim2.new(1, 0, 0, 2),
+        BackgroundColor3 = theme.Accent,
+        BorderSizePixel = 0,
+        ZIndex = 201,
+        LayoutOrder = 3,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 1) }) })
+    RegisterThemeObject(DurBar, "BackgroundColor3", "Accent")
+    DurBar.Parent = NotifyFrame
+
     NotifyFrame.Parent = ScreenGui
 
-    Tween(NotifyFrame, { BackgroundTransparency = 0 }, 0.3)
-    Tween(NotifyFrame, { Position = UDim2.new(0, 10, 1, -NotifyFrame.AbsoluteSize.Y - 10) }, 0.4, Enum.EasingStyle.Back)
+    local notifyData = { Frame = NotifyFrame }
+    table.insert(stack, notifyData)
 
-    local pbTween = Tween(ProgressBar, { Size = UDim2.new(1, 0, 0, 2) }, data.dur, Enum.EasingStyle.Linear)
+    local targetPos = GetStackPosition(position, notifyIndex)
+    Tween(NotifyFrame, { Position = targetPos, BackgroundTransparency = 0 }, 0.4, Enum.EasingStyle.Back)
 
-    local CloseNotify = New("TextButton", {
-        Size = UDim2.new(0, 18, 0, 18),
-        Position = UDim2.new(1, -22, 0, 4),
-        BackgroundTransparency = 1,
-        Text = "×",
-        TextColor3 = theme.TextSecondary,
-        Font = Enum.Font.GothamBold,
-        TextSize = 16,
-        ZIndex = 202
-    })
-    RegisterThemeObject(CloseNotify, "TextColor3", "TextSecondary")
-    CloseNotify.Parent = NotifyFrame
+    local dur = data.dur or 5
+    local pbTween = Tween(DurBar, { Size = UDim2.new(0, 0, 0, 2) }, dur, Enum.EasingStyle.Linear)
 
     local closing = false
-    CloseNotify.MouseEnter:Connect(function()
-        Tween(CloseNotify, { TextColor3 = GetTheme().TextPrimary }, 0.15)
-    end)
-    CloseNotify.MouseLeave:Connect(function()
-        Tween(CloseNotify, { TextColor3 = GetTheme().TextSecondary }, 0.15)
-    end)
-
     local function Close()
         if closing then return end
         closing = true
         pcall(function() pbTween:Cancel() end)
-        Tween(NotifyFrame, { Position = UDim2.new(0, -260, 1, -NotifyFrame.AbsoluteSize.Y - 10) }, 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+        for i, n in ipairs(stack) do
+            if n == notifyData then
+                table.remove(stack, i)
+                break
+            end
+        end
+        Tween(NotifyFrame, { Position = NotifyFrame.Position + UDim2.new(0, 300, 0, 0) }, 0.3, Enum.EasingStyle.Quad)
         Tween(NotifyFrame, { BackgroundTransparency = 1 }, 0.25)
         task.delay(0.35, function()
-            if NotifyFrame and NotifyFrame.Destroy then
-                NotifyFrame:Destroy()
-            end
-            NotifyActive = false
-            ProcessNotifyQueue()
+            if NotifyFrame and NotifyFrame.Destroy then NotifyFrame:Destroy() end
+            RebuildStack(position)
         end)
     end
 
-    CloseNotify.MouseButton1Click:Connect(Close)
-    task.delay(data.dur, function()
+    local CloseBtn = New("TextButton", {
+        Size = UDim2.new(0, 16, 0, 16),
+        Position = UDim2.new(1, -18, 0, 2),
+        BackgroundTransparency = 1,
+        Text = "×",
+        TextColor3 = theme.TextSecondary,
+        Font = Enum.Font.GothamBold,
+        TextSize = 14,
+        ZIndex = 202,
+    })
+    RegisterThemeObject(CloseBtn, "TextColor3", "TextSecondary")
+    CloseBtn.Parent = NotifyFrame
+
+    CloseBtn.MouseEnter:Connect(function()
+        Tween(CloseBtn, { TextColor3 = GetTheme().TextPrimary }, 0.15)
+    end)
+    CloseBtn.MouseLeave:Connect(function()
+        Tween(CloseBtn, { TextColor3 = GetTheme().TextSecondary }, 0.15)
+    end)
+    CloseBtn.MouseButton1Click:Connect(Close)
+
+    task.delay(dur, function()
         if not closing then Close() end
+    end)
+end
+
+-- ========== COLOR PICKER ==========
+local ActiveColorPicker = nil
+
+local function RGBToHex(r, g, b)
+    return string.format("#%02x%02x%02x", r, g, b)
+end
+
+local function HexToRGB(hex)
+    hex = hex:gsub("#", "")
+    local r = tonumber(hex:sub(1, 2), 16) or 0
+    local g = tonumber(hex:sub(3, 4), 16) or 0
+    local b = tonumber(hex:sub(5, 6), 16) or 0
+    return r, g, b
+end
+
+local function HSVToRGB(h, s, v)
+    local r, g, b
+    local i = math.floor(h * 6)
+    local f = h * 6 - i
+    local p = v * (1 - s)
+    local q = v * (1 - f * s)
+    local t = v * (1 - (1 - f) * s)
+    i = i % 6
+    if i == 0 then r, g, b = v, t, p
+    elseif i == 1 then r, g, b = q, v, p
+    elseif i == 2 then r, g, b = p, v, t
+    elseif i == 3 then r, g, b = p, q, v
+    elseif i == 4 then r, g, b = t, p, v
+    elseif i == 5 then r, g, b = v, p, q
+    end
+    return math.floor(r * 255), math.floor(g * 255), math.floor(b * 255)
+end
+
+local function RGBToHSV(r, g, b)
+    r, g, b = r / 255, g / 255, b / 255
+    local max, min = math.max(r, g, b), math.min(r, g, b)
+    local h, s, v = 0, 0, max
+    local d = max - min
+    s = max == 0 and 0 or d / max
+    if max ~= min then
+        if max == r then h = (g - b) / d + (g < b and 6 or 0)
+        elseif max == g then h = (b - r) / d + 2
+        else h = (r - g) / d + 4
+        end
+        h = h / 6
+    end
+    return h, s, v
+end
+
+local function ShowColorPicker(config, callback)
+    if ActiveColorPicker then
+        pcall(function() ActiveColorPicker:Destroy() end)
+    end
+
+    local theme = GetTheme()
+    local title = config.Title or "Colorpicker 3"
+    local defaultColor = config.Default or Color3.fromRGB(50, 200, 100)
+
+    local r, g, b = math.floor(defaultColor.R * 255), math.floor(defaultColor.G * 255), math.floor(defaultColor.B * 255)
+    local h, s, v = RGBToHSV(r, g, b)
+
+    local PickerFrame = New("Frame", {
+        Size = UDim2.new(0, 340, 0, 0),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = theme.Background,
+        BorderSizePixel = 0,
+        ZIndex = 500,
+        BackgroundTransparency = 1,
+        ClipsDescendants = true,
+    }, {
+        New("UICorner", { CornerRadius = UDim.new(0, 14) }),
+        New("UIStroke", { Color = theme.Stroke, Thickness = 1.5 }),
+        New("UIPadding", {
+            PaddingTop = UDim.new(0, 16),
+            PaddingLeft = UDim.new(0, 16),
+            PaddingRight = UDim.new(0, 16),
+            PaddingBottom = UDim.new(0, 16),
+        }),
+    })
+    RegisterThemeObject(PickerFrame, "BackgroundColor3", "Background")
+
+    local TitleLabel = New("TextLabel", {
+        Text = title,
+        TextColor3 = theme.TextPrimary,
+        Font = Enum.Font.GothamBold,
+        TextSize = 18,
+        BackgroundTransparency = 1,
+        Size = UDim2.new(1, 0, 0, 24),
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ZIndex = 501,
+    })
+    RegisterThemeObject(TitleLabel, "TextColor3", "TextPrimary")
+    TitleLabel.Parent = PickerFrame
+
+    local ContentLayout = New("Frame", {
+        Size = UDim2.new(1, 0, 0, 220),
+        Position = UDim2.new(0, 0, 0, 32),
+        BackgroundTransparency = 1,
+        ZIndex = 501,
+    })
+    ContentLayout.Parent = PickerFrame
+
+    local SVFrame = New("Frame", {
+        Size = UDim2.new(0, 180, 0, 180),
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundColor3 = Color3.fromHSV(h, 1, 1),
+        BorderSizePixel = 0,
+        ZIndex = 502,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 10) }) })
+    SVFrame.Parent = ContentLayout
+
+    local WhiteGrad = New("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+            ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1)),
+        }),
+        Transparency = NumberSequence.new({
+            NumberSequenceKeypoint.new(0, 0),
+            NumberSequenceKeypoint.new(1, 1),
+        }),
+    })
+    local WhiteFrame = New("Frame", {
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        ZIndex = 503,
+    }, { WhiteGrad })
+    WhiteFrame.Parent = SVFrame
+
+    local BlackGrad = New("UIGradient", {
+        Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)),
+            ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0)),
+        }),
+        Transparency = NumberSequence.new({
+            NumberSequenceKeypoint.new(0, 1),
+            NumberSequenceKeypoint.new(1, 0),
+        }),
+        Rotation = 180,
+    })
+    local BlackFrame = New("Frame", {
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        ZIndex = 504,
+    }, { BlackGrad })
+    BlackFrame.Parent = SVFrame
+
+    local SVCursor = New("Frame", {
+        Size = UDim2.new(0, 14, 0, 14),
+        Position = UDim2.new(s, -7, 1 - v, -7),
+        BackgroundColor3 = Color3.new(1, 1, 1),
+        BorderSizePixel = 0,
+        ZIndex = 505,
+    }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }), New("UIStroke", { Color = Color3.new(0.3, 0.3, 0.3), Thickness = 2 }) })
+    SVCursor.Parent = SVFrame
+
+    local HueFrame = New("Frame", {
+        Size = UDim2.new(0, 16, 0, 180),
+        Position = UDim2.new(0, 192, 0, 0),
+        BackgroundColor3 = Color3.new(1, 1, 1),
+        BorderSizePixel = 0,
+        ZIndex = 502,
+    }, {
+        New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+        New("UIGradient", {
+            Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+                ColorSequenceKeypoint.new(0.167, Color3.fromRGB(255, 255, 0)),
+                ColorSequenceKeypoint.new(0.333, Color3.fromRGB(0, 255, 0)),
+                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+                ColorSequenceKeypoint.new(0.667, Color3.fromRGB(0, 0, 255)),
+                ColorSequenceKeypoint.new(0.833, Color3.fromRGB(255, 0, 255)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0)),
+            }),
+        }),
+    })
+    HueFrame.Parent = ContentLayout
+
+    local HueCursor = New("Frame", {
+        Size = UDim2.new(0, 22, 0, 22),
+        Position = UDim2.new(0.5, -11, h, -11),
+        BackgroundColor3 = Color3.new(1, 1, 1),
+        BorderSizePixel = 0,
+        ZIndex = 505,
+    }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }), New("UIStroke", { Color = Color3.new(0.3, 0.3, 0.3), Thickness = 2 }) })
+    HueCursor.Parent = HueFrame
+
+    local ValuesFrame = New("Frame", {
+        Size = UDim2.new(0, 100, 0, 180),
+        Position = UDim2.new(0, 220, 0, 0),
+        BackgroundTransparency = 1,
+        ZIndex = 502,
+    }, { New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }) })
+    ValuesFrame.Parent = ContentLayout
+
+    local function CreateValueBox(labelText, defaultVal, layoutOrder)
+        local BoxFrame = New("Frame", {
+            Size = UDim2.new(1, 0, 0, 32),
+            BackgroundColor3 = theme.InputBg,
+            BorderSizePixel = 0,
+            LayoutOrder = layoutOrder,
+            ZIndex = 503,
+        }, {
+            New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+            New("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }),
+        })
+        RegisterThemeObject(BoxFrame, "BackgroundColor3", "InputBg")
+
+        local Box = New("TextBox", {
+            Size = UDim2.new(1, -30, 1, 0),
+            BackgroundTransparency = 1,
+            Text = tostring(defaultVal),
+            TextColor3 = theme.TextPrimary,
+            Font = Enum.Font.GothamBold,
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ClearTextOnFocus = false,
+            ZIndex = 504,
+        })
+        RegisterThemeObject(Box, "TextColor3", "TextPrimary")
+        Box.Parent = BoxFrame
+
+        local Label = New("TextLabel", {
+            Size = UDim2.new(0, 30, 1, 0),
+            Position = UDim2.new(1, -30, 0, 0),
+            BackgroundTransparency = 1,
+            Text = labelText,
+            TextColor3 = theme.TextSecondary,
+            Font = Enum.Font.Gotham,
+            TextSize = 12,
+            TextXAlignment = Enum.TextXAlignment.Right,
+            ZIndex = 504,
+        })
+        RegisterThemeObject(Label, "TextColor3", "TextSecondary")
+        Label.Parent = BoxFrame
+
+        return BoxFrame, Box
+    end
+
+    local HexBoxFrame, HexBox = CreateValueBox("Hex", RGBToHex(r, g, b), 1)
+    local RBoxFrame, RBox = CreateValueBox("Red", r, 2)
+    local GBoxFrame, GBox = CreateValueBox("Green", g, 3)
+    local BBoxFrame, BBox = CreateValueBox("Blue", b, 4)
+
+    HexBoxFrame.Parent = ValuesFrame
+    RBoxFrame.Parent = ValuesFrame
+    GBoxFrame.Parent = ValuesFrame
+    BBoxFrame.Parent = ValuesFrame
+
+    local PreviewFrame = New("Frame", {
+        Size = UDim2.new(1, 0, 0, 32),
+        Position = UDim2.new(0, 0, 0, 192),
+        BackgroundTransparency = 1,
+        ZIndex = 502,
+    })
+    PreviewFrame.Parent = ContentLayout
+
+    local OldPreview = New("Frame", {
+        Size = UDim2.new(0, 85, 0, 28),
+        Position = UDim2.new(0, 0, 0, 2),
+        BackgroundColor3 = defaultColor,
+        BorderSizePixel = 0,
+        ZIndex = 503,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
+    OldPreview.Parent = PreviewFrame
+
+    local NewPreview = New("Frame", {
+        Size = UDim2.new(0, 85, 0, 28),
+        Position = UDim2.new(0, 95, 0, 2),
+        BackgroundColor3 = defaultColor,
+        BorderSizePixel = 0,
+        ZIndex = 503,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
+    NewPreview.Parent = PreviewFrame
+
+    local BtnFrame = New("Frame", {
+        Size = UDim2.new(1, 0, 0, 36),
+        Position = UDim2.new(0, 0, 0, 230),
+        BackgroundTransparency = 1,
+        ZIndex = 502,
+    })
+    BtnFrame.Parent = ContentLayout
+
+    local CancelBtn = New("TextButton", {
+        Size = UDim2.new(0, 150, 0, 36),
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundColor3 = theme.Button,
+        AutoButtonColor = false,
+        Text = "Cancel",
+        TextColor3 = theme.TextPrimary,
+        Font = Enum.Font.GothamBold,
+        TextSize = 14,
+        ZIndex = 503,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 10) }) })
+    RegisterThemeObject(CancelBtn, "BackgroundColor3", "Button")
+    RegisterThemeObject(CancelBtn, "TextColor3", "TextPrimary")
+    CancelBtn.Parent = BtnFrame
+
+    local ApplyBtn = New("TextButton", {
+        Size = UDim2.new(0, 150, 0, 36),
+        Position = UDim2.new(1, -150, 0, 0),
+        BackgroundColor3 = theme.Accent,
+        AutoButtonColor = false,
+        Text = "Apply",
+        TextColor3 = Color3.new(1, 1, 1),
+        Font = Enum.Font.GothamBold,
+        TextSize = 14,
+        ZIndex = 503,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 10) }) })
+    ApplyBtn.Parent = BtnFrame
+
+    PickerFrame.Parent = ScreenGui
+    ActiveColorPicker = PickerFrame
+
+    local scale = Instance.new("UIScale")
+    scale.Scale = 0.8
+    scale.Parent = PickerFrame
+    Tween(PickerFrame, { BackgroundTransparency = 0 }, 0.3)
+    SpringTween(scale, { Scale = 1 }, 0.35)
+
+    local Backdrop = New("Frame", {
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundColor3 = Color3.new(0, 0, 0),
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        ZIndex = 499,
+    })
+    Backdrop.Parent = ScreenGui
+    Tween(Backdrop, { BackgroundTransparency = 0.5 }, 0.3)
+
+    local function UpdateColorFromBoxes()
+        local nr = tonumber(RBox.Text) or 0
+        local ng = tonumber(GBox.Text) or 0
+        local nb = tonumber(BBox.Text) or 0
+        nr = math.clamp(nr, 0, 255)
+        ng = math.clamp(ng, 0, 255)
+        nb = math.clamp(nb, 0, 255)
+        local nh, ns, nv = RGBToHSV(nr, ng, nb)
+        h, s, v = nh, ns, nv
+        SVFrame.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+        SVCursor.Position = UDim2.new(s, -7, 1 - v, -7)
+        HueCursor.Position = UDim2.new(0.5, -11, h, -11)
+        NewPreview.BackgroundColor3 = Color3.fromRGB(nr, ng, nb)
+        HexBox.Text = RGBToHex(nr, ng, nb)
+    end
+
+    local function UpdateFromHex()
+        local hex = HexBox.Text
+        if hex:sub(1, 1) ~= "#" then hex = "#" .. hex end
+        local nr, ng, nb = HexToRGB(hex)
+        RBox.Text = tostring(nr)
+        GBox.Text = tostring(ng)
+        BBox.Text = tostring(nb)
+        UpdateColorFromBoxes()
+    end
+
+    local function UpdateColor()
+        local nr, ng, nb = HSVToRGB(h, s, v)
+        RBox.Text = tostring(nr)
+        GBox.Text = tostring(ng)
+        BBox.Text = tostring(nb)
+        HexBox.Text = RGBToHex(nr, ng, nb)
+        NewPreview.BackgroundColor3 = Color3.fromRGB(nr, ng, nb)
+    end
+
+    local svDragging = false
+    SVFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            svDragging = true
+            local absPos = SVFrame.AbsolutePosition
+            local absSize = SVFrame.AbsoluteSize
+            local relX = math.clamp((input.Position.X - absPos.X) / absSize.X, 0, 1)
+            local relY = math.clamp((input.Position.Y - absPos.Y) / absSize.Y, 0, 1)
+            s = relX
+            v = 1 - relY
+            SVCursor.Position = UDim2.new(s, -7, 1 - v, -7)
+            UpdateColor()
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if svDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local absPos = SVFrame.AbsolutePosition
+            local absSize = SVFrame.AbsoluteSize
+            local relX = math.clamp((input.Position.X - absPos.X) / absSize.X, 0, 1)
+            local relY = math.clamp((input.Position.Y - absPos.Y) / absSize.Y, 0, 1)
+            s = relX
+            v = 1 - relY
+            SVCursor.Position = UDim2.new(s, -7, 1 - v, -7)
+            UpdateColor()
+        end
+    end)
+
+    local hueDragging = false
+    HueFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            hueDragging = true
+            local absPos = HueFrame.AbsolutePosition
+            local absSize = HueFrame.AbsoluteSize
+            h = math.clamp((input.Position.Y - absPos.Y) / absSize.Y, 0, 1)
+            HueCursor.Position = UDim2.new(0.5, -11, h, -11)
+            SVFrame.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+            UpdateColor()
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if hueDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local absPos = HueFrame.AbsolutePosition
+            local absSize = HueFrame.AbsoluteSize
+            h = math.clamp((input.Position.Y - absPos.Y) / absSize.Y, 0, 1)
+            HueCursor.Position = UDim2.new(0.5, -11, h, -11)
+            SVFrame.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+            UpdateColor()
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            svDragging = false
+            hueDragging = false
+        end
+    end)
+
+    HexBox.FocusLost:Connect(UpdateFromHex)
+    RBox.FocusLost:Connect(UpdateColorFromBoxes)
+    GBox.FocusLost:Connect(UpdateColorFromBoxes)
+    BBox.FocusLost:Connect(UpdateColorFromBoxes)
+
+    local function ClosePicker(apply)
+        ActiveColorPicker = nil
+        Tween(PickerFrame, { BackgroundTransparency = 1 }, 0.2)
+        Tween(Backdrop, { BackgroundTransparency = 1 }, 0.2)
+        task.delay(0.25, function()
+            PickerFrame:Destroy()
+            Backdrop:Destroy()
+        end)
+        if apply then
+            local nr, ng, nb = HSVToRGB(h, s, v)
+            callback(Color3.fromRGB(nr, ng, nb))
+        end
+    end
+
+    CancelBtn.MouseButton1Click:Connect(function() ClosePicker(false) end)
+    ApplyBtn.MouseButton1Click:Connect(function() ClosePicker(true) end)
+    Backdrop.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            ClosePicker(false)
+        end
+    end)
+
+    CancelBtn.MouseEnter:Connect(function()
+        Tween(CancelBtn, { BackgroundColor3 = GetTheme().ButtonHover }, 0.15)
+    end)
+    CancelBtn.MouseLeave:Connect(function()
+        Tween(CancelBtn, { BackgroundColor3 = GetTheme().Button }, 0.15)
     end)
 end
 
@@ -575,7 +831,7 @@ function SimpleLib:Win(config)
     local title = config.title or "SimpleLib"
     local desc = config.desc or ""
     local icon = config.icon
-    local size = config.size and UDim2.new(unpack(config.size)) or UDim2.new(0, 520, 0, 380)
+    local size = config.size and UDim2.new(unpack(config.size)) or UDim2.new(0, 540, 0, 400)
 
     local ShadowFrame = New("Frame", {
         Size = UDim2.new(0, 0, 0, 0),
@@ -584,10 +840,8 @@ function SimpleLib:Win(config)
         BackgroundColor3 = Color3.fromRGB(0, 0, 0),
         BackgroundTransparency = 0.6,
         BorderSizePixel = 0,
-        ZIndex = 9
-    }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 14) })
-    })
+        ZIndex = 9,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 16) }) })
     ShadowFrame.Parent = ScreenGui
 
     local MainFrame = New("Frame", {
@@ -598,44 +852,38 @@ function SimpleLib:Win(config)
         BorderSizePixel = 0,
         BackgroundTransparency = 1,
         ZIndex = 10,
-        ClipsDescendants = true
+        ClipsDescendants = true,
     }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 12) }),
-        New("UIStroke", {
-            Color = theme.Stroke,
-            Thickness = 1.5
-        })
+        New("UICorner", { CornerRadius = UDim.new(0, 14) }),
+        New("UIStroke", { Color = theme.Stroke, Thickness = 1.5 }),
     })
     RegisterThemeObject(MainFrame, "BackgroundColor3", "Background")
     RegisterThemeObject(MainFrame:FindFirstChildOfClass("UIStroke"), "Color", "Stroke")
     MainFrame.Parent = ScreenGui
 
-    Tween(ShadowFrame, { Size = UDim2.new(0, size.X.Offset + 16, 0, size.Y.Offset + 16), BackgroundTransparency = 0.5 }, 0.5, Enum.EasingStyle.Quad)
+    Tween(ShadowFrame, { Size = UDim2.new(0, size.X.Offset + 20, 0, size.Y.Offset + 20), BackgroundTransparency = 0.45 }, 0.5, Enum.EasingStyle.Quad)
 
-    local targetSize = size
     local scaleFrame = Instance.new("UIScale")
     scaleFrame.Scale = 0.85
     scaleFrame.Parent = MainFrame
 
-    Tween(MainFrame, { Size = targetSize, BackgroundTransparency = 0 }, 0.45, Enum.EasingStyle.Quad)
+    Tween(MainFrame, { Size = size, BackgroundTransparency = 0 }, 0.45, Enum.EasingStyle.Quad)
     SpringTween(scaleFrame, { Scale = 1 }, 0.45)
     game:GetService("Debris"):AddItem(scaleFrame, 0.5)
 
     local Topbar = New("Frame", {
         Name = "Topbar",
-        Size = UDim2.new(1, 0, 0, 52),
+        Size = UDim2.new(1, 0, 0, 54),
         BackgroundColor3 = theme.Topbar,
-        BorderSizePixel = 0
-    }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 12) })
-    })
+        BorderSizePixel = 0,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 14) }) })
     RegisterThemeObject(Topbar, "BackgroundColor3", "Topbar")
 
     local TopbarFix = New("Frame", {
-        Size = UDim2.new(1, 0, 0, 12),
-        Position = UDim2.new(0, 0, 1, -12),
+        Size = UDim2.new(1, 0, 0, 14),
+        Position = UDim2.new(0, 0, 1, -14),
         BackgroundColor3 = theme.Topbar,
-        BorderSizePixel = 0
+        BorderSizePixel = 0,
     })
     RegisterThemeObject(TopbarFix, "BackgroundColor3", "Topbar")
     TopbarFix.Parent = Topbar
@@ -644,11 +892,10 @@ function SimpleLib:Win(config)
     if icon then
         IconLabel = New("ImageLabel", {
             Size = UDim2.new(0, 26, 0, 26),
-            Position = UDim2.new(0, 18, 0, 13),
+            Position = UDim2.new(0, 18, 0, 14),
             BackgroundTransparency = 1,
             Image = icon,
             ScaleType = Enum.ScaleType.Fit,
-            Visible = true
         })
         IconLabel.Parent = Topbar
     end
@@ -660,8 +907,8 @@ function SimpleLib:Win(config)
         Font = Enum.Font.GothamBold,
         TextColor3 = theme.TextPrimary,
         BackgroundTransparency = 1,
-        Position = icon and UDim2.new(0, 18 + 26 + 6, 0, 10) or UDim2.new(0, 18, 0, 10),
-        Size = UDim2.new(0, 220, 0, 26)
+        Position = icon and UDim2.new(0, 18 + 26 + 8, 0, 10) or UDim2.new(0, 18, 0, 10),
+        Size = UDim2.new(0, 220, 0, 26),
     })
     RegisterThemeObject(TitleLabel, "TextColor3", "TextPrimary")
 
@@ -672,8 +919,8 @@ function SimpleLib:Win(config)
         Font = Enum.Font.Gotham,
         TextColor3 = theme.TextSecondary,
         BackgroundTransparency = 1,
-        Position = icon and UDim2.new(0, 18 + 26 + 6, 0, 34) or UDim2.new(0, 18, 0, 34),
-        Size = UDim2.new(0, 220, 0, 16)
+        Position = icon and UDim2.new(0, 18 + 26 + 8, 0, 34) or UDim2.new(0, 18, 0, 34),
+        Size = UDim2.new(0, 220, 0, 16),
     })
     RegisterThemeObject(DescLabel, "TextColor3", "TextSecondary")
     TitleLabel.Parent = Topbar
@@ -681,7 +928,7 @@ function SimpleLib:Win(config)
 
     local MinimizeBtn = New("TextButton", {
         Size = UDim2.new(0, 32, 0, 32),
-        Position = UDim2.new(1, -42, 0, 10),
+        Position = UDim2.new(1, -42, 0, 11),
         BackgroundColor3 = theme.MinimizeBtn,
         AutoButtonColor = false,
         Text = "—",
@@ -689,16 +936,14 @@ function SimpleLib:Win(config)
         TextSize = 18,
         TextColor3 = theme.TextPrimary,
         BorderSizePixel = 0,
-        ZIndex = 10
-    }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 8) })
-    })
+        ZIndex = 10,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
     RegisterThemeObject(MinimizeBtn, "BackgroundColor3", "MinimizeBtn")
     RegisterThemeObject(MinimizeBtn, "TextColor3", "TextPrimary")
 
     local CloseBtn = New("TextButton", {
         Size = UDim2.new(0, 32, 0, 32),
-        Position = UDim2.new(1, -80, 0, 10),
+        Position = UDim2.new(1, -80, 0, 11),
         BackgroundColor3 = theme.CloseBtn,
         AutoButtonColor = false,
         Text = "✕",
@@ -706,10 +951,8 @@ function SimpleLib:Win(config)
         TextSize = 16,
         TextColor3 = theme.TextPrimary,
         BorderSizePixel = 0,
-        ZIndex = 10
-    }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 8) })
-    })
+        ZIndex = 10,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
     RegisterThemeObject(CloseBtn, "BackgroundColor3", "CloseBtn")
     RegisterThemeObject(CloseBtn, "TextColor3", "TextPrimary")
 
@@ -733,26 +976,23 @@ function SimpleLib:Win(config)
 
     local Sidebar = New("ScrollingFrame", {
         Name = "Sidebar",
-        Position = UDim2.new(0, 0, 0, 52),
-        Size = UDim2.new(0, 150, 1, -52),
+        Position = UDim2.new(0, 0, 0, 54),
+        Size = UDim2.new(0, 155, 1, -54),
         BackgroundColor3 = theme.Sidebar,
         BorderSizePixel = 0,
         ScrollBarThickness = 3,
         ScrollBarImageColor3 = theme.Scrollbar,
         CanvasSize = UDim2.new(0, 0, 0, 0),
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
-        ScrollingDirection = Enum.ScrollingDirection.Y
+        ScrollingDirection = Enum.ScrollingDirection.Y,
     }, {
-        New("UIListLayout", {
-            SortOrder = Enum.SortOrder.LayoutOrder,
-            Padding = UDim.new(0, 6)
-        }),
+        New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }),
         New("UIPadding", {
             PaddingTop = UDim.new(0, 10),
             PaddingBottom = UDim.new(0, 10),
             PaddingLeft = UDim.new(0, 8),
-            PaddingRight = UDim.new(0, 8)
-        })
+            PaddingRight = UDim.new(0, 8),
+        }),
     })
     RegisterThemeObject(Sidebar, "BackgroundColor3", "Sidebar")
     RegisterThemeObject(Sidebar, "ScrollBarImageColor3", "Scrollbar")
@@ -762,13 +1002,10 @@ function SimpleLib:Win(config)
         BackgroundColor3 = theme.SearchBg,
         BorderSizePixel = 0,
         LayoutOrder = -1,
-        Visible = false
+        Visible = false,
     }, {
         New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-        New("UIPadding", {
-            PaddingLeft = UDim.new(0, 8),
-            PaddingRight = UDim.new(0, 8)
-        })
+        New("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }),
     })
     RegisterThemeObject(SearchFrame, "BackgroundColor3", "SearchBg")
 
@@ -778,7 +1015,7 @@ function SimpleLib:Win(config)
         Text = "🔍",
         Font = Enum.Font.Gotham,
         TextSize = 12,
-        TextColor3 = theme.SearchPlaceholder
+        TextColor3 = theme.SearchPlaceholder,
     })
     RegisterThemeObject(SearchIcon, "TextColor3", "SearchPlaceholder")
     SearchIcon.Parent = SearchFrame
@@ -793,7 +1030,7 @@ function SimpleLib:Win(config)
         PlaceholderColor3 = theme.SearchPlaceholder,
         Font = Enum.Font.Gotham,
         TextSize = 13,
-        ClearTextOnFocus = false
+        ClearTextOnFocus = false,
     })
     RegisterThemeObject(SearchBox, "TextColor3", "TextPrimary")
     RegisterThemeObject(SearchBox, "PlaceholderColor3", "SearchPlaceholder")
@@ -802,14 +1039,12 @@ function SimpleLib:Win(config)
 
     local MainPanel = New("Frame", {
         Name = "MainPanel",
-        Position = UDim2.new(0, 150, 0, 52),
-        Size = UDim2.new(1, -150, 1, -52),
+        Position = UDim2.new(0, 155, 0, 54),
+        Size = UDim2.new(1, -155, 1, -54),
         BackgroundColor3 = theme.MainPanel,
         BorderSizePixel = 0,
-        ClipsDescendants = true
-    }, {
-        New("UICorner", { CornerRadius = UDim.new(0, 10) })
-    })
+        ClipsDescendants = true,
+    }, { New("UICorner", { CornerRadius = UDim.new(0, 12) }) })
     RegisterThemeObject(MainPanel, "BackgroundColor3", "MainPanel")
 
     Topbar.Parent = MainFrame
@@ -820,14 +1055,13 @@ function SimpleLib:Win(config)
         duration = tonumber(duration) or 2.5
         local loading = New("Frame", {
             Size = UDim2.new(1, 0, 1, 0),
-            Position = UDim2.new(0, 0, 0, 0),
             BackgroundColor3 = theme.LoadingBg,
             BorderSizePixel = 0,
             ZIndex = 999,
-            BackgroundTransparency = 1
+            BackgroundTransparency = 1,
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 10) }),
-            New("UIStroke", { Color = theme.LoadingStroke, Thickness = 1.5 })
+            New("UICorner", { CornerRadius = UDim.new(0, 12) }),
+            New("UIStroke", { Color = theme.LoadingStroke, Thickness = 1.5 }),
         })
         RegisterThemeObject(loading, "BackgroundColor3", "LoadingBg")
 
@@ -836,9 +1070,7 @@ function SimpleLib:Win(config)
             Position = UDim2.new(0.5, 0, 0.5, 0),
             AnchorPoint = Vector2.new(0.5, 0.5),
             BackgroundTransparency = 1,
-            ZIndex = 1000
-        }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 8) })
+            ZIndex = 1000,
         })
 
         local libLabel = New("TextLabel", {
@@ -849,7 +1081,7 @@ function SimpleLib:Win(config)
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 16, 0, 12),
             Size = UDim2.new(1, -32, 0, 34),
-            TextXAlignment = Enum.TextXAlignment.Left
+            TextXAlignment = Enum.TextXAlignment.Left,
         })
         RegisterThemeObject(libLabel, "TextColor3", "LoadingText")
 
@@ -861,43 +1093,25 @@ function SimpleLib:Win(config)
             BackgroundTransparency = 1,
             Position = UDim2.new(0, 16, 0, 48),
             Size = UDim2.new(1, -32, 0, 20),
-            TextXAlignment = Enum.TextXAlignment.Left
+            TextXAlignment = Enum.TextXAlignment.Left,
         })
         RegisterThemeObject(subLabel, "TextColor3", "LoadingSub")
 
         local barBg = New("Frame", {
             Size = UDim2.new(1, -32, 0, 10),
             Position = UDim2.new(0, 16, 1, -36),
-            AnchorPoint = Vector2.new(0, 0),
             BackgroundColor3 = theme.InputBg,
-            BorderSizePixel = 0
-        }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 5) })
-        })
+            BorderSizePixel = 0,
+        }, { New("UICorner", { CornerRadius = UDim.new(0, 5) }) })
         RegisterThemeObject(barBg, "BackgroundColor3", "InputBg")
 
         local barFill = New("Frame", {
             Size = UDim2.new(0, 0, 1, 0),
-            Position = UDim2.new(0, 0, 0, 0),
             BackgroundColor3 = theme.Accent,
             BorderSizePixel = 0,
-            ZIndex = 1001
-        }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 5) })
-        })
+            ZIndex = 1001,
+        }, { New("UICorner", { CornerRadius = UDim.new(0, 5) }) })
         RegisterThemeObject(barFill, "BackgroundColor3", "Accent")
-
-        local barGlow = New("Frame", {
-            Size = UDim2.new(0, 0, 1, 0),
-            Position = UDim2.new(0, 0, 0, 0),
-            BackgroundColor3 = theme.Accent,
-            BackgroundTransparency = 0.7,
-            BorderSizePixel = 0,
-            ZIndex = 1000
-        }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 5) })
-        })
-        RegisterThemeObject(barGlow, "BackgroundColor3", "Accent")
 
         local percentLabel = New("TextLabel", {
             Text = "0%",
@@ -908,12 +1122,11 @@ function SimpleLib:Win(config)
             Position = UDim2.new(1, -70, 1, -58),
             Size = UDim2.new(0, 56, 0, 20),
             ZIndex = 1002,
-            TextXAlignment = Enum.TextXAlignment.Right
+            TextXAlignment = Enum.TextXAlignment.Right,
         })
         RegisterThemeObject(percentLabel, "TextColor3", "LoadingSub")
 
         barFill.Parent = barBg
-        barGlow.Parent = barBg
         center.Parent = loading
         libLabel.Parent = center
         subLabel.Parent = center
@@ -921,11 +1134,8 @@ function SimpleLib:Win(config)
         percentLabel.Parent = center
         loading.Parent = MainFrame
 
-        loading.BackgroundTransparency = 1
         Tween(loading, { BackgroundTransparency = 0 }, 0.3)
-
         local tween = Tween(barFill, { Size = UDim2.new(1, 0, 1, 0) }, duration, Enum.EasingStyle.Linear)
-        Tween(barGlow, { Size = UDim2.new(1, 0, 1, 0) }, duration, Enum.EasingStyle.Linear)
 
         local start = tick()
         task.spawn(function()
@@ -933,20 +1143,14 @@ function SimpleLib:Win(config)
                 local t = (tick() - start) / duration
                 local pct = math.clamp(math.floor(t * 100), 0, 100)
                 percentLabel.Text = tostring(pct) .. "%"
-                if math.random() < 0.08 then
-                    subLabel.Text = subTitle .. string.rep(".", math.random(1, 3))
-                else
-                    subLabel.Text = subTitle
-                end
+                subLabel.Text = subTitle .. string.rep(".", math.random(1, 3))
                 task.wait(0.04)
             end
             percentLabel.Text = "100%"
         end)
 
         tween.Completed:Wait()
-
         Tween(loading, { BackgroundTransparency = 1 }, 0.3)
-        Tween(center, { Position = UDim2.new(0.5, 0, 0.45, 0) }, 0.3)
         task.wait(0.35)
         loading:Destroy()
     end
@@ -970,10 +1174,7 @@ function SimpleLib:Win(config)
     UserInputService.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = UserInputService:GetMouseLocation() - dragStart
-            MainFrame.Position = UDim2.new(
-                startPos.X.Scale, startPos.X.Offset + delta.X,
-                startPos.Y.Scale, startPos.Y.Offset + delta.Y
-            )
+            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
             ShadowFrame.Position = MainFrame.Position
         end
     end)
@@ -986,27 +1187,25 @@ function SimpleLib:Win(config)
 
     local MiniBar = nil
     local isMinimized = false
-    local MiniBarDefaultPos = UDim2.new(0.5, 0, 0, 8)
+    local MiniBarDefaultPos = UDim2.new(0.5, 0, 0, 10)
 
     local function CreateMiniBar()
         if MiniBar then return end
         theme = GetTheme()
 
         local MiniShadow = New("Frame", {
-            Size = UDim2.new(0, 200, 0, 40),
+            Size = UDim2.new(0, 220, 0, 44),
             Position = MiniBarDefaultPos,
             AnchorPoint = Vector2.new(0.5, 0),
             BackgroundColor3 = Color3.fromRGB(0, 0, 0),
             BackgroundTransparency = 0.7,
             BorderSizePixel = 0,
-            ZIndex = 99
-        }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 10) })
-        })
+            ZIndex = 99,
+        }, { New("UICorner", { CornerRadius = UDim.new(0, 12) }) })
         MiniShadow.Parent = ScreenGui
 
         MiniBar = New("TextButton", {
-            Size = UDim2.new(0, 200, 0, 40),
+            Size = UDim2.new(0, 220, 0, 44),
             Position = MiniBarDefaultPos,
             AnchorPoint = Vector2.new(0.5, 0),
             BackgroundColor3 = theme.MiniBarBg,
@@ -1015,52 +1214,49 @@ function SimpleLib:Win(config)
             AutoButtonColor = false,
             ZIndex = 100,
             BackgroundTransparency = 1,
-            ClipsDescendants = true
+            ClipsDescendants = true,
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 10) }),
+            New("UICorner", { CornerRadius = UDim.new(0, 12) }),
             New("UIStroke", { Color = theme.MiniBarStroke, Thickness = 1.5 }),
-            New("UIPadding", {
-                PaddingLeft = UDim.new(0, 12),
-                PaddingRight = UDim.new(0, 12)
-            })
+            New("UIPadding", { PaddingLeft = UDim.new(0, 14), PaddingRight = UDim.new(0, 14) }),
         })
         RegisterThemeObject(MiniBar, "BackgroundColor3", "MiniBarBg")
         RegisterThemeObject(MiniBar:FindFirstChildOfClass("UIStroke"), "Color", "MiniBarStroke")
 
         local MiniIcon = New("TextLabel", {
-            Size = UDim2.new(0, 20, 0, 20),
-            Position = UDim2.new(0, 0, 0.5, -10),
+            Size = UDim2.new(0, 22, 0, 22),
+            Position = UDim2.new(0, 0, 0.5, -11),
             BackgroundTransparency = 1,
             Text = "◈",
             TextColor3 = theme.Accent,
             Font = Enum.Font.GothamBold,
-            TextSize = 14
+            TextSize = 15,
         })
         RegisterThemeObject(MiniIcon, "TextColor3", "Accent")
         MiniIcon.Parent = MiniBar
 
         local MiniTitle = New("TextLabel", {
-            Size = UDim2.new(1, -50, 1, 0),
-            Position = UDim2.new(0, 24, 0, 0),
+            Size = UDim2.new(1, -56, 1, 0),
+            Position = UDim2.new(0, 26, 0, 0),
             BackgroundTransparency = 1,
             Text = title,
             TextColor3 = theme.TextPrimary,
             Font = Enum.Font.GothamBold,
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left,
-            TextTruncate = Enum.TextTruncate.AtEnd
+            TextTruncate = Enum.TextTruncate.AtEnd,
         })
         RegisterThemeObject(MiniTitle, "TextColor3", "TextPrimary")
         MiniTitle.Parent = MiniBar
 
         local MiniRestore = New("TextLabel", {
-            Size = UDim2.new(0, 22, 0, 22),
-            Position = UDim2.new(1, -22, 0.5, -11),
+            Size = UDim2.new(0, 24, 0, 24),
+            Position = UDim2.new(1, -24, 0.5, -12),
             BackgroundTransparency = 1,
             Text = "❐",
             TextColor3 = theme.TextSecondary,
             Font = Enum.Font.GothamBold,
-            TextSize = 13
+            TextSize = 14,
         })
         RegisterThemeObject(MiniRestore, "TextColor3", "TextSecondary")
         MiniRestore.Parent = MiniBar
@@ -1068,7 +1264,7 @@ function SimpleLib:Win(config)
         MiniBar.Parent = ScreenGui
 
         Tween(MiniBar, { BackgroundTransparency = 0 }, 0.3)
-        Tween(MiniShadow, { BackgroundTransparency = 0.5 }, 0.3)
+        Tween(MiniShadow, { BackgroundTransparency = 0.45 }, 0.3)
 
         MiniBar.MouseEnter:Connect(function()
             Tween(MiniBar, { BackgroundColor3 = GetTheme().ButtonHover }, 0.15)
@@ -1095,14 +1291,9 @@ function SimpleLib:Win(config)
         UserInputService.InputChanged:Connect(function(input)
             if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) and mbDragStart then
                 local delta = UserInputService:GetMouseLocation() - mbDragStart
-                if delta.Magnitude > dragThreshold then
-                    mbDragging = true
-                end
+                if delta.Magnitude > dragThreshold then mbDragging = true end
                 if mbDragging then
-                    MiniBar.Position = UDim2.new(
-                        mbStartPos.X.Scale, mbStartPos.X.Offset + delta.X,
-                        mbStartPos.Y.Scale, mbStartPos.Y.Offset + delta.Y
-                    )
+                    MiniBar.Position = UDim2.new(mbStartPos.X.Scale, mbStartPos.X.Offset + delta.X, mbStartPos.Y.Scale, mbStartPos.Y.Offset + delta.Y)
                     MiniShadow.Position = MiniBar.Position
                 end
             end
@@ -1122,13 +1313,8 @@ function SimpleLib:Win(config)
             Tween(MiniBar, { BackgroundTransparency = 1 }, 0.2)
             Tween(MiniShadow, { BackgroundTransparency = 1 }, 0.2)
             task.delay(0.25, function()
-                if MiniBar then
-                    MiniBar:Destroy()
-                    MiniBar = nil
-                end
-                if MiniShadow then
-                    MiniShadow:Destroy()
-                end
+                if MiniBar then MiniBar:Destroy() MiniBar = nil end
+                if MiniShadow then MiniShadow:Destroy() end
             end)
 
             MainFrame.Visible = true
@@ -1147,54 +1333,51 @@ function SimpleLib:Win(config)
             MinimizeBtn.Text = "—"
             Sidebar.Visible = true
             MainPanel.Visible = true
-            Topbar.Size = UDim2.new(1, 0, 0, 52)
+            Topbar.Size = UDim2.new(1, 0, 0, 54)
             if IconLabel then
                 IconLabel.Visible = true
                 IconLabel.Size = UDim2.new(0, 26, 0, 26)
-                IconLabel.Position = UDim2.new(0, 18, 0, 13)
+                IconLabel.Position = UDim2.new(0, 18, 0, 14)
             end
-            TitleLabel.Position = icon and UDim2.new(0, 18 + 26 + 6, 0, 10) or UDim2.new(0, 18, 0, 10)
+            TitleLabel.Position = icon and UDim2.new(0, 18 + 26 + 8, 0, 10) or UDim2.new(0, 18, 0, 10)
             TitleLabel.Size = UDim2.new(0, 220, 0, 26)
             TitleLabel.TextSize = 21
             DescLabel.Visible = true
             CloseBtn.Visible = true
 
-            MiniBarDefaultPos = UDim2.new(0.5, 0, 0, 8)
+            MiniBarDefaultPos = UDim2.new(0.5, 0, 0, 10)
         end)
     end
 
     MinimizeBtn.MouseButton1Click:Connect(function()
-        if isMinimized then
-            return
-        else
-            isMinimized = true
+        if isMinimized then return end
+        isMinimized = true
 
-            Tween(MainFrame, { Size = UDim2.new(0, MainFrame.AbsoluteSize.X, 0, 52) }, 0.3, Enum.EasingStyle.Quad)
-            Tween(ShadowFrame, { Size = UDim2.new(0, MainFrame.AbsoluteSize.X + 16, 0, 68) }, 0.3)
+        Tween(MainFrame, { Size = UDim2.new(0, MainFrame.AbsoluteSize.X, 0, 54) }, 0.3, Enum.EasingStyle.Quad)
+        Tween(ShadowFrame, { Size = UDim2.new(0, MainFrame.AbsoluteSize.X + 20, 0, 74) }, 0.3)
 
-            task.delay(0.15, function()
-                Sidebar.Visible = false
-                MainPanel.Visible = false
-                if IconLabel then IconLabel.Visible = false end
-                DescLabel.Visible = false
-                TitleLabel.TextSize = 14
-                TitleLabel.Position = UDim2.new(0, 12, 0.5, -10)
-                TitleLabel.Size = UDim2.new(1, -80, 0, 20)
-                MinimizeBtn.Text = "❐"
-                MinimizeBtn.Size = UDim2.new(0, 36, 0, 36)
-                MinimizeBtn.Position = UDim2.new(1, -46, 0.5, -18)
-                MinimizeBtn.BackgroundColor3 = theme.Accent
-                CloseBtn.Visible = false
-            end)
+        task.delay(0.15, function()
+            Sidebar.Visible = false
+            MainPanel.Visible = false
+            if IconLabel then IconLabel.Visible = false end
+            DescLabel.Visible = false
+            TitleLabel.TextSize = 14
+            TitleLabel.Position = UDim2.new(0, 12, 0.5, -10)
+            TitleLabel.Size = UDim2.new(1, -80, 0, 20)
+            MinimizeBtn.Text = "❐"
+            MinimizeBtn.Size = UDim2.new(0, 36, 0, 36)
+            MinimizeBtn.Position = UDim2.new(1, -48, 0.5, -18)
+            MinimizeBtn.BackgroundColor3 = theme.Accent
+            CloseBtn.Visible = false
+        end)
 
-            task.delay(0.3, function()
-                MainFrame.Visible = false
-                ShadowFrame.Visible = false
-                CreateMiniBar()
-                MainFrame.Size = targetSize
-                ShadowFrame.Size = UDim2.new(0, targetSize.X.Offset + 16, 0, targetSize.Y.Offset + 16)
-            end)
-        end
+        task.delay(0.3, function()
+            MainFrame.Visible = false
+            ShadowFrame.Visible = false
+            CreateMiniBar()
+            MainFrame.Size = size
+            ShadowFrame.Size = UDim2.new(0, size.X.Offset + 20, 0, size.Y.Offset + 20)
+        end)
     end)
 
     local function ShowConfirmDialog()
@@ -1204,7 +1387,7 @@ function SimpleLib:Win(config)
             BackgroundColor3 = Color3.fromRGB(0, 0, 0),
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
-            ZIndex = 998
+            ZIndex = 998,
         })
         overlay.Parent = MainFrame
         Tween(overlay, { BackgroundTransparency = 0.4 }, 0.2)
@@ -1217,7 +1400,7 @@ function SimpleLib:Win(config)
             BorderSizePixel = 0,
             Visible = false,
             BackgroundTransparency = 1,
-            ZIndex = 999
+            ZIndex = 999,
         }, {
             New("UICorner", { CornerRadius = UDim.new(0, 12) }),
             New("UIStroke", { Color = theme.Stroke, Thickness = 1.5 }),
@@ -1225,7 +1408,7 @@ function SimpleLib:Win(config)
                 PaddingTop = UDim.new(0, 20),
                 PaddingLeft = UDim.new(0, 20),
                 PaddingRight = UDim.new(0, 20),
-                PaddingBottom = UDim.new(0, 20)
+                PaddingBottom = UDim.new(0, 20),
             }),
             New("TextLabel", {
                 Text = "Close GUI?",
@@ -1234,7 +1417,7 @@ function SimpleLib:Win(config)
                 TextColor3 = theme.TextPrimary,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 0, 28),
-                TextXAlignment = Enum.TextXAlignment.Left
+                TextXAlignment = Enum.TextXAlignment.Left,
             }),
             New("TextLabel", {
                 Text = "Are you sure you want to close the interface?",
@@ -1244,8 +1427,8 @@ function SimpleLib:Win(config)
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0, 0, 0, 32),
                 Size = UDim2.new(1, 0, 0, 20),
-                TextXAlignment = Enum.TextXAlignment.Left
-            })
+                TextXAlignment = Enum.TextXAlignment.Left,
+            }),
         })
         RegisterThemeObject(Dialog, "BackgroundColor3", "Background")
 
@@ -1260,7 +1443,7 @@ function SimpleLib:Win(config)
             TextSize = 14,
             TextColor3 = Color3.fromRGB(255, 255, 255),
             BorderSizePixel = 0,
-            ZIndex = 1000
+            ZIndex = 1000,
         }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
 
         local okBtn = New("TextButton", {
@@ -1274,7 +1457,7 @@ function SimpleLib:Win(config)
             TextSize = 14,
             TextColor3 = Color3.fromRGB(255, 255, 255),
             BorderSizePixel = 0,
-            ZIndex = 1000
+            ZIndex = 1000,
         }, { New("UICorner", { CornerRadius = UDim.new(0, 8) }) })
 
         noBtn.Parent = Dialog
@@ -1340,15 +1523,12 @@ function SimpleLib:Win(config)
         Sidebar = Sidebar,
         Tabs = {},
         TabButtons = {},
-        SearchEnabled = false
+        SearchEnabled = false,
+        ConfigData = {},
     }
 
     function Window:Notify(config)
-        local title = config.title or "Notification"
-        local content = config.content or ""
-        local dur = config.dur or 5
-        table.insert(NotifyQueue, { title = title, content = content, dur = dur })
-        ProcessNotifyQueue()
+        ShowNotification(config)
     end
 
     local function FilterTabs(query)
@@ -1389,7 +1569,7 @@ function SimpleLib:Win(config)
             AutoButtonColor = false,
             Text = "",
             BorderSizePixel = 0,
-            BackgroundTransparency = 0
+            BackgroundTransparency = 0,
         }, {
             New("UICorner", { CornerRadius = UDim.new(0, 8) }),
             New("TextLabel", {
@@ -1400,8 +1580,8 @@ function SimpleLib:Win(config)
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, -12, 1, 0),
                 Position = UDim2.new(0, 12, 0, 0),
-                TextXAlignment = Enum.TextXAlignment.Left
-            })
+                TextXAlignment = Enum.TextXAlignment.Left,
+            }),
         })
         RegisterThemeObject(TabButton, "BackgroundColor3", "TabBtn")
         RegisterThemeObject(TabButton.TextLabel, "TextColor3", "TextSecondary")
@@ -1433,38 +1613,43 @@ function SimpleLib:Win(config)
             CanvasSize = UDim2.new(0, 0, 0, 0),
             AutomaticCanvasSize = Enum.AutomaticSize.Y,
             Visible = #Window.Tabs == 0,
-            ScrollingDirection = Enum.ScrollingDirection.Y
+            ScrollingDirection = Enum.ScrollingDirection.Y,
         }, {
             New("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 10)
+                Padding = UDim.new(0, 10),
             }),
             New("UIPadding", {
                 PaddingTop = UDim.new(0, 10),
                 PaddingLeft = UDim.new(0, 10),
                 PaddingRight = UDim.new(0, 10),
-                PaddingBottom = UDim.new(0, 10)
-            })
+                PaddingBottom = UDim.new(0, 10),
+            }),
         })
         RegisterThemeObject(TabContent, "ScrollBarImageColor3", "Scrollbar")
 
-        -- ShowOnTop feature
+        -- ShowOnTop centered
         if showOnTop then
             local TopTitleFrame = New("Frame", {
-                Size = UDim2.new(1, 0, 0, 36),
+                Size = UDim2.new(1, 0, 0, 40),
                 BackgroundTransparency = 1,
-                LayoutOrder = -100
+                LayoutOrder = -100,
             }, {
+                New("UIListLayout", {
+                    SortOrder = Enum.SortOrder.LayoutOrder,
+                    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+                    VerticalAlignment = Enum.VerticalAlignment.Center,
+                }),
                 New("TextLabel", {
                     Text = tabTitle,
                     TextColor3 = theme.TextPrimary,
                     Font = Enum.Font.GothamBold,
-                    TextSize = 18,
+                    TextSize = 20,
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1, 0, 1, 0),
-                    TextXAlignment = Enum.TextXAlignment.Left,
-                    TextYAlignment = Enum.TextYAlignment.Center
-                })
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                    TextYAlignment = Enum.TextYAlignment.Center,
+                }),
             })
             RegisterThemeObject(TopTitleFrame.TextLabel, "TextColor3", "TextPrimary")
             TopTitleFrame.Parent = TabContent
@@ -1478,10 +1663,8 @@ function SimpleLib:Win(config)
             AnchorPoint = Vector2.new(0, 0.5),
             BackgroundColor3 = theme.Accent,
             BorderSizePixel = 0,
-            BackgroundTransparency = 1
-        }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 2) })
-        })
+            BackgroundTransparency = 1,
+        }, { New("UICorner", { CornerRadius = UDim.new(0, 2) }) })
         RegisterThemeObject(ActiveIndicator, "BackgroundColor3", "Accent")
         ActiveIndicator.Parent = TabButton
 
@@ -1511,7 +1694,7 @@ function SimpleLib:Win(config)
             Button = TabButton,
             ActiveIndicator = ActiveIndicator,
             Title = tabTitle,
-            Elements = {}
+            Elements = {},
         }
 
         table.insert(Window.Tabs, Tab)
@@ -1544,26 +1727,29 @@ function SimpleLib:Win(config)
         function Tab:Section(sectionConfig)
             theme = GetTheme()
             local sectionTitle = sectionConfig.title or "Section"
+            local defaultState = sectionConfig.state
+            if defaultState == nil then defaultState = false end
+
             local SectionFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 36),
                 BackgroundColor3 = theme.Section,
                 BorderSizePixel = 0,
                 ClipsDescendants = false,
-                BackgroundTransparency = 0
+                BackgroundTransparency = 0,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
                 New("UIPadding", {
                     PaddingTop = UDim.new(0, 8),
                     PaddingLeft = UDim.new(0, 10),
                     PaddingRight = UDim.new(0, 10),
-                    PaddingBottom = UDim.new(0, 8)
+                    PaddingBottom = UDim.new(0, 8),
                 }),
                 New("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
                     Padding = UDim.new(0, 6),
                     FillDirection = Enum.FillDirection.Horizontal,
-                    VerticalAlignment = Enum.VerticalAlignment.Center
-                })
+                    VerticalAlignment = Enum.VerticalAlignment.Center,
+                }),
             })
             RegisterThemeObject(SectionFrame, "BackgroundColor3", "Section")
 
@@ -1575,7 +1761,7 @@ function SimpleLib:Win(config)
                 Font = Enum.Font.GothamBold,
                 TextSize = 12,
                 BorderSizePixel = 0,
-                Rotation = 0
+                Rotation = 0,
             })
             RegisterThemeObject(ArrowButton, "TextColor3", "TextSecondary")
 
@@ -1586,7 +1772,7 @@ function SimpleLib:Win(config)
                 TextSize = 15,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, -34, 1, 0),
-                TextXAlignment = Enum.TextXAlignment.Left
+                TextXAlignment = Enum.TextXAlignment.Left,
             })
             RegisterThemeObject(SectionTitleLabel, "TextColor3", "TextPrimary")
 
@@ -1597,37 +1783,37 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = SectionFrame,
                 Searchable = true,
-                SearchText = sectionTitle
+                SearchText = sectionTitle,
             })
 
             local ContentFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 0),
                 BackgroundTransparency = 1,
-                Visible = false,
-                AutomaticSize = Enum.AutomaticSize.Y
+                Visible = defaultState,
+                AutomaticSize = Enum.AutomaticSize.Y,
             }, {
                 New("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 8)
+                    Padding = UDim.new(0, 8),
                 }),
                 New("UIPadding", {
                     PaddingTop = UDim.new(0, 6),
                     PaddingLeft = UDim.new(0, 6),
                     PaddingRight = UDim.new(0, 6),
-                    PaddingBottom = UDim.new(0, 6)
-                })
+                    PaddingBottom = UDim.new(0, 6),
+                }),
             })
-
             ContentFrame.Parent = Tab.Content
 
-            local IsOpen = false
+            local IsOpen = defaultState
             local function UpdateSection()
                 if IsOpen then
-                    Tween(ArrowButton, { Rotation = 180 }, 0.2, Enum.EasingStyle.Back)
                     ContentFrame.Visible = true
+                    ContentFrame.Size = UDim2.new(1, 0, 0, 0)
+                    Tween(ArrowButton, { Rotation = 180 }, 0.25, Enum.EasingStyle.Back)
                     Tween(ContentFrame, { BackgroundTransparency = 0 }, 0.2)
                 else
-                    Tween(ArrowButton, { Rotation = 0 }, 0.2, Enum.EasingStyle.Back)
+                    Tween(ArrowButton, { Rotation = 0 }, 0.25, Enum.EasingStyle.Back)
                     Tween(ContentFrame, { BackgroundTransparency = 1 }, 0.15)
                     task.delay(0.15, function()
                         if not IsOpen then ContentFrame.Visible = false end
@@ -1647,9 +1833,7 @@ function SimpleLib:Win(config)
                 end
             end)
 
-            local Section = {
-                Content = ContentFrame
-            }
+            local Section = { Content = ContentFrame }
 
             for name, func in pairs(Tab) do
                 if type(func) == "function" and name ~= "Section" and name ~= "SetSearchQuery" then
@@ -1680,7 +1864,7 @@ function SimpleLib:Win(config)
             return Section
         end
 
-        -- Button (renamed from Btn, with confined ripple)
+        -- Button
         function Tab:Button(btnConfig)
             theme = GetTheme()
             local btnTitle = btnConfig.title or "Button"
@@ -1692,9 +1876,9 @@ function SimpleLib:Win(config)
                 Text = "",
                 BorderSizePixel = 0,
                 BackgroundTransparency = 0,
-                ClipsDescendants = true
+                ClipsDescendants = true,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
                 New("TextLabel", {
                     Text = btnTitle,
                     TextColor3 = theme.TextPrimary,
@@ -1702,8 +1886,8 @@ function SimpleLib:Win(config)
                     TextSize = 15,
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1, 0, 1, 0),
-                    TextXAlignment = Enum.TextXAlignment.Center
-                })
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                }),
             })
             RegisterThemeObject(Button, "BackgroundColor3", "Button")
             RegisterThemeObject(Button.TextLabel, "TextColor3", "TextPrimary")
@@ -1730,12 +1914,11 @@ function SimpleLib:Win(config)
                     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                     BackgroundTransparency = 0.7,
                     BorderSizePixel = 0,
-                    ZIndex = 2
+                    ZIndex = 2,
                 }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
                 ripple.Parent = Button
                 Tween(ripple, { Size = UDim2.new(0, 120, 0, 120), BackgroundTransparency = 1 }, 0.4)
                 game:GetService("Debris"):AddItem(ripple, 0.4)
-
                 callback()
             end)
             Button.Parent = Tab.Content
@@ -1743,27 +1926,28 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = Button,
                 Searchable = true,
-                SearchText = btnTitle
+                SearchText = btnTitle,
             })
         end
-        -- Alias for backward compatibility
         Tab.Btn = Tab.Button
 
-        -- Toggle (renamed from Tog)
+        -- Toggle with state
         function Tab:Toggle(togConfig)
             theme = GetTheme()
             local togTitle = togConfig.title or "Toggle"
             local togDesc = togConfig.desc or ""
             local callback = togConfig[1] or function() end
-            local IsToggled = togConfig.Enable == true
+            local IsToggled = togConfig.state
+            if IsToggled == nil then IsToggled = togConfig.Enable == true end
+            if IsToggled == nil then IsToggled = false end
 
             local ToggleFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 52),
                 BackgroundColor3 = theme.Element,
                 BorderSizePixel = 0,
-                BackgroundTransparency = 0
+                BackgroundTransparency = 0,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
                 New("TextLabel", {
                     Name = "Title",
                     Text = togTitle,
@@ -1772,7 +1956,7 @@ function SimpleLib:Win(config)
                     TextSize = 15,
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 14, 0, 8),
-                    Size = UDim2.new(1, -90, 0, 18)
+                    Size = UDim2.new(1, -90, 0, 18),
                 }),
                 New("TextLabel", {
                     Name = "Desc",
@@ -1782,7 +1966,7 @@ function SimpleLib:Win(config)
                     TextSize = 12,
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 14, 0, 26),
-                    Size = UDim2.new(1, -90, 0, 14)
+                    Size = UDim2.new(1, -90, 0, 14),
                 }),
                 New("TextButton", {
                     Name = "ToggleBtn",
@@ -1791,7 +1975,7 @@ function SimpleLib:Win(config)
                     BackgroundColor3 = theme.ToggleOff,
                     AutoButtonColor = false,
                     BorderSizePixel = 0,
-                    Text = ""
+                    Text = "",
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(1, 0) }),
                     New("Frame", {
@@ -1799,11 +1983,9 @@ function SimpleLib:Win(config)
                         Size = UDim2.new(0, 16, 0, 16),
                         Position = UDim2.new(0, 3, 0, 3),
                         BackgroundColor3 = Color3.fromRGB(200, 200, 210),
-                        BorderSizePixel = 0
-                    }, {
-                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
-                    })
-                })
+                        BorderSizePixel = 0,
+                    }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) }),
+                }),
             })
             RegisterThemeObject(ToggleFrame, "BackgroundColor3", "Element")
             RegisterThemeObject(ToggleFrame.Title, "TextColor3", "TextPrimary")
@@ -1864,7 +2046,7 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = ToggleFrame,
                 Searchable = true,
-                SearchText = togTitle .. " " .. togDesc
+                SearchText = togTitle .. " " .. togDesc,
             })
 
             return {
@@ -1873,12 +2055,12 @@ function SimpleLib:Win(config)
                     UpdateVisual(true)
                     callback(IsToggled)
                 end,
-                Get = function() return IsToggled end
+                Get = function() return IsToggled end,
             }
         end
-        -- Alias
         Tab.Tog = Tab.Toggle
 
+        -- Input
         function Tab:Input(inputConfig)
             theme = GetTheme()
             local title = inputConfig.title or "Input"
@@ -1888,9 +2070,9 @@ function SimpleLib:Win(config)
             local InputFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 56),
                 BackgroundColor3 = theme.Element,
-                BorderSizePixel = 0
+                BorderSizePixel = 0,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
                 New("TextLabel", {
                     Name = "Title",
                     Text = title,
@@ -1899,7 +2081,7 @@ function SimpleLib:Win(config)
                     TextSize = 15,
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 14, 0, 8),
-                    Size = UDim2.new(1, -28, 0, 18)
+                    Size = UDim2.new(1, -28, 0, 18),
                 }),
                 New("TextBox", {
                     Name = "TextBox",
@@ -1913,14 +2095,11 @@ function SimpleLib:Win(config)
                     PlaceholderColor3 = theme.SearchPlaceholder,
                     Font = Enum.Font.Gotham,
                     TextSize = 14,
-                    ClearTextOnFocus = false
+                    ClearTextOnFocus = false,
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-                    New("UIPadding", {
-                        PaddingLeft = UDim.new(0, 10),
-                        PaddingRight = UDim.new(0, 10)
-                    })
-                })
+                    New("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10) }),
+                }),
             })
             RegisterThemeObject(InputFrame, "BackgroundColor3", "Element")
             RegisterThemeObject(InputFrame.Title, "TextColor3", "TextPrimary")
@@ -1945,11 +2124,11 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = InputFrame,
                 Searchable = true,
-                SearchText = title .. " " .. desc
+                SearchText = title .. " " .. desc,
             })
         end
 
-        -- DropDown (renamed from DD)
+        -- DropDown with external animated panel
         function Tab:DropDown(ddConfig)
             theme = GetTheme()
             local title = ddConfig.title or "Dropdown"
@@ -1962,19 +2141,16 @@ function SimpleLib:Win(config)
                 Size = UDim2.new(1, 0, 0, 56),
                 BackgroundColor3 = theme.Element,
                 BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.Y
+                AutomaticSize = Enum.AutomaticSize.Y,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-                New("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 6)
-                }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
+                New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }),
                 New("UIPadding", {
                     PaddingTop = UDim.new(0, 10),
                     PaddingLeft = UDim.new(0, 12),
                     PaddingRight = UDim.new(0, 12),
-                    PaddingBottom = UDim.new(0, 10)
-                })
+                    PaddingBottom = UDim.new(0, 10),
+                }),
             })
             RegisterThemeObject(DDFrame, "BackgroundColor3", "Element")
 
@@ -1986,7 +2162,7 @@ function SimpleLib:Win(config)
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 0, 18),
                 TextXAlignment = Enum.TextXAlignment.Left,
-                LayoutOrder = 1
+                LayoutOrder = 1,
             })
             RegisterThemeObject(TitleLabel, "TextColor3", "TextPrimary")
             TitleLabel.Parent = DDFrame
@@ -1994,7 +2170,7 @@ function SimpleLib:Win(config)
             local SelectorFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 28),
                 BackgroundTransparency = 1,
-                LayoutOrder = 2
+                LayoutOrder = 2,
             })
             SelectorFrame.Parent = DDFrame
 
@@ -2006,13 +2182,10 @@ function SimpleLib:Win(config)
                 TextColor3 = theme.TextPrimary,
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
-                BorderSizePixel = 0
+                BorderSizePixel = 0,
             }, {
                 New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-                New("UIPadding", {
-                    PaddingLeft = UDim.new(0, 10),
-                    PaddingRight = UDim.new(0, 10)
-                })
+                New("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10) }),
             })
             RegisterThemeObject(SelectedBtn, "BackgroundColor3", "Button")
             RegisterThemeObject(SelectedBtn, "TextColor3", "TextPrimary")
@@ -2025,39 +2198,46 @@ function SimpleLib:Win(config)
                 Text = "▼",
                 TextColor3 = theme.TextSecondary,
                 Font = Enum.Font.GothamBold,
-                TextSize = 10
+                TextSize = 10,
             })
             RegisterThemeObject(ArrowIcon, "TextColor3", "TextSecondary")
             ArrowIcon.Parent = SelectedBtn
 
-            local DropdownMenu = New("ScrollingFrame", {
-                Size = UDim2.new(0, 140, 0, 0),
+            -- External Dropdown Panel
+            local DropdownPanel = New("Frame", {
+                Size = UDim2.new(0, 250, 0, 0),
                 BackgroundColor3 = theme.DropdownBg,
                 BorderSizePixel = 0,
                 Visible = false,
-                ScrollBarThickness = 3,
-                ScrollBarImageColor3 = theme.Scrollbar,
-                CanvasSize = UDim2.new(0, 0, 0, 0),
-                AutomaticCanvasSize = Enum.AutomaticSize.Y,
                 ZIndex = 999,
-                BackgroundTransparency = 1
+                BackgroundTransparency = 1,
+                ClipsDescendants = true,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
                 New("UIStroke", { Color = theme.Stroke, Thickness = 1 }),
-                New("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 2)
-                }),
                 New("UIPadding", {
                     PaddingTop = UDim.new(0, 6),
                     PaddingLeft = UDim.new(0, 6),
                     PaddingRight = UDim.new(0, 6),
-                    PaddingBottom = UDim.new(0, 6)
-                })
+                    PaddingBottom = UDim.new(0, 6),
+                }),
             })
-            RegisterThemeObject(DropdownMenu, "BackgroundColor3", "DropdownBg")
-            RegisterThemeObject(DropdownMenu, "ScrollBarImageColor3", "Scrollbar")
-            DropdownMenu.Parent = ScreenGui
+            RegisterThemeObject(DropdownPanel, "BackgroundColor3", "DropdownBg")
+
+            local DropdownScroll = New("ScrollingFrame", {
+                Size = UDim2.new(1, 0, 1, 0),
+                BackgroundTransparency = 1,
+                ScrollBarThickness = 3,
+                ScrollBarImageColor3 = theme.Scrollbar,
+                CanvasSize = UDim2.new(0, 0, 0, 0),
+                AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                ZIndex = 1000,
+            }, {
+                New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }),
+            })
+            RegisterThemeObject(DropdownScroll, "ScrollBarImageColor3", "Scrollbar")
+            DropdownScroll.Parent = DropdownPanel
+            DropdownPanel.Parent = ScreenGui
 
             local DdSearchBox
             if searchEnabled then
@@ -2065,13 +2245,11 @@ function SimpleLib:Win(config)
                     Size = UDim2.new(1, 0, 0, 28),
                     BackgroundColor3 = theme.SearchBg,
                     BorderSizePixel = 0,
-                    LayoutOrder = -1
+                    LayoutOrder = -1,
+                    ZIndex = 1001,
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-                    New("UIPadding", {
-                        PaddingLeft = UDim.new(0, 8),
-                        PaddingRight = UDim.new(0, 8)
-                    })
+                    New("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }),
                 })
                 RegisterThemeObject(SearchContainer, "BackgroundColor3", "SearchBg")
 
@@ -2084,12 +2262,13 @@ function SimpleLib:Win(config)
                     PlaceholderColor3 = theme.SearchPlaceholder,
                     Font = Enum.Font.Gotham,
                     TextSize = 13,
-                    ClearTextOnFocus = false
+                    ClearTextOnFocus = false,
+                    ZIndex = 1002,
                 })
                 RegisterThemeObject(DdSearchBox, "TextColor3", "TextPrimary")
                 RegisterThemeObject(DdSearchBox, "PlaceholderColor3", "SearchPlaceholder")
                 DdSearchBox.Parent = SearchContainer
-                SearchContainer.Parent = DropdownMenu
+                SearchContainer.Parent = DropdownScroll
             end
 
             local ItemButtons = {}
@@ -2102,10 +2281,9 @@ function SimpleLib:Win(config)
                     TextColor3 = theme.TextPrimary,
                     Font = Enum.Font.Gotham,
                     TextSize = 14,
-                    BorderSizePixel = 0
-                }, {
-                    New("UICorner", { CornerRadius = UDim.new(0, 5) })
-                })
+                    BorderSizePixel = 0,
+                    ZIndex = 1001,
+                }, { New("UICorner", { CornerRadius = UDim.new(0, 5) }) })
                 RegisterThemeObject(ItemBtn, "BackgroundColor3", "DropdownItem")
                 RegisterThemeObject(ItemBtn, "TextColor3", "TextPrimary")
 
@@ -2119,11 +2297,7 @@ function SimpleLib:Win(config)
                 ItemBtn.MouseButton1Click:Connect(function()
                     SelectedItem = item
                     SelectedBtn.Text = tostring(item)
-                    Tween(DropdownMenu, { BackgroundTransparency = 1 }, 0.15)
-                    Tween(ArrowIcon, { Rotation = 0 }, 0.15)
-                    task.delay(0.15, function()
-                        DropdownMenu.Visible = false
-                    end)
+                    CloseDropdown()
                     callback(item)
                 end)
 
@@ -2132,7 +2306,7 @@ function SimpleLib:Win(config)
 
             for _, item in ipairs(items) do
                 local btn = CreateItemButton(item)
-                btn.Parent = DropdownMenu
+                btn.Parent = DropdownScroll
                 table.insert(ItemButtons, { Button = btn, Text = string.lower(tostring(item)) })
             end
 
@@ -2145,55 +2319,69 @@ function SimpleLib:Win(config)
                 end)
             end
 
-            SelectedBtn.MouseButton1Click:Connect(function()
-                if DropdownMenu.Visible then
-                    Tween(DropdownMenu, { BackgroundTransparency = 1 }, 0.15)
-                    Tween(ArrowIcon, { Rotation = 0 }, 0.15)
-                    task.delay(0.15, function()
-                        DropdownMenu.Visible = false
-                    end)
-                    return
-                end
-
+            local IsOpen = false
+            local function OpenDropdown()
+                if IsOpen then return end
+                IsOpen = true
                 local absPos = SelectedBtn.AbsolutePosition
                 local absSize = SelectedBtn.AbsoluteSize
-                DropdownMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y + 4)
+                DropdownPanel.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y + 4)
                 local visibleCount = 0
                 for _, data in ipairs(ItemButtons) do
                     if data.Button.Visible then visibleCount = visibleCount + 1 end
                 end
-                DropdownMenu.Size = UDim2.new(0, absSize.X, 0, math.min(visibleCount * 28 + (searchEnabled and 34 or 16), 200))
-                DropdownMenu.Visible = true
-                DropdownMenu.BackgroundTransparency = 1
-                Tween(DropdownMenu, { BackgroundTransparency = 0 }, 0.2)
+                local targetHeight = math.min(visibleCount * 28 + (searchEnabled and 34 or 16), 225)
+                DropdownPanel.Size = UDim2.new(0, 250, 0, 0)
+                DropdownPanel.Visible = true
+                DropdownPanel.BackgroundTransparency = 1
+
+                local scale = Instance.new("UIScale")
+                scale.Scale = 0.9
+                scale.Parent = DropdownPanel
+
+                Tween(DropdownPanel, { Size = UDim2.new(0, 250, 0, targetHeight), BackgroundTransparency = 0 }, 0.25, Enum.EasingStyle.Quad)
+                SpringTween(scale, { Scale = 1 }, 0.25)
+                game:GetService("Debris"):AddItem(scale, 0.3)
+
                 Tween(ArrowIcon, { Rotation = 180 }, 0.2)
 
                 if DdSearchBox then
                     DdSearchBox.Text = ""
-                    for _, data in ipairs(ItemButtons) do
-                        data.Button.Visible = true
-                    end
+                    for _, data in ipairs(ItemButtons) do data.Button.Visible = true end
+                end
+            end
+
+            local function CloseDropdown()
+                if not IsOpen then return end
+                IsOpen = false
+                Tween(DropdownPanel, { Size = UDim2.new(0, 250, 0, 0), BackgroundTransparency = 1 }, 0.2, Enum.EasingStyle.Quad)
+                Tween(ArrowIcon, { Rotation = 0 }, 0.15)
+                task.delay(0.2, function()
+                    if not IsOpen then DropdownPanel.Visible = false end
+                end)
+            end
+
+            SelectedBtn.MouseButton1Click:Connect(function()
+                if IsOpen then
+                    CloseDropdown()
+                else
+                    OpenDropdown()
                 end
             end)
 
             UserInputService.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    if not DropdownMenu.Visible then return end
+                if input.UserInputType == Enum.UserInputType.MouseButton1 and IsOpen then
                     local mousePos = UserInputService:GetMouseLocation()
-                    local menuAbs = DropdownMenu.AbsolutePosition
-                    local menuSize = DropdownMenu.AbsoluteSize
-                    if not (mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
-                           mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y) then
-                        local btnAbs = SelectedBtn.AbsolutePosition
-                        local btnSize = SelectedBtn.AbsoluteSize
-                        if not (mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
-                               mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y) then
-                            Tween(DropdownMenu, { BackgroundTransparency = 1 }, 0.15)
-                            Tween(ArrowIcon, { Rotation = 0 }, 0.15)
-                            task.delay(0.15, function()
-                                DropdownMenu.Visible = false
-                            end)
-                        end
+                    local menuAbs = DropdownPanel.AbsolutePosition
+                    local menuSize = DropdownPanel.AbsoluteSize
+                    local inMenu = mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
+                                   mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y
+                    local btnAbs = SelectedBtn.AbsolutePosition
+                    local btnSize = SelectedBtn.AbsoluteSize
+                    local inBtn = mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
+                                  mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y
+                    if not inMenu and not inBtn then
+                        CloseDropdown()
                     end
                 end
             end)
@@ -2203,7 +2391,7 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = DDFrame,
                 Searchable = true,
-                SearchText = title .. " " .. table.concat(items, " ")
+                SearchText = title .. " " .. table.concat(items, " "),
             })
 
             return {
@@ -2212,13 +2400,12 @@ function SimpleLib:Win(config)
                     SelectedBtn.Text = tostring(val)
                     callback(val)
                 end,
-                Get = function() return SelectedItem end
+                Get = function() return SelectedItem end,
             }
         end
-        -- Alias
         Tab.DD = Tab.DropDown
 
-        -- MultiDropDown (renamed from DDM)
+        -- MultiDropDown
         function Tab:MultiDropDown(ddmConfig)
             theme = GetTheme()
             local title = ddmConfig.title or "Multi Dropdown"
@@ -2231,19 +2418,16 @@ function SimpleLib:Win(config)
                 Size = UDim2.new(1, 0, 0, 56),
                 BackgroundColor3 = theme.Element,
                 BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.Y
+                AutomaticSize = Enum.AutomaticSize.Y,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-                New("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 6)
-                }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
+                New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }),
                 New("UIPadding", {
                     PaddingTop = UDim.new(0, 10),
                     PaddingLeft = UDim.new(0, 12),
                     PaddingRight = UDim.new(0, 12),
-                    PaddingBottom = UDim.new(0, 10)
-                })
+                    PaddingBottom = UDim.new(0, 10),
+                }),
             })
             RegisterThemeObject(DDMFrame, "BackgroundColor3", "Element")
 
@@ -2255,7 +2439,7 @@ function SimpleLib:Win(config)
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 0, 18),
                 TextXAlignment = Enum.TextXAlignment.Left,
-                LayoutOrder = 1
+                LayoutOrder = 1,
             })
             RegisterThemeObject(TitleLabel, "TextColor3", "TextPrimary")
             TitleLabel.Parent = DDMFrame
@@ -2263,7 +2447,7 @@ function SimpleLib:Win(config)
             local SelectorFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 28),
                 BackgroundTransparency = 1,
-                LayoutOrder = 2
+                LayoutOrder = 2,
             })
             SelectorFrame.Parent = DDMFrame
 
@@ -2275,13 +2459,10 @@ function SimpleLib:Win(config)
                 TextColor3 = theme.TextPrimary,
                 Font = Enum.Font.Gotham,
                 TextSize = 14,
-                BorderSizePixel = 0
+                BorderSizePixel = 0,
             }, {
                 New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-                New("UIPadding", {
-                    PaddingLeft = UDim.new(0, 10),
-                    PaddingRight = UDim.new(0, 10)
-                })
+                New("UIPadding", { PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10) }),
             })
             RegisterThemeObject(SelectedBtn, "BackgroundColor3", "Button")
             RegisterThemeObject(SelectedBtn, "TextColor3", "TextPrimary")
@@ -2294,39 +2475,46 @@ function SimpleLib:Win(config)
                 Text = "▼",
                 TextColor3 = theme.TextSecondary,
                 Font = Enum.Font.GothamBold,
-                TextSize = 10
+                TextSize = 10,
             })
             RegisterThemeObject(ArrowIcon, "TextColor3", "TextSecondary")
             ArrowIcon.Parent = SelectedBtn
 
-            local DropdownMenu = New("ScrollingFrame", {
-                Size = UDim2.new(0, 140, 0, 0),
+            -- External Dropdown Panel
+            local DropdownPanel = New("Frame", {
+                Size = UDim2.new(0, 250, 0, 0),
                 BackgroundColor3 = theme.DropdownBg,
                 BorderSizePixel = 0,
                 Visible = false,
-                ScrollBarThickness = 3,
-                ScrollBarImageColor3 = theme.Scrollbar,
-                CanvasSize = UDim2.new(0, 0, 0, 0),
-                AutomaticCanvasSize = Enum.AutomaticSize.Y,
                 ZIndex = 999,
-                BackgroundTransparency = 1
+                BackgroundTransparency = 1,
+                ClipsDescendants = true,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
                 New("UIStroke", { Color = theme.Stroke, Thickness = 1 }),
-                New("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 2)
-                }),
                 New("UIPadding", {
                     PaddingTop = UDim.new(0, 6),
                     PaddingLeft = UDim.new(0, 6),
                     PaddingRight = UDim.new(0, 6),
-                    PaddingBottom = UDim.new(0, 6)
-                })
+                    PaddingBottom = UDim.new(0, 6),
+                }),
             })
-            RegisterThemeObject(DropdownMenu, "BackgroundColor3", "DropdownBg")
-            RegisterThemeObject(DropdownMenu, "ScrollBarImageColor3", "Scrollbar")
-            DropdownMenu.Parent = ScreenGui
+            RegisterThemeObject(DropdownPanel, "BackgroundColor3", "DropdownBg")
+
+            local DropdownScroll = New("ScrollingFrame", {
+                Size = UDim2.new(1, 0, 1, 0),
+                BackgroundTransparency = 1,
+                ScrollBarThickness = 3,
+                ScrollBarImageColor3 = theme.Scrollbar,
+                CanvasSize = UDim2.new(0, 0, 0, 0),
+                AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                ZIndex = 1000,
+            }, {
+                New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }),
+            })
+            RegisterThemeObject(DropdownScroll, "ScrollBarImageColor3", "Scrollbar")
+            DropdownScroll.Parent = DropdownPanel
+            DropdownPanel.Parent = ScreenGui
 
             local DdSearchBox
             if searchEnabled then
@@ -2334,13 +2522,11 @@ function SimpleLib:Win(config)
                     Size = UDim2.new(1, 0, 0, 28),
                     BackgroundColor3 = theme.SearchBg,
                     BorderSizePixel = 0,
-                    LayoutOrder = -1
+                    LayoutOrder = -1,
+                    ZIndex = 1001,
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-                    New("UIPadding", {
-                        PaddingLeft = UDim.new(0, 8),
-                        PaddingRight = UDim.new(0, 8)
-                    })
+                    New("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }),
                 })
                 RegisterThemeObject(SearchContainer, "BackgroundColor3", "SearchBg")
 
@@ -2353,12 +2539,13 @@ function SimpleLib:Win(config)
                     PlaceholderColor3 = theme.SearchPlaceholder,
                     Font = Enum.Font.Gotham,
                     TextSize = 13,
-                    ClearTextOnFocus = false
+                    ClearTextOnFocus = false,
+                    ZIndex = 1002,
                 })
                 RegisterThemeObject(DdSearchBox, "TextColor3", "TextPrimary")
                 RegisterThemeObject(DdSearchBox, "PlaceholderColor3", "SearchPlaceholder")
                 DdSearchBox.Parent = SearchContainer
-                SearchContainer.Parent = DropdownMenu
+                SearchContainer.Parent = DropdownScroll
             end
 
             local ItemStates = {}
@@ -2374,10 +2561,9 @@ function SimpleLib:Win(config)
                     TextColor3 = theme.TextPrimary,
                     Font = Enum.Font.Gotham,
                     TextSize = 14,
-                    BorderSizePixel = 0
-                }, {
-                    New("UICorner", { CornerRadius = UDim.new(0, 5) })
-                })
+                    BorderSizePixel = 0,
+                    ZIndex = 1001,
+                }, { New("UICorner", { CornerRadius = UDim.new(0, 5) }) })
                 RegisterThemeObject(ItemBtn, "BackgroundColor3", "DropdownItem")
                 RegisterThemeObject(ItemBtn, "TextColor3", "TextPrimary")
 
@@ -2394,15 +2580,10 @@ function SimpleLib:Win(config)
                         table.insert(SelectedItems, item)
                         ItemBtn.Text = "✓ " .. item
                         Tween(ItemBtn, { BackgroundColor3 = GetTheme().ToggleOn }, 0.15)
-                        if callbacks[item] then
-                            callbacks[item]()
-                        end
+                        if callbacks[item] then callbacks[item]() end
                     else
                         for i, v in ipairs(SelectedItems) do
-                            if v == item then
-                                table.remove(SelectedItems, i)
-                                break
-                            end
+                            if v == item then table.remove(SelectedItems, i) break end
                         end
                         ItemBtn.Text = "  " .. item
                         Tween(ItemBtn, { BackgroundColor3 = GetTheme().DropdownItem }, 0.15)
@@ -2410,7 +2591,7 @@ function SimpleLib:Win(config)
                     SelectedBtn.Text = #SelectedItems > 0 and tostring(#SelectedItems) .. " selected" or "Select..."
                 end)
 
-                ItemBtn.Parent = DropdownMenu
+                ItemBtn.Parent = DropdownScroll
                 table.insert(ItemButtons, { Button = ItemBtn, Text = string.lower(tostring(item)) })
             end
 
@@ -2423,55 +2604,65 @@ function SimpleLib:Win(config)
                 end)
             end
 
-            SelectedBtn.MouseButton1Click:Connect(function()
-                if DropdownMenu.Visible then
-                    Tween(DropdownMenu, { BackgroundTransparency = 1 }, 0.15)
-                    Tween(ArrowIcon, { Rotation = 0 }, 0.15)
-                    task.delay(0.15, function()
-                        DropdownMenu.Visible = false
-                    end)
-                    return
-                end
-
+            local IsOpen = false
+            local function OpenDropdown()
+                if IsOpen then return end
+                IsOpen = true
                 local absPos = SelectedBtn.AbsolutePosition
                 local absSize = SelectedBtn.AbsoluteSize
-                DropdownMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y + 4)
+                DropdownPanel.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y + 4)
                 local visibleCount = 0
                 for _, data in ipairs(ItemButtons) do
                     if data.Button.Visible then visibleCount = visibleCount + 1 end
                 end
-                DropdownMenu.Size = UDim2.new(0, absSize.X, 0, math.min(visibleCount * 28 + (searchEnabled and 34 or 16), 200))
-                DropdownMenu.Visible = true
-                DropdownMenu.BackgroundTransparency = 1
-                Tween(DropdownMenu, { BackgroundTransparency = 0 }, 0.2)
+                local targetHeight = math.min(visibleCount * 28 + (searchEnabled and 34 or 16), 225)
+                DropdownPanel.Size = UDim2.new(0, 250, 0, 0)
+                DropdownPanel.Visible = true
+                DropdownPanel.BackgroundTransparency = 1
+
+                local scale = Instance.new("UIScale")
+                scale.Scale = 0.9
+                scale.Parent = DropdownPanel
+
+                Tween(DropdownPanel, { Size = UDim2.new(0, 250, 0, targetHeight), BackgroundTransparency = 0 }, 0.25, Enum.EasingStyle.Quad)
+                SpringTween(scale, { Scale = 1 }, 0.25)
+                game:GetService("Debris"):AddItem(scale, 0.3)
+
                 Tween(ArrowIcon, { Rotation = 180 }, 0.2)
 
                 if DdSearchBox then
                     DdSearchBox.Text = ""
-                    for _, data in ipairs(ItemButtons) do
-                        data.Button.Visible = true
-                    end
+                    for _, data in ipairs(ItemButtons) do data.Button.Visible = true end
                 end
+            end
+
+            local function CloseDropdown()
+                if not IsOpen then return end
+                IsOpen = false
+                Tween(DropdownPanel, { Size = UDim2.new(0, 250, 0, 0), BackgroundTransparency = 1 }, 0.2, Enum.EasingStyle.Quad)
+                Tween(ArrowIcon, { Rotation = 0 }, 0.15)
+                task.delay(0.2, function()
+                    if not IsOpen then DropdownPanel.Visible = false end
+                end)
+            end
+
+            SelectedBtn.MouseButton1Click:Connect(function()
+                if IsOpen then CloseDropdown() else OpenDropdown() end
             end)
 
             UserInputService.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    if not DropdownMenu.Visible then return end
+                if input.UserInputType == Enum.UserInputType.MouseButton1 and IsOpen then
                     local mousePos = UserInputService:GetMouseLocation()
-                    local menuAbs = DropdownMenu.AbsolutePosition
-                    local menuSize = DropdownMenu.AbsoluteSize
-                    if not (mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
-                           mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y) then
-                        local btnAbs = SelectedBtn.AbsolutePosition
-                        local btnSize = SelectedBtn.AbsoluteSize
-                        if not (mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
-                               mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y) then
-                            Tween(DropdownMenu, { BackgroundTransparency = 1 }, 0.15)
-                            Tween(ArrowIcon, { Rotation = 0 }, 0.15)
-                            task.delay(0.15, function()
-                                DropdownMenu.Visible = false
-                            end)
-                        end
+                    local menuAbs = DropdownPanel.AbsolutePosition
+                    local menuSize = DropdownPanel.AbsoluteSize
+                    local inMenu = mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
+                                   mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y
+                    local btnAbs = SelectedBtn.AbsolutePosition
+                    local btnSize = SelectedBtn.AbsoluteSize
+                    local inBtn = mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
+                                  mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y
+                    if not inMenu and not inBtn then
+                        CloseDropdown()
                     end
                 end
             end)
@@ -2481,16 +2672,14 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = DDMFrame,
                 Searchable = true,
-                SearchText = title .. " " .. table.concat(items, " ")
+                SearchText = title .. " " .. table.concat(items, " "),
             })
 
             return {
                 GetSelected = function() return SelectedItems end,
                 SetSelected = function(vals)
                     SelectedItems = {}
-                    for item, _ in pairs(ItemStates) do
-                        ItemStates[item] = false
-                    end
+                    for item, _ in pairs(ItemStates) do ItemStates[item] = false end
                     for _, data in ipairs(ItemButtons) do
                         data.Button.Text = "  " .. data.Button.Text:gsub("^✓ ", ""):gsub("^  ", "")
                         Tween(data.Button, { BackgroundColor3 = GetTheme().DropdownItem }, 0.1)
@@ -2506,12 +2695,12 @@ function SimpleLib:Win(config)
                         end
                     end
                     SelectedBtn.Text = #SelectedItems > 0 and tostring(#SelectedItems) .. " selected" or "Select..."
-                end
+                end,
             }
         end
-        -- Alias
         Tab.DDM = Tab.MultiDropDown
 
+        -- SLable
         function Tab:SLable(config)
             local content = config.content or "Simple Label"
             local SLabel = New("TextLabel", {
@@ -2524,7 +2713,7 @@ function SimpleLib:Win(config)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextYAlignment = Enum.TextYAlignment.Center,
                 AutomaticSize = Enum.AutomaticSize.Y,
-                TextWrapped = true
+                TextWrapped = true,
             })
             RegisterThemeObject(SLabel, "TextColor3", "TextSecondary")
             SLabel.Parent = Tab.Content
@@ -2532,10 +2721,11 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = SLabel,
                 Searchable = true,
-                SearchText = content
+                SearchText = content,
             })
         end
 
+        -- SLBig
         function Tab:SLBig(config)
             local content = config.content or "Simple Label Big"
             local SLabelBig = New("TextLabel", {
@@ -2548,7 +2738,7 @@ function SimpleLib:Win(config)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextYAlignment = Enum.TextYAlignment.Center,
                 AutomaticSize = Enum.AutomaticSize.Y,
-                TextWrapped = true
+                TextWrapped = true,
             })
             RegisterThemeObject(SLabelBig, "TextColor3", "TextPrimary")
             SLabelBig.Parent = Tab.Content
@@ -2556,10 +2746,11 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = SLabelBig,
                 Searchable = true,
-                SearchText = content
+                SearchText = content,
             })
         end
 
+        -- Label
         function Tab:Label(config)
             theme = GetTheme()
             local labelTitle = config.title or "Label"
@@ -2569,19 +2760,16 @@ function SimpleLib:Win(config)
                 Size = UDim2.new(1, 0, 0, 0),
                 BackgroundColor3 = theme.Element,
                 BorderSizePixel = 0,
-                AutomaticSize = Enum.AutomaticSize.Y
+                AutomaticSize = Enum.AutomaticSize.Y,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
                 New("UIPadding", {
                     PaddingTop = UDim.new(0, 10),
                     PaddingLeft = UDim.new(0, 14),
                     PaddingRight = UDim.new(0, 14),
-                    PaddingBottom = UDim.new(0, 10)
+                    PaddingBottom = UDim.new(0, 10),
                 }),
-                New("UIListLayout", {
-                    SortOrder = Enum.SortOrder.LayoutOrder,
-                    Padding = UDim.new(0, 4)
-                })
+                New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) }),
             })
             RegisterThemeObject(LabelFrame, "BackgroundColor3", "Element")
 
@@ -2595,7 +2783,6 @@ function SimpleLib:Win(config)
                 AutomaticSize = Enum.AutomaticSize.Y,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 TextWrapped = true,
-                TextScaled = false
             })
             RegisterThemeObject(Title, "TextColor3", "TextPrimary")
             Title.Parent = LabelFrame
@@ -2611,7 +2798,6 @@ function SimpleLib:Win(config)
                 TextXAlignment = Enum.TextXAlignment.Left,
                 Visible = labelDesc ~= "",
                 TextWrapped = true,
-                TextScaled = false
             })
             RegisterThemeObject(Desc, "TextColor3", "TextSecondary")
             Desc.Parent = LabelFrame
@@ -2621,38 +2807,29 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = LabelFrame,
                 Searchable = true,
-                SearchText = labelTitle .. " " .. labelDesc
+                SearchText = labelTitle .. " " .. labelDesc,
             })
 
-            local LabelObj = {
-                ElementFrame = LabelFrame,
-                _titleLabel = Title,
-                _descLabel = Desc,
-            }
+            local LabelObj = { ElementFrame = LabelFrame, _titleLabel = Title, _descLabel = Desc }
             local LabelMeta = {
                 __index = function(self, key)
-                    if key == "title" then
-                        return self._titleLabel.Text
-                    elseif key == "desc" then
-                        return self._descLabel.Text
-                    end
+                    if key == "title" then return self._titleLabel.Text
+                    elseif key == "desc" then return self._descLabel.Text end
                     return rawget(self, key)
                 end,
                 __newindex = function(self, key, value)
-                    if key == "title" then
-                        self._titleLabel.Text = value
+                    if key == "title" then self._titleLabel.Text = value
                     elseif key == "desc" then
                         self._descLabel.Text = value
                         self._descLabel.Visible = value ~= ""
-                    else
-                        rawset(self, key, value)
-                    end
-                end
+                    else rawset(self, key, value) end
+                end,
             }
             setmetatable(LabelObj, LabelMeta)
             return LabelObj
         end
 
+        -- Slider (Realtime)
         function Tab:Slider(sliderConfig)
             theme = GetTheme()
             local title = sliderConfig.title or "Slider"
@@ -2669,9 +2846,9 @@ function SimpleLib:Win(config)
             local SliderFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 56),
                 BackgroundColor3 = theme.Element,
-                BorderSizePixel = 0
+                BorderSizePixel = 0,
             }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
                 New("TextLabel", {
                     Name = "Title",
                     Text = title,
@@ -2680,7 +2857,7 @@ function SimpleLib:Win(config)
                     TextSize = 15,
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 14, 0, 6),
-                    Size = UDim2.new(1, -80, 0, 16)
+                    Size = UDim2.new(1, -80, 0, 16),
                 }),
                 New("TextLabel", {
                     Name = "Desc",
@@ -2690,7 +2867,7 @@ function SimpleLib:Win(config)
                     TextSize = 12,
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 14, 0, 22),
-                    Size = UDim2.new(1, -80, 0, 14)
+                    Size = UDim2.new(1, -80, 0, 14),
                 }),
                 New("TextButton", {
                     Name = "ValueLabel",
@@ -2703,16 +2880,14 @@ function SimpleLib:Win(config)
                     Position = UDim2.new(1, -50, 0, 6),
                     Size = UDim2.new(0, 44, 0, 24),
                     AutoButtonColor = false,
-                    TextXAlignment = Enum.TextXAlignment.Center
-                }, {
-                    New("UICorner", { CornerRadius = UDim.new(0, 6) })
-                }),
+                    TextXAlignment = Enum.TextXAlignment.Center,
+                }, { New("UICorner", { CornerRadius = UDim.new(0, 6) }) }),
                 New("Frame", {
                     Name = "Track",
                     Size = UDim2.new(1, -28, 0, 5),
                     Position = UDim2.new(0, 14, 0, 40),
                     BackgroundColor3 = theme.Track,
-                    BorderSizePixel = 0
+                    BorderSizePixel = 0,
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(1, 0) }),
                     New("Frame", {
@@ -2720,10 +2895,7 @@ function SimpleLib:Win(config)
                         Size = UDim2.new((CurrentValue - minVal) / (math.max(1, (maxVal - minVal))), 0, 1, 0),
                         BackgroundColor3 = theme.TrackFill,
                         BorderSizePixel = 0,
-                        Active = false
-                    }, {
-                        New("UICorner", { CornerRadius = UDim.new(1, 0) })
-                    }),
+                    }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) }),
                     New("TextButton", {
                         Name = "Thumb",
                         Size = UDim2.new(0, 18, 0, 18),
@@ -2731,13 +2903,12 @@ function SimpleLib:Win(config)
                         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
                         BorderSizePixel = 0,
                         AutoButtonColor = false,
-                        Active = false,
-                        Text = ""
+                        Text = "",
                     }, {
                         New("UICorner", { CornerRadius = UDim.new(1, 0) }),
-                        New("UIStroke", { Color = theme.TrackFill, Thickness = 2 })
-                    })
-                })
+                        New("UIStroke", { Color = theme.TrackFill, Thickness = 2 }),
+                    }),
+                }),
             })
             RegisterThemeObject(SliderFrame, "BackgroundColor3", "Element")
             RegisterThemeObject(SliderFrame.Title, "TextColor3", "TextPrimary")
@@ -2771,6 +2942,7 @@ function SimpleLib:Win(config)
                     Fill.Size = UDim2.new(fillRatio, 0, 1, 0)
                     Thumb.Position = UDim2.new(fillRatio, -9, 0.5, -9)
                 end
+                callback(CurrentValue)
             end
 
             Track.InputBegan:Connect(function(input)
@@ -2788,17 +2960,13 @@ function SimpleLib:Win(config)
 
             UserInputService.InputEnded:Connect(function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    if dragging then
-                        dragging = false
-                        callback(CurrentValue)
-                    end
+                    dragging = false
                 end
             end)
 
             local NumberInput
             ValueLabel.MouseButton1Click:Connect(function()
                 if NumberInput then return end
-
                 NumberInput = New("TextBox", {
                     Size = UDim2.new(0, 60, 0, 28),
                     Position = UDim2.new(1, -66, 0, 4),
@@ -2810,10 +2978,10 @@ function SimpleLib:Win(config)
                     TextSize = 14,
                     TextXAlignment = Enum.TextXAlignment.Center,
                     ClearTextOnFocus = true,
-                    ZIndex = 50
+                    ZIndex = 50,
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 6) }),
-                    New("UIStroke", { Color = GetTheme().Accent, Thickness = 2 })
+                    New("UIStroke", { Color = GetTheme().Accent, Thickness = 2 }),
                 })
                 NumberInput.Parent = SliderFrame
                 NumberInput:CaptureFocus()
@@ -2845,7 +3013,7 @@ function SimpleLib:Win(config)
             table.insert(Tab.Elements, {
                 Frame = SliderFrame,
                 Searchable = true,
-                SearchText = title .. " " .. desc
+                SearchText = title .. " " .. desc,
             })
 
             return {
@@ -2857,14 +3025,80 @@ function SimpleLib:Win(config)
                     Tween(Thumb, { Position = UDim2.new(fillRatio, -9, 0.5, -9) }, 0.2, Enum.EasingStyle.Back)
                     callback(CurrentValue)
                 end,
-                Get = function() return CurrentValue end
+                Get = function() return CurrentValue end,
             }
         end
+
+        -- ColorPicker Element
+        function Tab:ColorPicker(cpConfig)
+            theme = GetTheme()
+            local cpTitle = cpConfig.title or "Color Picker"
+            local defaultColor = cpConfig.Default or cpConfig.default or Color3.fromRGB(50, 200, 100)
+            local cpCallback = cpConfig[1] or function() end
+
+            local CPFrame = New("Frame", {
+                Size = UDim2.new(1, 0, 0, 56),
+                BackgroundColor3 = theme.Element,
+                BorderSizePixel = 0,
+            }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
+                New("TextLabel", {
+                    Name = "Title",
+                    Text = cpTitle,
+                    TextColor3 = theme.TextPrimary,
+                    Font = Enum.Font.GothamBold,
+                    TextSize = 15,
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0, 14, 0, 8),
+                    Size = UDim2.new(1, -80, 0, 18),
+                }),
+                New("TextButton", {
+                    Name = "ColorPreview",
+                    Size = UDim2.new(0, 44, 0, 24),
+                    Position = UDim2.new(1, -58, 0, 16),
+                    BackgroundColor3 = defaultColor,
+                    AutoButtonColor = false,
+                    Text = "",
+                    BorderSizePixel = 0,
+                }, { New("UICorner", { CornerRadius = UDim.new(0, 6) }) }),
+            })
+            RegisterThemeObject(CPFrame, "BackgroundColor3", "Element")
+            RegisterThemeObject(CPFrame.Title, "TextColor3", "TextPrimary")
+
+            local ColorPreview = CPFrame.ColorPreview
+
+            ColorPreview.MouseButton1Click:Connect(function()
+                ShowColorPicker({
+                    Title = cpTitle,
+                    Default = ColorPreview.BackgroundColor3,
+                }, function(color)
+                    ColorPreview.BackgroundColor3 = color
+                    cpCallback(color)
+                end)
+            end)
+
+            CPFrame.Parent = Tab.Content
+
+            table.insert(Tab.Elements, {
+                Frame = CPFrame,
+                Searchable = true,
+                SearchText = cpTitle,
+            })
+
+            return {
+                Set = function(color)
+                    ColorPreview.BackgroundColor3 = color
+                    cpCallback(color)
+                end,
+                Get = function() return ColorPreview.BackgroundColor3 end,
+            }
+        end
+        Tab.CP = Tab.ColorPicker
 
         return Tab
     end
 
-    -- ========== SIDEBAR SECTION (winsec) ==========
+    -- Sidebar Section
     function Window:Section(sectionConfig)
         theme = GetTheme()
         local sectionTitle = sectionConfig.title or "Section"
@@ -2874,13 +3108,10 @@ function SimpleLib:Win(config)
             Size = UDim2.new(1, -8, 0, 34),
             BackgroundColor3 = theme.SectionHeader,
             BorderSizePixel = 0,
-            AutomaticSize = Enum.AutomaticSize.Y
+            AutomaticSize = Enum.AutomaticSize.Y,
         }, {
-            New("UICorner", { CornerRadius = UDim.new(0, 8) }),
-            New("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 2)
-            })
+            New("UICorner", { CornerRadius = UDim.new(0, 10) }),
+            New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }),
         })
         RegisterThemeObject(SectionFrame, "BackgroundColor3", "SectionHeader")
 
@@ -2889,7 +3120,7 @@ function SimpleLib:Win(config)
             BackgroundColor3 = theme.SectionHeader,
             AutoButtonColor = false,
             Text = "",
-            BorderSizePixel = 0
+            BorderSizePixel = 0,
         }, {
             New("UICorner", { CornerRadius = UDim.new(0, 6) }),
             New("TextLabel", {
@@ -2900,7 +3131,7 @@ function SimpleLib:Win(config)
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0, 10, 0, 0),
                 Size = UDim2.new(1, -36, 1, 0),
-                TextXAlignment = Enum.TextXAlignment.Left
+                TextXAlignment = Enum.TextXAlignment.Left,
             }),
             New("TextLabel", {
                 Name = "Arrow",
@@ -2910,8 +3141,8 @@ function SimpleLib:Win(config)
                 TextSize = 12,
                 BackgroundTransparency = 1,
                 Position = UDim2.new(1, -24, 0, 0),
-                Size = UDim2.new(0, 20, 1, 0)
-            })
+                Size = UDim2.new(0, 20, 1, 0),
+            }),
         })
         RegisterThemeObject(Header, "BackgroundColor3", "SectionHeader")
         RegisterThemeObject(Header.TextLabel, "TextColor3", "TextPrimary")
@@ -2921,17 +3152,14 @@ function SimpleLib:Win(config)
             Size = UDim2.new(1, 0, 0, 0),
             BackgroundTransparency = 1,
             Visible = not collapsed,
-            AutomaticSize = Enum.AutomaticSize.Y
+            AutomaticSize = Enum.AutomaticSize.Y,
         }, {
-            New("UIListLayout", {
-                SortOrder = Enum.SortOrder.LayoutOrder,
-                Padding = UDim.new(0, 4)
-            }),
+            New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) }),
             New("UIPadding", {
                 PaddingLeft = UDim.new(0, 8),
                 PaddingRight = UDim.new(0, 8),
-                PaddingBottom = UDim.new(0, 6)
-            })
+                PaddingBottom = UDim.new(0, 6),
+            }),
         })
         Header.Parent = SectionFrame
         TabContainer.Parent = SectionFrame
@@ -2944,17 +3172,12 @@ function SimpleLib:Win(config)
             Tween(Header.Arrow, { Rotation = isCollapsed and 0 or 180 }, 0.2, Enum.EasingStyle.Back)
         end)
 
-        local Section = {
-            Container = TabContainer,
-            Tab = function(_, tabConfig)
-                return Window:Tab(tabConfig)
-            end
-        }
-
+        local Section = { Container = TabContainer }
+        Section.Tab = function(_, tabConfig) return Window:Tab(tabConfig) end
         return Section
     end
 
-    -- ========== THEME SWITCHER ==========
+    -- Theme Switcher
     function Window:SetTheme(themeName)
         if SimpleLib.Themes[themeName] then
             SimpleLib.Theme = themeName
@@ -2962,12 +3185,19 @@ function SimpleLib:Win(config)
             Window:Notify({
                 title = "Theme Changed",
                 content = "Switched to " .. themeName .. " theme",
-                dur = 3
+                dur = 3,
             })
         end
     end
 
     return Window
+end
+
+-- Global aliases on SimpleLib
+for alias, realName in pairs(Aliases) do
+    if not SimpleLib[alias] and SimpleLib[realName] then
+        SimpleLib[alias] = SimpleLib[realName]
+    end
 end
 
 -- ========== GLOBAL THEME SETTER ==========
@@ -2976,6 +3206,20 @@ function SimpleLib:SetTheme(themeName)
         self.Theme = themeName
         ApplyTheme()
     end
+end
+
+-- ========== LOAD THEMES FROM URL ==========
+function SimpleLib:LoadThemesFromURL(url)
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet(url))()
+    end)
+    if success and type(result) == "table" then
+        for name, theme in pairs(result) do
+            self.Themes[name] = theme
+        end
+        return true
+    end
+    return false
 end
 
 return SimpleLib
