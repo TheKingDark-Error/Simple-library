@@ -1,5 +1,7 @@
 -- SimpleLibTheme.lua
--- External Theme File for SimpleLib v3.0.0
+-- Theme file for SimpleLib v3.1.0 (these themes are already built into the lib,
+-- this file is only needed if you want to edit/override themes manually)
+-- New keys: SectionContent (nền nội dung section), DropdownStroke (viền dropdown)
 -- Load via: SimpleLib:LoadThemesFromURL("your_url_here")
 
 local Themes = {}
@@ -27,6 +29,7 @@ Themes.Dark = {
     MiniBarBg = Color3.fromRGB(35, 35, 40), MiniBarStroke = Color3.fromRGB(60, 60, 70),
     TabBtn = Color3.fromRGB(40, 40, 45), TabBtnHover = Color3.fromRGB(50, 50, 55),
     TabBtnActive = Color3.fromRGB(55, 55, 65), SectionHeader = Color3.fromRGB(35, 35, 40),
+    SectionContent = Color3.fromRGB(22, 22, 26), DropdownStroke = Color3.fromRGB(60, 60, 70),
     ProgressBar = Color3.fromRGB(50, 200, 100),
 }
 
@@ -53,6 +56,7 @@ Themes.Light = {
     MiniBarBg = Color3.fromRGB(235, 235, 240), MiniBarStroke = Color3.fromRGB(200, 200, 210),
     TabBtn = Color3.fromRGB(210, 210, 220), TabBtnHover = Color3.fromRGB(190, 190, 200),
     TabBtnActive = Color3.fromRGB(180, 180, 195), SectionHeader = Color3.fromRGB(220, 220, 225),
+    SectionContent = Color3.fromRGB(240, 240, 245), DropdownStroke = Color3.fromRGB(200, 200, 210),
     ProgressBar = Color3.fromRGB(50, 180, 100),
 }
 
@@ -79,6 +83,7 @@ Themes.Midnight = {
     MiniBarBg = Color3.fromRGB(20, 20, 35), MiniBarStroke = Color3.fromRGB(50, 50, 80),
     TabBtn = Color3.fromRGB(30, 30, 55), TabBtnHover = Color3.fromRGB(40, 40, 70),
     TabBtnActive = Color3.fromRGB(45, 45, 75), SectionHeader = Color3.fromRGB(28, 28, 50),
+    SectionContent = Color3.fromRGB(18, 18, 30), DropdownStroke = Color3.fromRGB(50, 50, 80),
     ProgressBar = Color3.fromRGB(100, 80, 220),
 }
 
@@ -105,6 +110,7 @@ Themes.Ocean = {
     MiniBarBg = Color3.fromRGB(25, 35, 45), MiniBarStroke = Color3.fromRGB(50, 70, 90),
     TabBtn = Color3.fromRGB(30, 45, 60), TabBtnHover = Color3.fromRGB(40, 60, 80),
     TabBtnActive = Color3.fromRGB(45, 65, 85), SectionHeader = Color3.fromRGB(30, 42, 55),
+    SectionContent = Color3.fromRGB(22, 32, 42), DropdownStroke = Color3.fromRGB(50, 70, 90),
     ProgressBar = Color3.fromRGB(40, 160, 200),
 }
 
@@ -131,6 +137,7 @@ Themes.Forest = {
     MiniBarBg = Color3.fromRGB(28, 38, 28), MiniBarStroke = Color3.fromRGB(55, 75, 55),
     TabBtn = Color3.fromRGB(35, 50, 35), TabBtnHover = Color3.fromRGB(45, 65, 45),
     TabBtnActive = Color3.fromRGB(50, 70, 50), SectionHeader = Color3.fromRGB(32, 45, 32),
+    SectionContent = Color3.fromRGB(24, 34, 24), DropdownStroke = Color3.fromRGB(55, 75, 55),
     ProgressBar = Color3.fromRGB(60, 180, 80),
 }
 
@@ -157,6 +164,7 @@ Themes.Crimson = {
     MiniBarBg = Color3.fromRGB(40, 25, 25), MiniBarStroke = Color3.fromRGB(80, 50, 50),
     TabBtn = Color3.fromRGB(55, 32, 32), TabBtnHover = Color3.fromRGB(70, 40, 40),
     TabBtnActive = Color3.fromRGB(75, 45, 45), SectionHeader = Color3.fromRGB(52, 30, 30),
+    SectionContent = Color3.fromRGB(38, 22, 22), DropdownStroke = Color3.fromRGB(80, 50, 50),
     ProgressBar = Color3.fromRGB(220, 60, 60),
 }
 
@@ -183,6 +191,7 @@ Themes.Cyber = {
     MiniBarBg = Color3.fromRGB(15, 15, 25), MiniBarStroke = Color3.fromRGB(40, 40, 70),
     TabBtn = Color3.fromRGB(22, 22, 40), TabBtnHover = Color3.fromRGB(32, 32, 55),
     TabBtnActive = Color3.fromRGB(38, 38, 65), SectionHeader = Color3.fromRGB(20, 20, 35),
+    SectionContent = Color3.fromRGB(13, 13, 22), DropdownStroke = Color3.fromRGB(40, 40, 70),
     ProgressBar = Color3.fromRGB(0, 255, 200),
 }
 
@@ -211,6 +220,7 @@ Themes.Rose = {
     MiniBarBg = Color3.fromRGB(42, 28, 35), MiniBarStroke = Color3.fromRGB(80, 55, 68),
     TabBtn = Color3.fromRGB(55, 36, 46), TabBtnHover = Color3.fromRGB(70, 45, 58),
     TabBtnActive = Color3.fromRGB(75, 50, 62), SectionHeader = Color3.fromRGB(50, 34, 42),
+    SectionContent = Color3.fromRGB(38, 26, 32), DropdownStroke = Color3.fromRGB(80, 55, 68),
     ProgressBar = Color3.fromRGB(230, 100, 140),
 }
 
@@ -237,6 +247,7 @@ Themes.Sunset = {
     MiniBarBg = Color3.fromRGB(42, 32, 28), MiniBarStroke = Color3.fromRGB(85, 62, 50),
     TabBtn = Color3.fromRGB(58, 42, 35), TabBtnHover = Color3.fromRGB(75, 55, 45),
     TabBtnActive = Color3.fromRGB(80, 60, 48), SectionHeader = Color3.fromRGB(52, 40, 34),
+    SectionContent = Color3.fromRGB(38, 28, 24), DropdownStroke = Color3.fromRGB(85, 62, 50),
     ProgressBar = Color3.fromRGB(255, 140, 60),
 }
 
@@ -263,6 +274,7 @@ Themes.Amethyst = {
     MiniBarBg = Color3.fromRGB(38, 28, 42), MiniBarStroke = Color3.fromRGB(75, 55, 82),
     TabBtn = Color3.fromRGB(50, 38, 56), TabBtnHover = Color3.fromRGB(65, 48, 72),
     TabBtnActive = Color3.fromRGB(72, 54, 80), SectionHeader = Color3.fromRGB(48, 36, 54),
+    SectionContent = Color3.fromRGB(34, 26, 38), DropdownStroke = Color3.fromRGB(75, 55, 82),
     ProgressBar = Color3.fromRGB(180, 100, 220),
 }
 
@@ -289,6 +301,7 @@ Themes.Mint = {
     MiniBarBg = Color3.fromRGB(28, 38, 34), MiniBarStroke = Color3.fromRGB(55, 75, 65),
     TabBtn = Color3.fromRGB(38, 52, 45), TabBtnHover = Color3.fromRGB(48, 68, 58),
     TabBtnActive = Color3.fromRGB(55, 75, 65), SectionHeader = Color3.fromRGB(35, 48, 42),
+    SectionContent = Color3.fromRGB(24, 34, 30), DropdownStroke = Color3.fromRGB(55, 75, 65),
     ProgressBar = Color3.fromRGB(80, 210, 160),
 }
 
@@ -315,6 +328,7 @@ Themes.Slate = {
     MiniBarBg = Color3.fromRGB(38, 42, 48), MiniBarStroke = Color3.fromRGB(65, 72, 82),
     TabBtn = Color3.fromRGB(48, 54, 62), TabBtnHover = Color3.fromRGB(62, 68, 78),
     TabBtnActive = Color3.fromRGB(70, 76, 86), SectionHeader = Color3.fromRGB(46, 50, 58),
+    SectionContent = Color3.fromRGB(34, 38, 44), DropdownStroke = Color3.fromRGB(65, 72, 82),
     ProgressBar = Color3.fromRGB(120, 160, 210),
 }
 
@@ -341,6 +355,7 @@ Themes.Coral = {
     MiniBarBg = Color3.fromRGB(42, 30, 28), MiniBarStroke = Color3.fromRGB(82, 58, 50),
     TabBtn = Color3.fromRGB(56, 40, 35), TabBtnHover = Color3.fromRGB(72, 52, 46),
     TabBtnActive = Color3.fromRGB(80, 58, 50), SectionHeader = Color3.fromRGB(52, 38, 34),
+    SectionContent = Color3.fromRGB(38, 26, 24), DropdownStroke = Color3.fromRGB(82, 58, 50),
     ProgressBar = Color3.fromRGB(255, 125, 100),
 }
 
@@ -367,6 +382,7 @@ Themes.Aurora = {
     MiniBarBg = Color3.fromRGB(22, 28, 38), MiniBarStroke = Color3.fromRGB(50, 65, 88),
     TabBtn = Color3.fromRGB(35, 46, 62), TabBtnHover = Color3.fromRGB(45, 58, 78),
     TabBtnActive = Color3.fromRGB(52, 68, 90), SectionHeader = Color3.fromRGB(30, 38, 52),
+    SectionContent = Color3.fromRGB(20, 26, 34), DropdownStroke = Color3.fromRGB(50, 65, 88),
     ProgressBar = Color3.fromRGB(100, 220, 180),
 }
 
@@ -393,6 +409,7 @@ Themes.Ember = {
     MiniBarBg = Color3.fromRGB(35, 28, 22), MiniBarStroke = Color3.fromRGB(75, 58, 44),
     TabBtn = Color3.fromRGB(50, 40, 30), TabBtnHover = Color3.fromRGB(65, 50, 38),
     TabBtnActive = Color3.fromRGB(72, 56, 42), SectionHeader = Color3.fromRGB(46, 36, 28),
+    SectionContent = Color3.fromRGB(32, 25, 20), DropdownStroke = Color3.fromRGB(75, 58, 44),
     ProgressBar = Color3.fromRGB(240, 160, 60),
 }
 
@@ -419,6 +436,7 @@ Themes.Glacier = {
     MiniBarBg = Color3.fromRGB(28, 34, 40), MiniBarStroke = Color3.fromRGB(55, 68, 80),
     TabBtn = Color3.fromRGB(40, 50, 60), TabBtnHover = Color3.fromRGB(52, 64, 76),
     TabBtnActive = Color3.fromRGB(60, 74, 88), SectionHeader = Color3.fromRGB(36, 44, 52),
+    SectionContent = Color3.fromRGB(26, 32, 38), DropdownStroke = Color3.fromRGB(55, 68, 80),
     ProgressBar = Color3.fromRGB(100, 190, 230),
 }
 
@@ -445,6 +463,7 @@ Themes.Neon = {
     MiniBarBg = Color3.fromRGB(18, 18, 28), MiniBarStroke = Color3.fromRGB(55, 45, 75),
     TabBtn = Color3.fromRGB(30, 30, 50), TabBtnHover = Color3.fromRGB(40, 40, 65),
     TabBtnActive = Color3.fromRGB(48, 48, 78), SectionHeader = Color3.fromRGB(22, 22, 36),
+    SectionContent = Color3.fromRGB(16, 16, 24), DropdownStroke = Color3.fromRGB(55, 45, 75),
     ProgressBar = Color3.fromRGB(220, 50, 180),
 }
 
@@ -471,6 +490,7 @@ Themes.Coffee = {
     MiniBarBg = Color3.fromRGB(40, 34, 28), MiniBarStroke = Color3.fromRGB(75, 64, 52),
     TabBtn = Color3.fromRGB(54, 46, 38), TabBtnHover = Color3.fromRGB(68, 58, 48),
     TabBtnActive = Color3.fromRGB(76, 65, 52), SectionHeader = Color3.fromRGB(50, 42, 36),
+    SectionContent = Color3.fromRGB(36, 30, 26), DropdownStroke = Color3.fromRGB(75, 64, 52),
     ProgressBar = Color3.fromRGB(190, 145, 90),
 }
 
@@ -497,6 +517,7 @@ Themes.Lavender = {
     MiniBarBg = Color3.fromRGB(38, 34, 44), MiniBarStroke = Color3.fromRGB(70, 64, 82),
     TabBtn = Color3.fromRGB(50, 45, 60), TabBtnHover = Color3.fromRGB(62, 56, 75),
     TabBtnActive = Color3.fromRGB(70, 64, 85), SectionHeader = Color3.fromRGB(48, 44, 56),
+    SectionContent = Color3.fromRGB(34, 30, 40), DropdownStroke = Color3.fromRGB(70, 64, 82),
     ProgressBar = Color3.fromRGB(170, 130, 220),
 }
 
@@ -523,6 +544,7 @@ Themes.Obsidian = {
     MiniBarBg = Color3.fromRGB(18, 18, 18), MiniBarStroke = Color3.fromRGB(45, 45, 45),
     TabBtn = Color3.fromRGB(30, 30, 30), TabBtnHover = Color3.fromRGB(40, 40, 40),
     TabBtnActive = Color3.fromRGB(50, 50, 50), SectionHeader = Color3.fromRGB(22, 22, 22),
+    SectionContent = Color3.fromRGB(16, 16, 16), DropdownStroke = Color3.fromRGB(45, 45, 45),
     ProgressBar = Color3.fromRGB(200, 200, 200),
 }
 
