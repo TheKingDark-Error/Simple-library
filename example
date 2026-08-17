@@ -1,0 +1,80 @@
+-- cái này vẫn còn thiếu nên không khuyến khích lấy làm mẫu
+
+-- SimpleLib v3.1.0 Example
+local SimpleLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/TheKingDark-Error/Simple-library/refs/heads/main/Simple%20lib%20code"))()
+
+-- Theme đã được nhúng SẴN trong lib, không cần LoadThemesFromURL nữa!
+-- Đổi theme bất cứ lúc nào: SimpleLib:SetTheme("Midnight")
+
+local Window = SimpleLib:Win({
+    title = "MY HUB",
+    desc = "SimpleLib v3.1.0",
+    Loading = {
+        Load = true,                 -- loading card nhỏ, xong sẽ phóng to thành menu
+        load_time = 2.5,
+        title_load = "MY HUB",
+        subtitle_load = "initializing modules",
+    },
+})
+
+local Tab = Window:Tab({ title = "Main" })
+
+local Section = Tab:Section({ title = "Features", state = true })
+
+Section:Toggle({
+    title = "Auto Farm",
+    desc = "Farming automatically",
+    state = false,
+    function(state) print("Auto Farm:", state) end
+})
+
+Section:CP({
+    title = "Color Picker",
+    Default = Color3.fromRGB(50, 200, 100),
+    function(color) print(color) end
+})
+
+Section:Slider({
+    title = "Speed",
+    min = 0, max = 100, default = 50,
+    function(v) print(v) end
+})
+
+-- Dropdown kiểu SIDE (mặc định): menu sổ ra BÊN CẠNH cửa sổ chính
+Section:DD({
+    title = "Select (Side)",
+    item = { "A", "B", "C", "D" },
+    Type = "side",
+    function(v) print("Picked:", v) end
+})
+
+-- Dropdown kiểu CLASSIC: list mở BÊN TRONG element như bản cũ
+Section:DD({
+    title = "Select (Classic)",
+    item = { "A", "B", "C", "D" },
+    Type = "classic",
+    function(v) print("Picked:", v) end
+})
+
+-- MultiDropDown cũng có Type = "side" | "classic"
+Section:DDM({
+    title = "Multi (Side)",
+    item = { "One", "Two", "Three" },
+    Type = "side",
+})
+
+-- Button thường
+Section:Btn({
+    title = "Normal Button",
+    function() print("clicked") end
+})
+
+-- Button COPY: bấm là copy nội dung vào clipboard + chạy function (nếu có)
+Section:Btn({
+    title = "Copy Discord Link",
+    Type = "copy",
+    copy = "https://discord.gg/example",
+    function() print("copied!") end
+})
+
+Window:Notify({ title = "Loaded", content = "SimpleLib v3.1.0 ready!", dur = 4 })
