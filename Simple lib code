@@ -1,14 +1,564 @@
 -- SimpleLib.lua
--- Version 3.0.0 (UI AND FEATURES UPDATE)
--- Major rewrite with Config System, Stacked Notifications, ColorPicker, Realtime Slider, Animated Dropdown, States, and 13 new themes
+-- Version 3.1.0 (POLISH UPDATE)
+-- Built-in Themes (no manual load), Side/Classic Dropdowns, Copy Buttons, New Loading Animation,
+-- Section Background (themed + rounded), bigger Notify close button, ColorPicker fix
 
 local SimpleLib = {
-    Version = "3.0.0",
+    Version = "3.1.0",
     Theme = "Dark",
     Themes = {},
     Configs = {},
     AutoLoadConfig = nil,
 }
+
+-- ========== BUILT-IN THEMES (embedded, loaded automatically) ==========
+SimpleLib.Themes = (function()
+    local Themes = {}
+
+Themes.Dark = {
+    Background = Color3.fromRGB(35, 35, 40), Topbar = Color3.fromRGB(30, 30, 35), Sidebar = Color3.fromRGB(25, 25, 30),
+    MainPanel = Color3.fromRGB(22, 22, 26), Section = Color3.fromRGB(28, 28, 32), Element = Color3.fromRGB(28, 28, 32),
+    Button = Color3.fromRGB(50, 50, 55), ButtonHover = Color3.fromRGB(60, 60, 65),
+    ToggleOff = Color3.fromRGB(60, 60, 70), ToggleOn = Color3.fromRGB(50, 200, 100),
+    ToggleHoverOn = Color3.fromRGB(40, 180, 90), ToggleHoverOff = Color3.fromRGB(70, 70, 80),
+    Accent = Color3.fromRGB(50, 200, 100), AccentHover = Color3.fromRGB(40, 180, 90),
+    TextPrimary = Color3.fromRGB(255, 255, 255), TextSecondary = Color3.fromRGB(180, 180, 190),
+    TextAccent = Color3.fromRGB(50, 220, 120), Stroke = Color3.fromRGB(60, 60, 70),
+    Track = Color3.fromRGB(60, 60, 70), TrackFill = Color3.fromRGB(50, 200, 100),
+    InputBg = Color3.fromRGB(40, 40, 45), DropdownBg = Color3.fromRGB(35, 35, 40),
+    DropdownItem = Color3.fromRGB(40, 40, 45), DropdownItemHover = Color3.fromRGB(55, 55, 60),
+    LoadingBg = Color3.fromRGB(12, 12, 12), LoadingStroke = Color3.fromRGB(40, 180, 80),
+    LoadingText = Color3.fromRGB(50, 220, 120), LoadingSub = Color3.fromRGB(150, 255, 180),
+    NotifyBg = Color3.fromRGB(30, 30, 35), CloseBtn = Color3.fromRGB(50, 50, 55),
+    CloseBtnHover = Color3.fromRGB(60, 60, 65), MinimizeBtn = Color3.fromRGB(50, 50, 55),
+    MinimizeBtnHover = Color3.fromRGB(60, 60, 65), DialogNo = Color3.fromRGB(255, 80, 80),
+    DialogNoHover = Color3.fromRGB(255, 100, 100), DialogOk = Color3.fromRGB(50, 50, 55),
+    DialogOkHover = Color3.fromRGB(70, 70, 75), SearchBg = Color3.fromRGB(40, 40, 45),
+    SearchPlaceholder = Color3.fromRGB(120, 120, 130), Scrollbar = Color3.fromRGB(80, 80, 90),
+    MiniBarBg = Color3.fromRGB(35, 35, 40), MiniBarStroke = Color3.fromRGB(60, 60, 70),
+    TabBtn = Color3.fromRGB(40, 40, 45), TabBtnHover = Color3.fromRGB(50, 50, 55),
+    TabBtnActive = Color3.fromRGB(55, 55, 65), SectionHeader = Color3.fromRGB(35, 35, 40),
+    SectionContent = Color3.fromRGB(22, 22, 26), DropdownStroke = Color3.fromRGB(60, 60, 70),
+    ProgressBar = Color3.fromRGB(50, 200, 100),
+}
+
+Themes.Light = {
+    Background = Color3.fromRGB(245, 245, 250), Topbar = Color3.fromRGB(235, 235, 240), Sidebar = Color3.fromRGB(225, 225, 230),
+    MainPanel = Color3.fromRGB(240, 240, 245), Section = Color3.fromRGB(230, 230, 235), Element = Color3.fromRGB(230, 230, 235),
+    Button = Color3.fromRGB(200, 200, 210), ButtonHover = Color3.fromRGB(180, 180, 195),
+    ToggleOff = Color3.fromRGB(180, 180, 190), ToggleOn = Color3.fromRGB(50, 180, 100),
+    ToggleHoverOn = Color3.fromRGB(40, 160, 90), ToggleHoverOff = Color3.fromRGB(160, 160, 170),
+    Accent = Color3.fromRGB(50, 180, 100), AccentHover = Color3.fromRGB(40, 160, 90),
+    TextPrimary = Color3.fromRGB(30, 30, 35), TextSecondary = Color3.fromRGB(100, 100, 110),
+    TextAccent = Color3.fromRGB(40, 160, 90), Stroke = Color3.fromRGB(200, 200, 210),
+    Track = Color3.fromRGB(200, 200, 210), TrackFill = Color3.fromRGB(50, 180, 100),
+    InputBg = Color3.fromRGB(220, 220, 225), DropdownBg = Color3.fromRGB(235, 235, 240),
+    DropdownItem = Color3.fromRGB(220, 220, 225), DropdownItemHover = Color3.fromRGB(200, 200, 210),
+    LoadingBg = Color3.fromRGB(240, 240, 245), LoadingStroke = Color3.fromRGB(50, 180, 100),
+    LoadingText = Color3.fromRGB(40, 160, 90), LoadingSub = Color3.fromRGB(80, 180, 120),
+    NotifyBg = Color3.fromRGB(235, 235, 240), CloseBtn = Color3.fromRGB(200, 200, 210),
+    CloseBtnHover = Color3.fromRGB(180, 180, 195), MinimizeBtn = Color3.fromRGB(200, 200, 210),
+    MinimizeBtnHover = Color3.fromRGB(180, 180, 195), DialogNo = Color3.fromRGB(220, 80, 80),
+    DialogNoHover = Color3.fromRGB(200, 60, 60), DialogOk = Color3.fromRGB(200, 200, 210),
+    DialogOkHover = Color3.fromRGB(180, 180, 195), SearchBg = Color3.fromRGB(220, 220, 225),
+    SearchPlaceholder = Color3.fromRGB(150, 150, 160), Scrollbar = Color3.fromRGB(180, 180, 190),
+    MiniBarBg = Color3.fromRGB(235, 235, 240), MiniBarStroke = Color3.fromRGB(200, 200, 210),
+    TabBtn = Color3.fromRGB(210, 210, 220), TabBtnHover = Color3.fromRGB(190, 190, 200),
+    TabBtnActive = Color3.fromRGB(180, 180, 195), SectionHeader = Color3.fromRGB(220, 220, 225),
+    SectionContent = Color3.fromRGB(240, 240, 245), DropdownStroke = Color3.fromRGB(200, 200, 210),
+    ProgressBar = Color3.fromRGB(50, 180, 100),
+}
+
+Themes.Midnight = {
+    Background = Color3.fromRGB(20, 20, 35), Topbar = Color3.fromRGB(15, 15, 30), Sidebar = Color3.fromRGB(12, 12, 25),
+    MainPanel = Color3.fromRGB(18, 18, 30), Section = Color3.fromRGB(22, 22, 38), Element = Color3.fromRGB(22, 22, 38),
+    Button = Color3.fromRGB(40, 40, 65), ButtonHover = Color3.fromRGB(50, 50, 80),
+    ToggleOff = Color3.fromRGB(50, 50, 70), ToggleOn = Color3.fromRGB(100, 80, 220),
+    ToggleHoverOn = Color3.fromRGB(90, 70, 200), ToggleHoverOff = Color3.fromRGB(60, 60, 85),
+    Accent = Color3.fromRGB(100, 80, 220), AccentHover = Color3.fromRGB(90, 70, 200),
+    TextPrimary = Color3.fromRGB(230, 230, 255), TextSecondary = Color3.fromRGB(160, 160, 200),
+    TextAccent = Color3.fromRGB(140, 120, 255), Stroke = Color3.fromRGB(50, 50, 80),
+    Track = Color3.fromRGB(50, 50, 70), TrackFill = Color3.fromRGB(100, 80, 220),
+    InputBg = Color3.fromRGB(30, 30, 50), DropdownBg = Color3.fromRGB(25, 25, 45),
+    DropdownItem = Color3.fromRGB(30, 30, 50), DropdownItemHover = Color3.fromRGB(45, 45, 75),
+    LoadingBg = Color3.fromRGB(10, 10, 20), LoadingStroke = Color3.fromRGB(80, 60, 200),
+    LoadingText = Color3.fromRGB(120, 100, 255), LoadingSub = Color3.fromRGB(160, 140, 255),
+    NotifyBg = Color3.fromRGB(22, 22, 38), CloseBtn = Color3.fromRGB(40, 40, 65),
+    CloseBtnHover = Color3.fromRGB(50, 50, 80), MinimizeBtn = Color3.fromRGB(40, 40, 65),
+    MinimizeBtnHover = Color3.fromRGB(50, 50, 80), DialogNo = Color3.fromRGB(220, 60, 80),
+    DialogNoHover = Color3.fromRGB(240, 80, 100), DialogOk = Color3.fromRGB(40, 40, 65),
+    DialogOkHover = Color3.fromRGB(55, 55, 85), SearchBg = Color3.fromRGB(30, 30, 50),
+    SearchPlaceholder = Color3.fromRGB(100, 100, 140), Scrollbar = Color3.fromRGB(60, 60, 90),
+    MiniBarBg = Color3.fromRGB(20, 20, 35), MiniBarStroke = Color3.fromRGB(50, 50, 80),
+    TabBtn = Color3.fromRGB(30, 30, 55), TabBtnHover = Color3.fromRGB(40, 40, 70),
+    TabBtnActive = Color3.fromRGB(45, 45, 75), SectionHeader = Color3.fromRGB(28, 28, 50),
+    SectionContent = Color3.fromRGB(18, 18, 30), DropdownStroke = Color3.fromRGB(50, 50, 80),
+    ProgressBar = Color3.fromRGB(100, 80, 220),
+}
+
+Themes.Ocean = {
+    Background = Color3.fromRGB(25, 35, 45), Topbar = Color3.fromRGB(20, 30, 40), Sidebar = Color3.fromRGB(18, 28, 38),
+    MainPanel = Color3.fromRGB(22, 32, 42), Section = Color3.fromRGB(28, 38, 48), Element = Color3.fromRGB(28, 38, 48),
+    Button = Color3.fromRGB(40, 60, 80), ButtonHover = Color3.fromRGB(50, 75, 100),
+    ToggleOff = Color3.fromRGB(50, 65, 80), ToggleOn = Color3.fromRGB(40, 160, 200),
+    ToggleHoverOn = Color3.fromRGB(35, 140, 180), ToggleHoverOff = Color3.fromRGB(60, 80, 100),
+    Accent = Color3.fromRGB(40, 160, 200), AccentHover = Color3.fromRGB(35, 140, 180),
+    TextPrimary = Color3.fromRGB(220, 240, 255), TextSecondary = Color3.fromRGB(150, 180, 210),
+    TextAccent = Color3.fromRGB(80, 200, 240), Stroke = Color3.fromRGB(50, 70, 90),
+    Track = Color3.fromRGB(50, 65, 80), TrackFill = Color3.fromRGB(40, 160, 200),
+    InputBg = Color3.fromRGB(30, 45, 60), DropdownBg = Color3.fromRGB(28, 40, 52),
+    DropdownItem = Color3.fromRGB(30, 45, 60), DropdownItemHover = Color3.fromRGB(45, 65, 85),
+    LoadingBg = Color3.fromRGB(15, 25, 35), LoadingStroke = Color3.fromRGB(30, 140, 180),
+    LoadingText = Color3.fromRGB(60, 180, 220), LoadingSub = Color3.fromRGB(100, 200, 240),
+    NotifyBg = Color3.fromRGB(28, 38, 48), CloseBtn = Color3.fromRGB(40, 60, 80),
+    CloseBtnHover = Color3.fromRGB(50, 75, 100), MinimizeBtn = Color3.fromRGB(40, 60, 80),
+    MinimizeBtnHover = Color3.fromRGB(50, 75, 100), DialogNo = Color3.fromRGB(220, 80, 80),
+    DialogNoHover = Color3.fromRGB(240, 100, 100), DialogOk = Color3.fromRGB(40, 60, 80),
+    DialogOkHover = Color3.fromRGB(55, 80, 105), SearchBg = Color3.fromRGB(30, 45, 60),
+    SearchPlaceholder = Color3.fromRGB(120, 150, 180), Scrollbar = Color3.fromRGB(60, 80, 100),
+    MiniBarBg = Color3.fromRGB(25, 35, 45), MiniBarStroke = Color3.fromRGB(50, 70, 90),
+    TabBtn = Color3.fromRGB(30, 45, 60), TabBtnHover = Color3.fromRGB(40, 60, 80),
+    TabBtnActive = Color3.fromRGB(45, 65, 85), SectionHeader = Color3.fromRGB(30, 42, 55),
+    SectionContent = Color3.fromRGB(22, 32, 42), DropdownStroke = Color3.fromRGB(50, 70, 90),
+    ProgressBar = Color3.fromRGB(40, 160, 200),
+}
+
+Themes.Forest = {
+    Background = Color3.fromRGB(28, 38, 28), Topbar = Color3.fromRGB(22, 32, 22), Sidebar = Color3.fromRGB(18, 28, 18),
+    MainPanel = Color3.fromRGB(24, 34, 24), Section = Color3.fromRGB(30, 42, 30), Element = Color3.fromRGB(30, 42, 30),
+    Button = Color3.fromRGB(45, 65, 45), ButtonHover = Color3.fromRGB(55, 80, 55),
+    ToggleOff = Color3.fromRGB(55, 70, 55), ToggleOn = Color3.fromRGB(60, 180, 80),
+    ToggleHoverOn = Color3.fromRGB(50, 160, 70), ToggleHoverOff = Color3.fromRGB(65, 85, 65),
+    Accent = Color3.fromRGB(60, 180, 80), AccentHover = Color3.fromRGB(50, 160, 70),
+    TextPrimary = Color3.fromRGB(230, 255, 230), TextSecondary = Color3.fromRGB(160, 200, 160),
+    TextAccent = Color3.fromRGB(100, 220, 120), Stroke = Color3.fromRGB(55, 75, 55),
+    Track = Color3.fromRGB(55, 70, 55), TrackFill = Color3.fromRGB(60, 180, 80),
+    InputBg = Color3.fromRGB(35, 50, 35), DropdownBg = Color3.fromRGB(30, 42, 30),
+    DropdownItem = Color3.fromRGB(35, 50, 35), DropdownItemHover = Color3.fromRGB(50, 70, 50),
+    LoadingBg = Color3.fromRGB(15, 25, 15), LoadingStroke = Color3.fromRGB(50, 160, 70),
+    LoadingText = Color3.fromRGB(80, 200, 100), LoadingSub = Color3.fromRGB(120, 230, 140),
+    NotifyBg = Color3.fromRGB(30, 42, 30), CloseBtn = Color3.fromRGB(45, 65, 45),
+    CloseBtnHover = Color3.fromRGB(55, 80, 55), MinimizeBtn = Color3.fromRGB(45, 65, 45),
+    MinimizeBtnHover = Color3.fromRGB(55, 80, 55), DialogNo = Color3.fromRGB(220, 80, 80),
+    DialogNoHover = Color3.fromRGB(240, 100, 100), DialogOk = Color3.fromRGB(45, 65, 45),
+    DialogOkHover = Color3.fromRGB(60, 85, 60), SearchBg = Color3.fromRGB(35, 50, 35),
+    SearchPlaceholder = Color3.fromRGB(120, 160, 120), Scrollbar = Color3.fromRGB(65, 85, 65),
+    MiniBarBg = Color3.fromRGB(28, 38, 28), MiniBarStroke = Color3.fromRGB(55, 75, 55),
+    TabBtn = Color3.fromRGB(35, 50, 35), TabBtnHover = Color3.fromRGB(45, 65, 45),
+    TabBtnActive = Color3.fromRGB(50, 70, 50), SectionHeader = Color3.fromRGB(32, 45, 32),
+    SectionContent = Color3.fromRGB(24, 34, 24), DropdownStroke = Color3.fromRGB(55, 75, 55),
+    ProgressBar = Color3.fromRGB(60, 180, 80),
+}
+
+Themes.Crimson = {
+    Background = Color3.fromRGB(40, 25, 25), Topbar = Color3.fromRGB(35, 20, 20), Sidebar = Color3.fromRGB(28, 15, 15),
+    MainPanel = Color3.fromRGB(38, 22, 22), Section = Color3.fromRGB(48, 28, 28), Element = Color3.fromRGB(48, 28, 28),
+    Button = Color3.fromRGB(70, 40, 40), ButtonHover = Color3.fromRGB(85, 50, 50),
+    ToggleOff = Color3.fromRGB(70, 50, 50), ToggleOn = Color3.fromRGB(220, 60, 60),
+    ToggleHoverOn = Color3.fromRGB(200, 50, 50), ToggleHoverOff = Color3.fromRGB(85, 60, 60),
+    Accent = Color3.fromRGB(220, 60, 60), AccentHover = Color3.fromRGB(200, 50, 50),
+    TextPrimary = Color3.fromRGB(255, 230, 230), TextSecondary = Color3.fromRGB(210, 160, 160),
+    TextAccent = Color3.fromRGB(255, 120, 120), Stroke = Color3.fromRGB(80, 50, 50),
+    Track = Color3.fromRGB(70, 50, 50), TrackFill = Color3.fromRGB(220, 60, 60),
+    InputBg = Color3.fromRGB(55, 32, 32), DropdownBg = Color3.fromRGB(48, 28, 28),
+    DropdownItem = Color3.fromRGB(55, 32, 32), DropdownItemHover = Color3.fromRGB(75, 45, 45),
+    LoadingBg = Color3.fromRGB(25, 12, 12), LoadingStroke = Color3.fromRGB(200, 50, 50),
+    LoadingText = Color3.fromRGB(240, 80, 80), LoadingSub = Color3.fromRGB(255, 140, 140),
+    NotifyBg = Color3.fromRGB(48, 28, 28), CloseBtn = Color3.fromRGB(70, 40, 40),
+    CloseBtnHover = Color3.fromRGB(85, 50, 50), MinimizeBtn = Color3.fromRGB(70, 40, 40),
+    MinimizeBtnHover = Color3.fromRGB(85, 50, 50), DialogNo = Color3.fromRGB(220, 60, 60),
+    DialogNoHover = Color3.fromRGB(240, 80, 80), DialogOk = Color3.fromRGB(70, 40, 40),
+    DialogOkHover = Color3.fromRGB(90, 55, 55), SearchBg = Color3.fromRGB(55, 32, 32),
+    SearchPlaceholder = Color3.fromRGB(180, 130, 130), Scrollbar = Color3.fromRGB(90, 60, 60),
+    MiniBarBg = Color3.fromRGB(40, 25, 25), MiniBarStroke = Color3.fromRGB(80, 50, 50),
+    TabBtn = Color3.fromRGB(55, 32, 32), TabBtnHover = Color3.fromRGB(70, 40, 40),
+    TabBtnActive = Color3.fromRGB(75, 45, 45), SectionHeader = Color3.fromRGB(52, 30, 30),
+    SectionContent = Color3.fromRGB(38, 22, 22), DropdownStroke = Color3.fromRGB(80, 50, 50),
+    ProgressBar = Color3.fromRGB(220, 60, 60),
+}
+
+Themes.Cyber = {
+    Background = Color3.fromRGB(15, 15, 25), Topbar = Color3.fromRGB(12, 12, 20), Sidebar = Color3.fromRGB(10, 10, 18),
+    MainPanel = Color3.fromRGB(13, 13, 22), Section = Color3.fromRGB(18, 18, 30), Element = Color3.fromRGB(18, 18, 30),
+    Button = Color3.fromRGB(30, 30, 50), ButtonHover = Color3.fromRGB(40, 40, 70),
+    ToggleOff = Color3.fromRGB(40, 40, 55), ToggleOn = Color3.fromRGB(0, 255, 200),
+    ToggleHoverOn = Color3.fromRGB(0, 230, 180), ToggleHoverOff = Color3.fromRGB(50, 50, 70),
+    Accent = Color3.fromRGB(0, 255, 200), AccentHover = Color3.fromRGB(0, 230, 180),
+    TextPrimary = Color3.fromRGB(220, 255, 250), TextSecondary = Color3.fromRGB(140, 180, 170),
+    TextAccent = Color3.fromRGB(0, 255, 200), Stroke = Color3.fromRGB(40, 40, 70),
+    Track = Color3.fromRGB(40, 40, 55), TrackFill = Color3.fromRGB(0, 255, 200),
+    InputBg = Color3.fromRGB(22, 22, 40), DropdownBg = Color3.fromRGB(18, 18, 32),
+    DropdownItem = Color3.fromRGB(22, 22, 40), DropdownItemHover = Color3.fromRGB(35, 35, 60),
+    LoadingBg = Color3.fromRGB(8, 8, 15), LoadingStroke = Color3.fromRGB(0, 200, 160),
+    LoadingText = Color3.fromRGB(0, 255, 200), LoadingSub = Color3.fromRGB(100, 255, 220),
+    NotifyBg = Color3.fromRGB(18, 18, 30), CloseBtn = Color3.fromRGB(30, 30, 50),
+    CloseBtnHover = Color3.fromRGB(40, 40, 70), MinimizeBtn = Color3.fromRGB(30, 30, 50),
+    MinimizeBtnHover = Color3.fromRGB(40, 40, 70), DialogNo = Color3.fromRGB(255, 60, 100),
+    DialogNoHover = Color3.fromRGB(255, 80, 120), DialogOk = Color3.fromRGB(30, 30, 50),
+    DialogOkHover = Color3.fromRGB(45, 45, 75), SearchBg = Color3.fromRGB(22, 22, 40),
+    SearchPlaceholder = Color3.fromRGB(100, 140, 130), Scrollbar = Color3.fromRGB(50, 50, 80),
+    MiniBarBg = Color3.fromRGB(15, 15, 25), MiniBarStroke = Color3.fromRGB(40, 40, 70),
+    TabBtn = Color3.fromRGB(22, 22, 40), TabBtnHover = Color3.fromRGB(32, 32, 55),
+    TabBtnActive = Color3.fromRGB(38, 38, 65), SectionHeader = Color3.fromRGB(20, 20, 35),
+    SectionContent = Color3.fromRGB(13, 13, 22), DropdownStroke = Color3.fromRGB(40, 40, 70),
+    ProgressBar = Color3.fromRGB(0, 255, 200),
+}
+
+-- ========== 13 NEW THEMES ==========
+
+Themes.Rose = {
+    Background = Color3.fromRGB(42, 28, 35), Topbar = Color3.fromRGB(36, 24, 30), Sidebar = Color3.fromRGB(30, 20, 26),
+    MainPanel = Color3.fromRGB(38, 26, 32), Section = Color3.fromRGB(48, 32, 40), Element = Color3.fromRGB(48, 32, 40),
+    Button = Color3.fromRGB(70, 45, 58), ButtonHover = Color3.fromRGB(85, 55, 70),
+    ToggleOff = Color3.fromRGB(65, 45, 55), ToggleOn = Color3.fromRGB(230, 100, 140),
+    ToggleHoverOn = Color3.fromRGB(210, 85, 125), ToggleHoverOff = Color3.fromRGB(80, 55, 68),
+    Accent = Color3.fromRGB(230, 100, 140), AccentHover = Color3.fromRGB(210, 85, 125),
+    TextPrimary = Color3.fromRGB(255, 235, 242), TextSecondary = Color3.fromRGB(200, 160, 175),
+    TextAccent = Color3.fromRGB(255, 150, 180), Stroke = Color3.fromRGB(80, 55, 68),
+    Track = Color3.fromRGB(65, 45, 55), TrackFill = Color3.fromRGB(230, 100, 140),
+    InputBg = Color3.fromRGB(55, 36, 46), DropdownBg = Color3.fromRGB(48, 32, 40),
+    DropdownItem = Color3.fromRGB(55, 36, 46), DropdownItemHover = Color3.fromRGB(75, 50, 62),
+    LoadingBg = Color3.fromRGB(25, 15, 20), LoadingStroke = Color3.fromRGB(210, 85, 125),
+    LoadingText = Color3.fromRGB(255, 120, 160), LoadingSub = Color3.fromRGB(255, 180, 200),
+    NotifyBg = Color3.fromRGB(48, 32, 40), CloseBtn = Color3.fromRGB(70, 45, 58),
+    CloseBtnHover = Color3.fromRGB(85, 55, 70), MinimizeBtn = Color3.fromRGB(70, 45, 58),
+    MinimizeBtnHover = Color3.fromRGB(85, 55, 70), DialogNo = Color3.fromRGB(220, 80, 100),
+    DialogNoHover = Color3.fromRGB(240, 100, 120), DialogOk = Color3.fromRGB(70, 45, 58),
+    DialogOkHover = Color3.fromRGB(90, 60, 75), SearchBg = Color3.fromRGB(55, 36, 46),
+    SearchPlaceholder = Color3.fromRGB(160, 120, 135), Scrollbar = Color3.fromRGB(90, 60, 75),
+    MiniBarBg = Color3.fromRGB(42, 28, 35), MiniBarStroke = Color3.fromRGB(80, 55, 68),
+    TabBtn = Color3.fromRGB(55, 36, 46), TabBtnHover = Color3.fromRGB(70, 45, 58),
+    TabBtnActive = Color3.fromRGB(75, 50, 62), SectionHeader = Color3.fromRGB(50, 34, 42),
+    SectionContent = Color3.fromRGB(38, 26, 32), DropdownStroke = Color3.fromRGB(80, 55, 68),
+    ProgressBar = Color3.fromRGB(230, 100, 140),
+}
+
+Themes.Sunset = {
+    Background = Color3.fromRGB(42, 32, 28), Topbar = Color3.fromRGB(36, 28, 24), Sidebar = Color3.fromRGB(30, 22, 18),
+    MainPanel = Color3.fromRGB(38, 28, 24), Section = Color3.fromRGB(50, 38, 32), Element = Color3.fromRGB(50, 38, 32),
+    Button = Color3.fromRGB(75, 55, 45), ButtonHover = Color3.fromRGB(90, 68, 55),
+    ToggleOff = Color3.fromRGB(70, 52, 42), ToggleOn = Color3.fromRGB(255, 140, 60),
+    ToggleHoverOn = Color3.fromRGB(235, 125, 50), ToggleHoverOff = Color3.fromRGB(85, 62, 50),
+    Accent = Color3.fromRGB(255, 140, 60), AccentHover = Color3.fromRGB(235, 125, 50),
+    TextPrimary = Color3.fromRGB(255, 240, 230), TextSecondary = Color3.fromRGB(210, 175, 155),
+    TextAccent = Color3.fromRGB(255, 180, 110), Stroke = Color3.fromRGB(85, 62, 50),
+    Track = Color3.fromRGB(70, 52, 42), TrackFill = Color3.fromRGB(255, 140, 60),
+    InputBg = Color3.fromRGB(58, 42, 35), DropdownBg = Color3.fromRGB(50, 38, 32),
+    DropdownItem = Color3.fromRGB(58, 42, 35), DropdownItemHover = Color3.fromRGB(78, 58, 48),
+    LoadingBg = Color3.fromRGB(25, 18, 14), LoadingStroke = Color3.fromRGB(235, 125, 50),
+    LoadingText = Color3.fromRGB(255, 160, 70), LoadingSub = Color3.fromRGB(255, 200, 140),
+    NotifyBg = Color3.fromRGB(50, 38, 32), CloseBtn = Color3.fromRGB(75, 55, 45),
+    CloseBtnHover = Color3.fromRGB(90, 68, 55), MinimizeBtn = Color3.fromRGB(75, 55, 45),
+    MinimizeBtnHover = Color3.fromRGB(90, 68, 55), DialogNo = Color3.fromRGB(220, 80, 80),
+    DialogNoHover = Color3.fromRGB(240, 100, 100), DialogOk = Color3.fromRGB(75, 55, 45),
+    DialogOkHover = Color3.fromRGB(95, 72, 58), SearchBg = Color3.fromRGB(58, 42, 35),
+    SearchPlaceholder = Color3.fromRGB(170, 135, 115), Scrollbar = Color3.fromRGB(90, 68, 55),
+    MiniBarBg = Color3.fromRGB(42, 32, 28), MiniBarStroke = Color3.fromRGB(85, 62, 50),
+    TabBtn = Color3.fromRGB(58, 42, 35), TabBtnHover = Color3.fromRGB(75, 55, 45),
+    TabBtnActive = Color3.fromRGB(80, 60, 48), SectionHeader = Color3.fromRGB(52, 40, 34),
+    SectionContent = Color3.fromRGB(38, 28, 24), DropdownStroke = Color3.fromRGB(85, 62, 50),
+    ProgressBar = Color3.fromRGB(255, 140, 60),
+}
+
+Themes.Amethyst = {
+    Background = Color3.fromRGB(38, 28, 42), Topbar = Color3.fromRGB(32, 24, 36), Sidebar = Color3.fromRGB(26, 20, 30),
+    MainPanel = Color3.fromRGB(34, 26, 38), Section = Color3.fromRGB(45, 34, 50), Element = Color3.fromRGB(45, 34, 50),
+    Button = Color3.fromRGB(65, 48, 72), ButtonHover = Color3.fromRGB(78, 58, 88),
+    ToggleOff = Color3.fromRGB(60, 45, 68), ToggleOn = Color3.fromRGB(180, 100, 220),
+    ToggleHoverOn = Color3.fromRGB(165, 88, 205), ToggleHoverOff = Color3.fromRGB(75, 55, 82),
+    Accent = Color3.fromRGB(180, 100, 220), AccentHover = Color3.fromRGB(165, 88, 205),
+    TextPrimary = Color3.fromRGB(245, 235, 255), TextSecondary = Color3.fromRGB(190, 165, 210),
+    TextAccent = Color3.fromRGB(210, 150, 255), Stroke = Color3.fromRGB(75, 55, 82),
+    Track = Color3.fromRGB(60, 45, 68), TrackFill = Color3.fromRGB(180, 100, 220),
+    InputBg = Color3.fromRGB(50, 38, 56), DropdownBg = Color3.fromRGB(45, 34, 50),
+    DropdownItem = Color3.fromRGB(50, 38, 56), DropdownItemHover = Color3.fromRGB(70, 52, 78),
+    LoadingBg = Color3.fromRGB(20, 15, 24), LoadingStroke = Color3.fromRGB(165, 88, 205),
+    LoadingText = Color3.fromRGB(200, 120, 240), LoadingSub = Color3.fromRGB(230, 180, 255),
+    NotifyBg = Color3.fromRGB(45, 34, 50), CloseBtn = Color3.fromRGB(65, 48, 72),
+    CloseBtnHover = Color3.fromRGB(78, 58, 88), MinimizeBtn = Color3.fromRGB(65, 48, 72),
+    MinimizeBtnHover = Color3.fromRGB(78, 58, 88), DialogNo = Color3.fromRGB(220, 80, 100),
+    DialogNoHover = Color3.fromRGB(240, 100, 120), DialogOk = Color3.fromRGB(65, 48, 72),
+    DialogOkHover = Color3.fromRGB(85, 62, 92), SearchBg = Color3.fromRGB(50, 38, 56),
+    SearchPlaceholder = Color3.fromRGB(155, 130, 175), Scrollbar = Color3.fromRGB(80, 60, 90),
+    MiniBarBg = Color3.fromRGB(38, 28, 42), MiniBarStroke = Color3.fromRGB(75, 55, 82),
+    TabBtn = Color3.fromRGB(50, 38, 56), TabBtnHover = Color3.fromRGB(65, 48, 72),
+    TabBtnActive = Color3.fromRGB(72, 54, 80), SectionHeader = Color3.fromRGB(48, 36, 54),
+    SectionContent = Color3.fromRGB(34, 26, 38), DropdownStroke = Color3.fromRGB(75, 55, 82),
+    ProgressBar = Color3.fromRGB(180, 100, 220),
+}
+
+Themes.Mint = {
+    Background = Color3.fromRGB(28, 38, 34), Topbar = Color3.fromRGB(24, 32, 28), Sidebar = Color3.fromRGB(18, 26, 22),
+    MainPanel = Color3.fromRGB(24, 34, 30), Section = Color3.fromRGB(32, 44, 38), Element = Color3.fromRGB(32, 44, 38),
+    Button = Color3.fromRGB(48, 68, 58), ButtonHover = Color3.fromRGB(58, 82, 70),
+    ToggleOff = Color3.fromRGB(52, 70, 60), ToggleOn = Color3.fromRGB(80, 210, 160),
+    ToggleHoverOn = Color3.fromRGB(70, 190, 145), ToggleHoverOff = Color3.fromRGB(62, 82, 72),
+    Accent = Color3.fromRGB(80, 210, 160), AccentHover = Color3.fromRGB(70, 190, 145),
+    TextPrimary = Color3.fromRGB(235, 255, 248), TextSecondary = Color3.fromRGB(160, 200, 185),
+    TextAccent = Color3.fromRGB(120, 235, 190), Stroke = Color3.fromRGB(55, 75, 65),
+    Track = Color3.fromRGB(52, 70, 60), TrackFill = Color3.fromRGB(80, 210, 160),
+    InputBg = Color3.fromRGB(38, 52, 45), DropdownBg = Color3.fromRGB(32, 44, 38),
+    DropdownItem = Color3.fromRGB(38, 52, 45), DropdownItemHover = Color3.fromRGB(55, 75, 65),
+    LoadingBg = Color3.fromRGB(15, 22, 18), LoadingStroke = Color3.fromRGB(70, 190, 145),
+    LoadingText = Color3.fromRGB(100, 220, 175), LoadingSub = Color3.fromRGB(150, 245, 210),
+    NotifyBg = Color3.fromRGB(32, 44, 38), CloseBtn = Color3.fromRGB(48, 68, 58),
+    CloseBtnHover = Color3.fromRGB(58, 82, 70), MinimizeBtn = Color3.fromRGB(48, 68, 58),
+    MinimizeBtnHover = Color3.fromRGB(58, 82, 70), DialogNo = Color3.fromRGB(220, 80, 80),
+    DialogNoHover = Color3.fromRGB(240, 100, 100), DialogOk = Color3.fromRGB(48, 68, 58),
+    DialogOkHover = Color3.fromRGB(65, 88, 75), SearchBg = Color3.fromRGB(38, 52, 45),
+    SearchPlaceholder = Color3.fromRGB(120, 160, 145), Scrollbar = Color3.fromRGB(65, 88, 75),
+    MiniBarBg = Color3.fromRGB(28, 38, 34), MiniBarStroke = Color3.fromRGB(55, 75, 65),
+    TabBtn = Color3.fromRGB(38, 52, 45), TabBtnHover = Color3.fromRGB(48, 68, 58),
+    TabBtnActive = Color3.fromRGB(55, 75, 65), SectionHeader = Color3.fromRGB(35, 48, 42),
+    SectionContent = Color3.fromRGB(24, 34, 30), DropdownStroke = Color3.fromRGB(55, 75, 65),
+    ProgressBar = Color3.fromRGB(80, 210, 160),
+}
+
+Themes.Slate = {
+    Background = Color3.fromRGB(38, 42, 48), Topbar = Color3.fromRGB(32, 36, 42), Sidebar = Color3.fromRGB(26, 30, 35),
+    MainPanel = Color3.fromRGB(34, 38, 44), Section = Color3.fromRGB(44, 48, 55), Element = Color3.fromRGB(44, 48, 55),
+    Button = Color3.fromRGB(62, 68, 78), ButtonHover = Color3.fromRGB(74, 82, 94),
+    ToggleOff = Color3.fromRGB(58, 64, 74), ToggleOn = Color3.fromRGB(120, 160, 210),
+    ToggleHoverOn = Color3.fromRGB(108, 145, 192), ToggleHoverOff = Color3.fromRGB(70, 76, 86),
+    Accent = Color3.fromRGB(120, 160, 210), AccentHover = Color3.fromRGB(108, 145, 192),
+    TextPrimary = Color3.fromRGB(240, 245, 255), TextSecondary = Color3.fromRGB(165, 175, 195),
+    TextAccent = Color3.fromRGB(160, 200, 245), Stroke = Color3.fromRGB(65, 72, 82),
+    Track = Color3.fromRGB(58, 64, 74), TrackFill = Color3.fromRGB(120, 160, 210),
+    InputBg = Color3.fromRGB(48, 54, 62), DropdownBg = Color3.fromRGB(44, 48, 55),
+    DropdownItem = Color3.fromRGB(48, 54, 62), DropdownItemHover = Color3.fromRGB(68, 76, 88),
+    LoadingBg = Color3.fromRGB(18, 20, 24), LoadingStroke = Color3.fromRGB(108, 145, 192),
+    LoadingText = Color3.fromRGB(140, 185, 235), LoadingSub = Color3.fromRGB(190, 220, 255),
+    NotifyBg = Color3.fromRGB(44, 48, 55), CloseBtn = Color3.fromRGB(62, 68, 78),
+    CloseBtnHover = Color3.fromRGB(74, 82, 94), MinimizeBtn = Color3.fromRGB(62, 68, 78),
+    MinimizeBtnHover = Color3.fromRGB(74, 82, 94), DialogNo = Color3.fromRGB(220, 80, 80),
+    DialogNoHover = Color3.fromRGB(240, 100, 100), DialogOk = Color3.fromRGB(62, 68, 78),
+    DialogOkHover = Color3.fromRGB(82, 90, 102), SearchBg = Color3.fromRGB(48, 54, 62),
+    SearchPlaceholder = Color3.fromRGB(130, 140, 158), Scrollbar = Color3.fromRGB(78, 86, 98),
+    MiniBarBg = Color3.fromRGB(38, 42, 48), MiniBarStroke = Color3.fromRGB(65, 72, 82),
+    TabBtn = Color3.fromRGB(48, 54, 62), TabBtnHover = Color3.fromRGB(62, 68, 78),
+    TabBtnActive = Color3.fromRGB(70, 76, 86), SectionHeader = Color3.fromRGB(46, 50, 58),
+    SectionContent = Color3.fromRGB(34, 38, 44), DropdownStroke = Color3.fromRGB(65, 72, 82),
+    ProgressBar = Color3.fromRGB(120, 160, 210),
+}
+
+Themes.Coral = {
+    Background = Color3.fromRGB(42, 30, 28), Topbar = Color3.fromRGB(36, 26, 24), Sidebar = Color3.fromRGB(30, 20, 18),
+    MainPanel = Color3.fromRGB(38, 26, 24), Section = Color3.fromRGB(50, 36, 32), Element = Color3.fromRGB(50, 36, 32),
+    Button = Color3.fromRGB(72, 52, 46), ButtonHover = Color3.fromRGB(88, 64, 56),
+    ToggleOff = Color3.fromRGB(68, 48, 42), ToggleOn = Color3.fromRGB(255, 125, 100),
+    ToggleHoverOn = Color3.fromRGB(235, 110, 88), ToggleHoverOff = Color3.fromRGB(82, 58, 50),
+    Accent = Color3.fromRGB(255, 125, 100), AccentHover = Color3.fromRGB(235, 110, 88),
+    TextPrimary = Color3.fromRGB(255, 240, 238), TextSecondary = Color3.fromRGB(210, 175, 168),
+    TextAccent = Color3.fromRGB(255, 170, 150), Stroke = Color3.fromRGB(82, 58, 50),
+    Track = Color3.fromRGB(68, 48, 42), TrackFill = Color3.fromRGB(255, 125, 100),
+    InputBg = Color3.fromRGB(56, 40, 35), DropdownBg = Color3.fromRGB(50, 36, 32),
+    DropdownItem = Color3.fromRGB(56, 40, 35), DropdownItemHover = Color3.fromRGB(76, 55, 48),
+    LoadingBg = Color3.fromRGB(24, 16, 14), LoadingStroke = Color3.fromRGB(235, 110, 88),
+    LoadingText = Color3.fromRGB(255, 145, 120), LoadingSub = Color3.fromRGB(255, 195, 180),
+    NotifyBg = Color3.fromRGB(50, 36, 32), CloseBtn = Color3.fromRGB(72, 52, 46),
+    CloseBtnHover = Color3.fromRGB(88, 64, 56), MinimizeBtn = Color3.fromRGB(72, 52, 46),
+    MinimizeBtnHover = Color3.fromRGB(88, 64, 56), DialogNo = Color3.fromRGB(220, 80, 80),
+    DialogNoHover = Color3.fromRGB(240, 100, 100), DialogOk = Color3.fromRGB(72, 52, 46),
+    DialogOkHover = Color3.fromRGB(92, 68, 58), SearchBg = Color3.fromRGB(56, 40, 35),
+    SearchPlaceholder = Color3.fromRGB(170, 135, 125), Scrollbar = Color3.fromRGB(88, 64, 56),
+    MiniBarBg = Color3.fromRGB(42, 30, 28), MiniBarStroke = Color3.fromRGB(82, 58, 50),
+    TabBtn = Color3.fromRGB(56, 40, 35), TabBtnHover = Color3.fromRGB(72, 52, 46),
+    TabBtnActive = Color3.fromRGB(80, 58, 50), SectionHeader = Color3.fromRGB(52, 38, 34),
+    SectionContent = Color3.fromRGB(38, 26, 24), DropdownStroke = Color3.fromRGB(82, 58, 50),
+    ProgressBar = Color3.fromRGB(255, 125, 100),
+}
+
+Themes.Aurora = {
+    Background = Color3.fromRGB(22, 28, 38), Topbar = Color3.fromRGB(18, 24, 32), Sidebar = Color3.fromRGB(14, 20, 28),
+    MainPanel = Color3.fromRGB(20, 26, 34), Section = Color3.fromRGB(28, 36, 48), Element = Color3.fromRGB(28, 36, 48),
+    Button = Color3.fromRGB(45, 58, 78), ButtonHover = Color3.fromRGB(55, 72, 96),
+    ToggleOff = Color3.fromRGB(42, 54, 72), ToggleOn = Color3.fromRGB(100, 220, 180),
+    ToggleHoverOn = Color3.fromRGB(88, 200, 162), ToggleHoverOff = Color3.fromRGB(55, 68, 88),
+    Accent = Color3.fromRGB(100, 220, 180), AccentHover = Color3.fromRGB(88, 200, 162),
+    TextPrimary = Color3.fromRGB(235, 250, 255), TextSecondary = Color3.fromRGB(155, 185, 210),
+    TextAccent = Color3.fromRGB(140, 240, 210), Stroke = Color3.fromRGB(50, 65, 88),
+    Track = Color3.fromRGB(42, 54, 72), TrackFill = Color3.fromRGB(100, 220, 180),
+    InputBg = Color3.fromRGB(35, 46, 62), DropdownBg = Color3.fromRGB(28, 36, 48),
+    DropdownItem = Color3.fromRGB(35, 46, 62), DropdownItemHover = Color3.fromRGB(52, 68, 90),
+    LoadingBg = Color3.fromRGB(12, 16, 22), LoadingStroke = Color3.fromRGB(88, 200, 162),
+    LoadingText = Color3.fromRGB(120, 230, 195), LoadingSub = Color3.fromRGB(170, 245, 225),
+    NotifyBg = Color3.fromRGB(28, 36, 48), CloseBtn = Color3.fromRGB(45, 58, 78),
+    CloseBtnHover = Color3.fromRGB(55, 72, 96), MinimizeBtn = Color3.fromRGB(45, 58, 78),
+    MinimizeBtnHover = Color3.fromRGB(55, 72, 96), DialogNo = Color3.fromRGB(220, 80, 100),
+    DialogNoHover = Color3.fromRGB(240, 100, 120), DialogOk = Color3.fromRGB(45, 58, 78),
+    DialogOkHover = Color3.fromRGB(62, 80, 105), SearchBg = Color3.fromRGB(35, 46, 62),
+    SearchPlaceholder = Color3.fromRGB(115, 145, 172), Scrollbar = Color3.fromRGB(60, 78, 102),
+    MiniBarBg = Color3.fromRGB(22, 28, 38), MiniBarStroke = Color3.fromRGB(50, 65, 88),
+    TabBtn = Color3.fromRGB(35, 46, 62), TabBtnHover = Color3.fromRGB(45, 58, 78),
+    TabBtnActive = Color3.fromRGB(52, 68, 90), SectionHeader = Color3.fromRGB(30, 38, 52),
+    SectionContent = Color3.fromRGB(20, 26, 34), DropdownStroke = Color3.fromRGB(50, 65, 88),
+    ProgressBar = Color3.fromRGB(100, 220, 180),
+}
+
+Themes.Ember = {
+    Background = Color3.fromRGB(35, 28, 22), Topbar = Color3.fromRGB(30, 24, 18), Sidebar = Color3.fromRGB(24, 18, 14),
+    MainPanel = Color3.fromRGB(32, 25, 20), Section = Color3.fromRGB(42, 34, 26), Element = Color3.fromRGB(42, 34, 26),
+    Button = Color3.fromRGB(65, 50, 38), ButtonHover = Color3.fromRGB(80, 62, 46),
+    ToggleOff = Color3.fromRGB(60, 46, 36), ToggleOn = Color3.fromRGB(240, 160, 60),
+    ToggleHoverOn = Color3.fromRGB(220, 145, 50), ToggleHoverOff = Color3.fromRGB(75, 58, 44),
+    Accent = Color3.fromRGB(240, 160, 60), AccentHover = Color3.fromRGB(220, 145, 50),
+    TextPrimary = Color3.fromRGB(255, 245, 235), TextSecondary = Color3.fromRGB(200, 175, 150),
+    TextAccent = Color3.fromRGB(255, 200, 110), Stroke = Color3.fromRGB(75, 58, 44),
+    Track = Color3.fromRGB(60, 46, 36), TrackFill = Color3.fromRGB(240, 160, 60),
+    InputBg = Color3.fromRGB(50, 40, 30), DropdownBg = Color3.fromRGB(42, 34, 26),
+    DropdownItem = Color3.fromRGB(50, 40, 30), DropdownItemHover = Color3.fromRGB(70, 55, 42),
+    LoadingBg = Color3.fromRGB(18, 14, 10), LoadingStroke = Color3.fromRGB(220, 145, 50),
+    LoadingText = Color3.fromRGB(250, 175, 70), LoadingSub = Color3.fromRGB(255, 210, 140),
+    NotifyBg = Color3.fromRGB(42, 34, 26), CloseBtn = Color3.fromRGB(65, 50, 38),
+    CloseBtnHover = Color3.fromRGB(80, 62, 46), MinimizeBtn = Color3.fromRGB(65, 50, 38),
+    MinimizeBtnHover = Color3.fromRGB(80, 62, 46), DialogNo = Color3.fromRGB(220, 80, 60),
+    DialogNoHover = Color3.fromRGB(240, 100, 80), DialogOk = Color3.fromRGB(65, 50, 38),
+    DialogOkHover = Color3.fromRGB(85, 66, 50), SearchBg = Color3.fromRGB(50, 40, 30),
+    SearchPlaceholder = Color3.fromRGB(160, 135, 110), Scrollbar = Color3.fromRGB(82, 64, 48),
+    MiniBarBg = Color3.fromRGB(35, 28, 22), MiniBarStroke = Color3.fromRGB(75, 58, 44),
+    TabBtn = Color3.fromRGB(50, 40, 30), TabBtnHover = Color3.fromRGB(65, 50, 38),
+    TabBtnActive = Color3.fromRGB(72, 56, 42), SectionHeader = Color3.fromRGB(46, 36, 28),
+    SectionContent = Color3.fromRGB(32, 25, 20), DropdownStroke = Color3.fromRGB(75, 58, 44),
+    ProgressBar = Color3.fromRGB(240, 160, 60),
+}
+
+Themes.Glacier = {
+    Background = Color3.fromRGB(28, 34, 40), Topbar = Color3.fromRGB(24, 30, 36), Sidebar = Color3.fromRGB(18, 24, 30),
+    MainPanel = Color3.fromRGB(26, 32, 38), Section = Color3.fromRGB(34, 42, 50), Element = Color3.fromRGB(34, 42, 50),
+    Button = Color3.fromRGB(52, 64, 76), ButtonHover = Color3.fromRGB(64, 78, 92),
+    ToggleOff = Color3.fromRGB(48, 60, 72), ToggleOn = Color3.fromRGB(100, 190, 230),
+    ToggleHoverOn = Color3.fromRGB(88, 175, 215), ToggleHoverOff = Color3.fromRGB(58, 70, 82),
+    Accent = Color3.fromRGB(100, 190, 230), AccentHover = Color3.fromRGB(88, 175, 215),
+    TextPrimary = Color3.fromRGB(240, 248, 255), TextSecondary = Color3.fromRGB(160, 185, 205),
+    TextAccent = Color3.fromRGB(150, 215, 250), Stroke = Color3.fromRGB(55, 68, 80),
+    Track = Color3.fromRGB(48, 60, 72), TrackFill = Color3.fromRGB(100, 190, 230),
+    InputBg = Color3.fromRGB(40, 50, 60), DropdownBg = Color3.fromRGB(34, 42, 50),
+    DropdownItem = Color3.fromRGB(40, 50, 60), DropdownItemHover = Color3.fromRGB(58, 72, 86),
+    LoadingBg = Color3.fromRGB(14, 18, 22), LoadingStroke = Color3.fromRGB(88, 175, 215),
+    LoadingText = Color3.fromRGB(120, 200, 240), LoadingSub = Color3.fromRGB(180, 225, 255),
+    NotifyBg = Color3.fromRGB(34, 42, 50), CloseBtn = Color3.fromRGB(52, 64, 76),
+    CloseBtnHover = Color3.fromRGB(64, 78, 92), MinimizeBtn = Color3.fromRGB(52, 64, 76),
+    MinimizeBtnHover = Color3.fromRGB(64, 78, 92), DialogNo = Color3.fromRGB(220, 90, 90),
+    DialogNoHover = Color3.fromRGB(240, 110, 110), DialogOk = Color3.fromRGB(52, 64, 76),
+    DialogOkHover = Color3.fromRGB(72, 88, 102), SearchBg = Color3.fromRGB(40, 50, 60),
+    SearchPlaceholder = Color3.fromRGB(125, 150, 172), Scrollbar = Color3.fromRGB(68, 82, 96),
+    MiniBarBg = Color3.fromRGB(28, 34, 40), MiniBarStroke = Color3.fromRGB(55, 68, 80),
+    TabBtn = Color3.fromRGB(40, 50, 60), TabBtnHover = Color3.fromRGB(52, 64, 76),
+    TabBtnActive = Color3.fromRGB(60, 74, 88), SectionHeader = Color3.fromRGB(36, 44, 52),
+    SectionContent = Color3.fromRGB(26, 32, 38), DropdownStroke = Color3.fromRGB(55, 68, 80),
+    ProgressBar = Color3.fromRGB(100, 190, 230),
+}
+
+Themes.Neon = {
+    Background = Color3.fromRGB(18, 18, 28), Topbar = Color3.fromRGB(14, 14, 22), Sidebar = Color3.fromRGB(10, 10, 18),
+    MainPanel = Color3.fromRGB(16, 16, 24), Section = Color3.fromRGB(24, 24, 38), Element = Color3.fromRGB(24, 24, 38),
+    Button = Color3.fromRGB(40, 40, 65), ButtonHover = Color3.fromRGB(52, 52, 85),
+    ToggleOff = Color3.fromRGB(38, 38, 60), ToggleOn = Color3.fromRGB(220, 50, 180),
+    ToggleHoverOn = Color3.fromRGB(200, 42, 165), ToggleHoverOff = Color3.fromRGB(50, 50, 75),
+    Accent = Color3.fromRGB(220, 50, 180), AccentHover = Color3.fromRGB(200, 42, 165),
+    TextPrimary = Color3.fromRGB(250, 240, 255), TextSecondary = Color3.fromRGB(180, 165, 200),
+    TextAccent = Color3.fromRGB(255, 120, 220), Stroke = Color3.fromRGB(55, 45, 75),
+    Track = Color3.fromRGB(38, 38, 60), TrackFill = Color3.fromRGB(220, 50, 180),
+    InputBg = Color3.fromRGB(30, 30, 50), DropdownBg = Color3.fromRGB(24, 24, 38),
+    DropdownItem = Color3.fromRGB(30, 30, 50), DropdownItemHover = Color3.fromRGB(48, 48, 78),
+    LoadingBg = Color3.fromRGB(10, 10, 16), LoadingStroke = Color3.fromRGB(200, 42, 165),
+    LoadingText = Color3.fromRGB(240, 80, 200), LoadingSub = Color3.fromRGB(255, 150, 230),
+    NotifyBg = Color3.fromRGB(24, 24, 38), CloseBtn = Color3.fromRGB(40, 40, 65),
+    CloseBtnHover = Color3.fromRGB(52, 52, 85), MinimizeBtn = Color3.fromRGB(40, 40, 65),
+    MinimizeBtnHover = Color3.fromRGB(52, 52, 85), DialogNo = Color3.fromRGB(255, 60, 100),
+    DialogNoHover = Color3.fromRGB(255, 80, 120), DialogOk = Color3.fromRGB(40, 40, 65),
+    DialogOkHover = Color3.fromRGB(58, 58, 90), SearchBg = Color3.fromRGB(30, 30, 50),
+    SearchPlaceholder = Color3.fromRGB(130, 115, 155), Scrollbar = Color3.fromRGB(60, 50, 85),
+    MiniBarBg = Color3.fromRGB(18, 18, 28), MiniBarStroke = Color3.fromRGB(55, 45, 75),
+    TabBtn = Color3.fromRGB(30, 30, 50), TabBtnHover = Color3.fromRGB(40, 40, 65),
+    TabBtnActive = Color3.fromRGB(48, 48, 78), SectionHeader = Color3.fromRGB(22, 22, 36),
+    SectionContent = Color3.fromRGB(16, 16, 24), DropdownStroke = Color3.fromRGB(55, 45, 75),
+    ProgressBar = Color3.fromRGB(220, 50, 180),
+}
+
+Themes.Coffee = {
+    Background = Color3.fromRGB(40, 34, 28), Topbar = Color3.fromRGB(34, 28, 24), Sidebar = Color3.fromRGB(26, 22, 18),
+    MainPanel = Color3.fromRGB(36, 30, 26), Section = Color3.fromRGB(46, 40, 34), Element = Color3.fromRGB(46, 40, 34),
+    Button = Color3.fromRGB(68, 58, 48), ButtonHover = Color3.fromRGB(82, 70, 58),
+    ToggleOff = Color3.fromRGB(62, 54, 44), ToggleOn = Color3.fromRGB(190, 145, 90),
+    ToggleHoverOn = Color3.fromRGB(175, 130, 78), ToggleHoverOff = Color3.fromRGB(75, 64, 52),
+    Accent = Color3.fromRGB(190, 145, 90), AccentHover = Color3.fromRGB(175, 130, 78),
+    TextPrimary = Color3.fromRGB(250, 245, 238), TextSecondary = Color3.fromRGB(190, 175, 158),
+    TextAccent = Color3.fromRGB(230, 190, 130), Stroke = Color3.fromRGB(75, 64, 52),
+    Track = Color3.fromRGB(62, 54, 44), TrackFill = Color3.fromRGB(190, 145, 90),
+    InputBg = Color3.fromRGB(54, 46, 38), DropdownBg = Color3.fromRGB(46, 40, 34),
+    DropdownItem = Color3.fromRGB(54, 46, 38), DropdownItemHover = Color3.fromRGB(74, 64, 52),
+    LoadingBg = Color3.fromRGB(20, 16, 12), LoadingStroke = Color3.fromRGB(175, 130, 78),
+    LoadingText = Color3.fromRGB(210, 165, 105), LoadingSub = Color3.fromRGB(240, 205, 150),
+    NotifyBg = Color3.fromRGB(46, 40, 34), CloseBtn = Color3.fromRGB(68, 58, 48),
+    CloseBtnHover = Color3.fromRGB(82, 70, 58), MinimizeBtn = Color3.fromRGB(68, 58, 48),
+    MinimizeBtnHover = Color3.fromRGB(82, 70, 58), DialogNo = Color3.fromRGB(220, 80, 70),
+    DialogNoHover = Color3.fromRGB(240, 100, 88), DialogOk = Color3.fromRGB(68, 58, 48),
+    DialogOkHover = Color3.fromRGB(88, 76, 62), SearchBg = Color3.fromRGB(54, 46, 38),
+    SearchPlaceholder = Color3.fromRGB(155, 140, 122), Scrollbar = Color3.fromRGB(82, 70, 58),
+    MiniBarBg = Color3.fromRGB(40, 34, 28), MiniBarStroke = Color3.fromRGB(75, 64, 52),
+    TabBtn = Color3.fromRGB(54, 46, 38), TabBtnHover = Color3.fromRGB(68, 58, 48),
+    TabBtnActive = Color3.fromRGB(76, 65, 52), SectionHeader = Color3.fromRGB(50, 42, 36),
+    SectionContent = Color3.fromRGB(36, 30, 26), DropdownStroke = Color3.fromRGB(75, 64, 52),
+    ProgressBar = Color3.fromRGB(190, 145, 90),
+}
+
+Themes.Lavender = {
+    Background = Color3.fromRGB(38, 34, 44), Topbar = Color3.fromRGB(32, 28, 38), Sidebar = Color3.fromRGB(26, 22, 32),
+    MainPanel = Color3.fromRGB(34, 30, 40), Section = Color3.fromRGB(44, 40, 52), Element = Color3.fromRGB(44, 40, 52),
+    Button = Color3.fromRGB(62, 56, 75), ButtonHover = Color3.fromRGB(74, 68, 90),
+    ToggleOff = Color3.fromRGB(58, 52, 70), ToggleOn = Color3.fromRGB(170, 130, 220),
+    ToggleHoverOn = Color3.fromRGB(155, 115, 205), ToggleHoverOff = Color3.fromRGB(70, 64, 82),
+    Accent = Color3.fromRGB(170, 130, 220), AccentHover = Color3.fromRGB(155, 115, 205),
+    TextPrimary = Color3.fromRGB(248, 242, 255), TextSecondary = Color3.fromRGB(185, 170, 205),
+    TextAccent = Color3.fromRGB(210, 175, 250), Stroke = Color3.fromRGB(70, 64, 82),
+    Track = Color3.fromRGB(58, 52, 70), TrackFill = Color3.fromRGB(170, 130, 220),
+    InputBg = Color3.fromRGB(50, 45, 60), DropdownBg = Color3.fromRGB(44, 40, 52),
+    DropdownItem = Color3.fromRGB(50, 45, 60), DropdownItemHover = Color3.fromRGB(70, 64, 85),
+    LoadingBg = Color3.fromRGB(18, 16, 22), LoadingStroke = Color3.fromRGB(155, 115, 205),
+    LoadingText = Color3.fromRGB(190, 145, 235), LoadingSub = Color3.fromRGB(225, 195, 255),
+    NotifyBg = Color3.fromRGB(44, 40, 52), CloseBtn = Color3.fromRGB(62, 56, 75),
+    CloseBtnHover = Color3.fromRGB(74, 68, 90), MinimizeBtn = Color3.fromRGB(62, 56, 75),
+    MinimizeBtnHover = Color3.fromRGB(74, 68, 90), DialogNo = Color3.fromRGB(220, 80, 100),
+    DialogNoHover = Color3.fromRGB(240, 100, 120), DialogOk = Color3.fromRGB(62, 56, 75),
+    DialogOkHover = Color3.fromRGB(82, 76, 98), SearchBg = Color3.fromRGB(50, 45, 60),
+    SearchPlaceholder = Color3.fromRGB(145, 130, 168), Scrollbar = Color3.fromRGB(78, 70, 95),
+    MiniBarBg = Color3.fromRGB(38, 34, 44), MiniBarStroke = Color3.fromRGB(70, 64, 82),
+    TabBtn = Color3.fromRGB(50, 45, 60), TabBtnHover = Color3.fromRGB(62, 56, 75),
+    TabBtnActive = Color3.fromRGB(70, 64, 85), SectionHeader = Color3.fromRGB(48, 44, 56),
+    SectionContent = Color3.fromRGB(34, 30, 40), DropdownStroke = Color3.fromRGB(70, 64, 82),
+    ProgressBar = Color3.fromRGB(170, 130, 220),
+}
+
+Themes.Obsidian = {
+    Background = Color3.fromRGB(18, 18, 18), Topbar = Color3.fromRGB(14, 14, 14), Sidebar = Color3.fromRGB(10, 10, 10),
+    MainPanel = Color3.fromRGB(16, 16, 16), Section = Color3.fromRGB(24, 24, 24), Element = Color3.fromRGB(24, 24, 24),
+    Button = Color3.fromRGB(40, 40, 40), ButtonHover = Color3.fromRGB(55, 55, 55),
+    ToggleOff = Color3.fromRGB(45, 45, 45), ToggleOn = Color3.fromRGB(200, 200, 200),
+    ToggleHoverOn = Color3.fromRGB(180, 180, 180), ToggleHoverOff = Color3.fromRGB(55, 55, 55),
+    Accent = Color3.fromRGB(200, 200, 200), AccentHover = Color3.fromRGB(180, 180, 180),
+    TextPrimary = Color3.fromRGB(255, 255, 255), TextSecondary = Color3.fromRGB(160, 160, 160),
+    TextAccent = Color3.fromRGB(220, 220, 220), Stroke = Color3.fromRGB(45, 45, 45),
+    Track = Color3.fromRGB(45, 45, 45), TrackFill = Color3.fromRGB(200, 200, 200),
+    InputBg = Color3.fromRGB(30, 30, 30), DropdownBg = Color3.fromRGB(24, 24, 24),
+    DropdownItem = Color3.fromRGB(30, 30, 30), DropdownItemHover = Color3.fromRGB(50, 50, 50),
+    LoadingBg = Color3.fromRGB(8, 8, 8), LoadingStroke = Color3.fromRGB(160, 160, 160),
+    LoadingText = Color3.fromRGB(200, 200, 200), LoadingSub = Color3.fromRGB(230, 230, 230),
+    NotifyBg = Color3.fromRGB(24, 24, 24), CloseBtn = Color3.fromRGB(40, 40, 40),
+    CloseBtnHover = Color3.fromRGB(55, 55, 55), MinimizeBtn = Color3.fromRGB(40, 40, 40),
+    MinimizeBtnHover = Color3.fromRGB(55, 55, 55), DialogNo = Color3.fromRGB(220, 80, 80),
+    DialogNoHover = Color3.fromRGB(240, 100, 100), DialogOk = Color3.fromRGB(40, 40, 40),
+    DialogOkHover = Color3.fromRGB(60, 60, 60), SearchBg = Color3.fromRGB(30, 30, 30),
+    SearchPlaceholder = Color3.fromRGB(120, 120, 120), Scrollbar = Color3.fromRGB(60, 60, 60),
+    MiniBarBg = Color3.fromRGB(18, 18, 18), MiniBarStroke = Color3.fromRGB(45, 45, 45),
+    TabBtn = Color3.fromRGB(30, 30, 30), TabBtnHover = Color3.fromRGB(40, 40, 40),
+    TabBtnActive = Color3.fromRGB(50, 50, 50), SectionHeader = Color3.fromRGB(22, 22, 22),
+    SectionContent = Color3.fromRGB(16, 16, 16), DropdownStroke = Color3.fromRGB(45, 45, 45),
+    ProgressBar = Color3.fromRGB(200, 200, 200),
+}
+
+    return Themes
+end)()
 
 -- ========== ALIAS TABLE ==========
 local Aliases = {
@@ -332,13 +882,13 @@ local function ShowNotification(data)
     end
 
     local CloseBtn = New("TextButton", {
-        Size = UDim2.new(0, 16, 0, 16),
-        Position = UDim2.new(1, -18, 0, 2),
+        Size = UDim2.new(0, 24, 0, 24),
+        Position = UDim2.new(1, -26, 0, 0),
         BackgroundTransparency = 1,
         Text = "×",
         TextColor3 = theme.TextSecondary,
         Font = Enum.Font.GothamBold,
-        TextSize = 14,
+        TextSize = 20,
         ZIndex = 202,
     })
     RegisterThemeObject(CloseBtn, "TextColor3", "TextSecondary")
@@ -419,7 +969,7 @@ local function ShowColorPicker(config, callback)
     local h, s, v = RGBToHSV(r, g, b)
 
     local PickerFrame = New("Frame", {
-        Size = UDim2.new(0, 340, 0, 0),
+        Size = UDim2.new(0, 360, 0, 322),
         Position = UDim2.new(0.5, 0, 0.5, 0),
         AnchorPoint = Vector2.new(0.5, 0.5),
         BackgroundColor3 = theme.Background,
@@ -724,7 +1274,7 @@ local function ShowColorPicker(config, callback)
 
     local svDragging = false
     SVFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             svDragging = true
             local absPos = SVFrame.AbsolutePosition
             local absSize = SVFrame.AbsoluteSize
@@ -738,7 +1288,7 @@ local function ShowColorPicker(config, callback)
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if svDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        if svDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local absPos = SVFrame.AbsolutePosition
             local absSize = SVFrame.AbsoluteSize
             local relX = math.clamp((input.Position.X - absPos.X) / absSize.X, 0, 1)
@@ -752,7 +1302,7 @@ local function ShowColorPicker(config, callback)
 
     local hueDragging = false
     HueFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             hueDragging = true
             local absPos = HueFrame.AbsolutePosition
             local absSize = HueFrame.AbsoluteSize
@@ -764,7 +1314,7 @@ local function ShowColorPicker(config, callback)
     end)
 
     UserInputService.InputChanged:Connect(function(input)
-        if hueDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        if hueDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local absPos = HueFrame.AbsolutePosition
             local absSize = HueFrame.AbsoluteSize
             h = math.clamp((input.Position.Y - absPos.Y) / absSize.Y, 0, 1)
@@ -775,7 +1325,7 @@ local function ShowColorPicker(config, callback)
     end)
 
     UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             svDragging = false
             hueDragging = false
         end
@@ -833,6 +1383,8 @@ function SimpleLib:Win(config)
     local icon = config.icon
     local size = config.size and UDim2.new(unpack(config.size)) or UDim2.new(0, 540, 0, 400)
 
+    local LoadingCardSize = UDim2.new(0, 300, 0, 112)
+
     local ShadowFrame = New("Frame", {
         Size = UDim2.new(0, 0, 0, 0),
         Position = UDim2.new(0.5, 0, 0.5, 0),
@@ -861,15 +1413,21 @@ function SimpleLib:Win(config)
     RegisterThemeObject(MainFrame:FindFirstChildOfClass("UIStroke"), "Color", "Stroke")
     MainFrame.Parent = ScreenGui
 
-    Tween(ShadowFrame, { Size = UDim2.new(0, size.X.Offset + 20, 0, size.Y.Offset + 20), BackgroundTransparency = 0.45 }, 0.5, Enum.EasingStyle.Quad)
+    if load_enabled then
+        -- Start as a small loading card, expands into the full menu when done
+        Tween(MainFrame, { Size = LoadingCardSize, BackgroundTransparency = 0 }, 0.35, Enum.EasingStyle.Back)
+        Tween(ShadowFrame, { Size = UDim2.new(0, LoadingCardSize.X.Offset + 20, 0, LoadingCardSize.Y.Offset + 20), BackgroundTransparency = 0.45 }, 0.35)
+    else
+        Tween(ShadowFrame, { Size = UDim2.new(0, size.X.Offset + 20, 0, size.Y.Offset + 20), BackgroundTransparency = 0.45 }, 0.5, Enum.EasingStyle.Quad)
 
-    local scaleFrame = Instance.new("UIScale")
-    scaleFrame.Scale = 0.85
-    scaleFrame.Parent = MainFrame
+        local scaleFrame = Instance.new("UIScale")
+        scaleFrame.Scale = 0.85
+        scaleFrame.Parent = MainFrame
 
-    Tween(MainFrame, { Size = size, BackgroundTransparency = 0 }, 0.45, Enum.EasingStyle.Quad)
-    SpringTween(scaleFrame, { Scale = 1 }, 0.45)
-    game:GetService("Debris"):AddItem(scaleFrame, 0.5)
+        Tween(MainFrame, { Size = size, BackgroundTransparency = 0 }, 0.45, Enum.EasingStyle.Quad)
+        SpringTween(scaleFrame, { Scale = 1 }, 0.45)
+        game:GetService("Debris"):AddItem(scaleFrame, 0.5)
+    end
 
     local Topbar = New("Frame", {
         Name = "Topbar",
@@ -1051,90 +1609,128 @@ function SimpleLib:Win(config)
     Sidebar.Parent = MainFrame
     MainPanel.Parent = MainFrame
 
-    local function ShowLoadingOverlay(libName, subTitle, duration)
+    if load_enabled then
+        Topbar.Visible = false
+        Sidebar.Visible = false
+        MainPanel.Visible = false
+    end
+
+    local function ShowLoadingCard(libName, subTitle, duration)
         duration = tonumber(duration) or 2.5
-        local loading = New("Frame", {
+        local theme = GetTheme()
+
+        local LoadingUI = New("Frame", {
+            Name = "LoadingCard",
             Size = UDim2.new(1, 0, 1, 0),
-            BackgroundColor3 = theme.LoadingBg,
-            BorderSizePixel = 0,
-            ZIndex = 999,
             BackgroundTransparency = 1,
+            ZIndex = 60,
+        })
+
+        local IconBg = New("Frame", {
+            Size = UDim2.new(0, 46, 0, 46),
+            Position = UDim2.new(0, 16, 0.5, -26),
+            BackgroundColor3 = theme.InputBg,
+            BorderSizePixel = 0,
+            ZIndex = 61,
         }, {
             New("UICorner", { CornerRadius = UDim.new(0, 12) }),
             New("UIStroke", { Color = theme.LoadingStroke, Thickness = 1.5 }),
+            New("TextLabel", {
+                Size = UDim2.new(1, 0, 1, 0),
+                BackgroundTransparency = 1,
+                Text = "◈",
+                TextColor3 = theme.LoadingText,
+                Font = Enum.Font.GothamBold,
+                TextSize = 22,
+                ZIndex = 62,
+            }),
         })
-        RegisterThemeObject(loading, "BackgroundColor3", "LoadingBg")
-
-        local center = New("Frame", {
-            Size = UDim2.new(0, 380, 0, 140),
-            Position = UDim2.new(0.5, 0, 0.5, 0),
-            AnchorPoint = Vector2.new(0.5, 0.5),
-            BackgroundTransparency = 1,
-            ZIndex = 1000,
-        })
+        RegisterThemeObject(IconBg, "BackgroundColor3", "InputBg")
+        RegisterThemeObject(IconBg:FindFirstChildOfClass("UIStroke"), "Color", "LoadingStroke")
+        RegisterThemeObject(IconBg.TextLabel, "TextColor3", "LoadingText")
+        IconBg.Parent = LoadingUI
 
         local libLabel = New("TextLabel", {
             Text = libName,
             Font = Enum.Font.GothamBold,
-            TextSize = 26,
+            TextSize = 16,
             TextColor3 = theme.LoadingText,
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 16, 0, 12),
-            Size = UDim2.new(1, -32, 0, 34),
+            Position = UDim2.new(0, 74, 0, 20),
+            Size = UDim2.new(1, -134, 0, 20),
             TextXAlignment = Enum.TextXAlignment.Left,
+            TextTruncate = Enum.TextTruncate.AtEnd,
+            ZIndex = 61,
         })
         RegisterThemeObject(libLabel, "TextColor3", "LoadingText")
 
         local subLabel = New("TextLabel", {
             Text = subTitle,
             Font = Enum.Font.Gotham,
-            TextSize = 13,
+            TextSize = 12,
             TextColor3 = theme.LoadingSub,
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 16, 0, 48),
-            Size = UDim2.new(1, -32, 0, 20),
+            Position = UDim2.new(0, 74, 0, 42),
+            Size = UDim2.new(1, -134, 0, 16),
             TextXAlignment = Enum.TextXAlignment.Left,
+            TextTruncate = Enum.TextTruncate.AtEnd,
+            ZIndex = 61,
         })
         RegisterThemeObject(subLabel, "TextColor3", "LoadingSub")
 
+        local percentLabel = New("TextLabel", {
+            Text = "0%",
+            Font = Enum.Font.GothamBold,
+            TextSize = 15,
+            TextColor3 = theme.LoadingText,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(1, -58, 0.5, -15),
+            Size = UDim2.new(0, 46, 0, 24),
+            TextXAlignment = Enum.TextXAlignment.Right,
+            ZIndex = 61,
+        })
+        RegisterThemeObject(percentLabel, "TextColor3", "LoadingText")
+
         local barBg = New("Frame", {
-            Size = UDim2.new(1, -32, 0, 10),
-            Position = UDim2.new(0, 16, 1, -36),
+            Size = UDim2.new(1, -32, 0, 6),
+            Position = UDim2.new(0, 16, 1, -22),
             BackgroundColor3 = theme.InputBg,
             BorderSizePixel = 0,
-        }, { New("UICorner", { CornerRadius = UDim.new(0, 5) }) })
+            ZIndex = 61,
+        }, { New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
         RegisterThemeObject(barBg, "BackgroundColor3", "InputBg")
 
         local barFill = New("Frame", {
             Size = UDim2.new(0, 0, 1, 0),
             BackgroundColor3 = theme.Accent,
             BorderSizePixel = 0,
-            ZIndex = 1001,
-        }, { New("UICorner", { CornerRadius = UDim.new(0, 5) }) })
+            ZIndex = 62,
+        }, {
+            New("UICorner", { CornerRadius = UDim.new(1, 0) }),
+            New("UIGradient", {
+                Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, theme.Accent),
+                    ColorSequenceKeypoint.new(1, theme.AccentHover),
+                }),
+            }),
+        })
         RegisterThemeObject(barFill, "BackgroundColor3", "Accent")
 
-        local percentLabel = New("TextLabel", {
-            Text = "0%",
-            Font = Enum.Font.GothamBold,
-            TextSize = 14,
-            TextColor3 = theme.LoadingSub,
-            BackgroundTransparency = 1,
-            Position = UDim2.new(1, -70, 1, -58),
-            Size = UDim2.new(0, 56, 0, 20),
-            ZIndex = 1002,
-            TextXAlignment = Enum.TextXAlignment.Right,
-        })
-        RegisterThemeObject(percentLabel, "TextColor3", "LoadingSub")
-
         barFill.Parent = barBg
-        center.Parent = loading
-        libLabel.Parent = center
-        subLabel.Parent = center
-        barBg.Parent = center
-        percentLabel.Parent = center
-        loading.Parent = MainFrame
+        libLabel.Parent = LoadingUI
+        subLabel.Parent = LoadingUI
+        percentLabel.Parent = LoadingUI
+        barBg.Parent = LoadingUI
+        LoadingUI.Parent = MainFrame
 
-        Tween(loading, { BackgroundTransparency = 0 }, 0.3)
+        -- spinning icon
+        local spinIcon = IconBg.TextLabel
+        local spinConn = RunService.RenderStepped:Connect(function(dt)
+            if spinIcon and spinIcon.Parent then
+                spinIcon.Rotation = (spinIcon.Rotation + dt * 140) % 360
+            end
+        end)
+
         local tween = Tween(barFill, { Size = UDim2.new(1, 0, 1, 0) }, duration, Enum.EasingStyle.Linear)
 
         local start = tick()
@@ -1150,13 +1746,34 @@ function SimpleLib:Win(config)
         end)
 
         tween.Completed:Wait()
-        Tween(loading, { BackgroundTransparency = 1 }, 0.3)
-        task.wait(0.35)
-        loading:Destroy()
+        spinConn:Disconnect()
+        task.wait(0.15)
+
+        -- fade out loading card content
+        for _, obj in ipairs(LoadingUI:GetDescendants()) do
+            pcall(function()
+                if obj:IsA("TextLabel") then
+                    Tween(obj, { TextTransparency = 1 }, 0.2)
+                elseif obj:IsA("Frame") then
+                    Tween(obj, { BackgroundTransparency = 1 }, 0.2)
+                end
+            end)
+        end
+        task.wait(0.25)
+        LoadingUI:Destroy()
+
+        -- expand the card into the full menu
+        Tween(MainFrame, { Size = size }, 0.55, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+        Tween(ShadowFrame, { Size = UDim2.new(0, size.X.Offset + 20, 0, size.Y.Offset + 20) }, 0.55, Enum.EasingStyle.Quad)
+        task.wait(0.3)
+        Topbar.Visible = true
+        Sidebar.Visible = true
+        MainPanel.Visible = true
+        task.wait(0.25)
     end
 
     if load_enabled then
-        ShowLoadingOverlay(title_load, subtitle_load, load_time)
+        ShowLoadingCard(title_load, subtitle_load, load_time)
     end
 
     local dragging = false
@@ -1788,10 +2405,13 @@ function SimpleLib:Win(config)
 
             local ContentFrame = New("Frame", {
                 Size = UDim2.new(1, 0, 0, 0),
+                BackgroundColor3 = theme.SectionContent or theme.MainPanel,
                 BackgroundTransparency = 1,
+                BorderSizePixel = 0,
                 Visible = defaultState,
                 AutomaticSize = Enum.AutomaticSize.Y,
             }, {
+                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
                 New("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
                     Padding = UDim.new(0, 8),
@@ -1803,6 +2423,7 @@ function SimpleLib:Win(config)
                     PaddingBottom = UDim.new(0, 6),
                 }),
             })
+            RegisterThemeObject(ContentFrame, "BackgroundColor3", "SectionContent")
             ContentFrame.Parent = Tab.Content
 
             local IsOpen = defaultState
@@ -1869,6 +2490,8 @@ function SimpleLib:Win(config)
             theme = GetTheme()
             local btnTitle = btnConfig.title or "Button"
             local callback = btnConfig[1] or function() end
+            local btnType = string.lower(tostring(btnConfig.Type or btnConfig.type or "button"))
+            local copyContent = btnConfig.copy or btnConfig.Copy
             local Button = New("TextButton", {
                 Size = UDim2.new(1, 0, 0, 38),
                 BackgroundColor3 = theme.Button,
@@ -1919,6 +2542,20 @@ function SimpleLib:Win(config)
                 ripple.Parent = Button
                 Tween(ripple, { Size = UDim2.new(0, 120, 0, 120), BackgroundTransparency = 1 }, 0.4)
                 game:GetService("Debris"):AddItem(ripple, 0.4)
+                if btnType == "copy" and copyContent ~= nil then
+                    pcall(function()
+                        if setclipboard then setclipboard(tostring(copyContent)) end
+                    end)
+                    local lbl = Button.TextLabel
+                    lbl.Text = "✓ Copied!"
+                    Tween(Button, { BackgroundColor3 = GetTheme().ToggleOn }, 0.15)
+                    task.delay(1, function()
+                        if lbl and lbl.Parent then lbl.Text = btnTitle end
+                        if Button and Button.Parent then
+                            Tween(Button, { BackgroundColor3 = GetTheme().Button }, 0.2)
+                        end
+                    end)
+                end
                 callback()
             end)
             Button.Parent = Tab.Content
@@ -2128,12 +2765,13 @@ function SimpleLib:Win(config)
             })
         end
 
-        -- DropDown with external animated panel
+        -- DropDown (Type = "side" | "classic")
         function Tab:DropDown(ddConfig)
             theme = GetTheme()
             local title = ddConfig.title or "Dropdown"
             local items = ddConfig.item or {}
             local callback = ddConfig[1] or function() end
+            local ddType = string.lower(tostring(ddConfig.Type or ddConfig.type or "side"))
             local searchEnabled = ddConfig.search ~= false and #items > 6
             local SelectedItem = items[1] ~= nil and tostring(items[1]) or "None"
 
@@ -2203,57 +2841,25 @@ function SimpleLib:Win(config)
             RegisterThemeObject(ArrowIcon, "TextColor3", "TextSecondary")
             ArrowIcon.Parent = SelectedBtn
 
-            -- External Dropdown Panel
-            local DropdownPanel = New("Frame", {
-                Size = UDim2.new(0, 250, 0, 0),
-                BackgroundColor3 = theme.DropdownBg,
-                BorderSizePixel = 0,
-                Visible = false,
-                ZIndex = 999,
-                BackgroundTransparency = 1,
-                ClipsDescendants = true,
-            }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
-                New("UIStroke", { Color = theme.Stroke, Thickness = 1 }),
-                New("UIPadding", {
-                    PaddingTop = UDim.new(0, 6),
-                    PaddingLeft = UDim.new(0, 6),
-                    PaddingRight = UDim.new(0, 6),
-                    PaddingBottom = UDim.new(0, 6),
-                }),
-            })
-            RegisterThemeObject(DropdownPanel, "BackgroundColor3", "DropdownBg")
-
-            local DropdownScroll = New("ScrollingFrame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                BackgroundTransparency = 1,
-                ScrollBarThickness = 3,
-                ScrollBarImageColor3 = theme.Scrollbar,
-                CanvasSize = UDim2.new(0, 0, 0, 0),
-                AutomaticCanvasSize = Enum.AutomaticSize.Y,
-                ZIndex = 1000,
-            }, {
-                New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }),
-            })
-            RegisterThemeObject(DropdownScroll, "ScrollBarImageColor3", "Scrollbar")
-            DropdownScroll.Parent = DropdownPanel
-            DropdownPanel.Parent = ScreenGui
-
+            local IsOpen = false
+            local ItemButtons = {}
             local DdSearchBox
-            if searchEnabled then
+            local OpenDropdown, CloseDropdown
+
+            local function MakeSearch(parent, zindex)
                 local SearchContainer = New("Frame", {
                     Size = UDim2.new(1, 0, 0, 28),
                     BackgroundColor3 = theme.SearchBg,
                     BorderSizePixel = 0,
                     LayoutOrder = -1,
-                    ZIndex = 1001,
+                    ZIndex = zindex,
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                     New("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }),
                 })
                 RegisterThemeObject(SearchContainer, "BackgroundColor3", "SearchBg")
 
-                DdSearchBox = New("TextBox", {
+                local box = New("TextBox", {
                     Size = UDim2.new(1, 0, 1, 0),
                     BackgroundTransparency = 1,
                     Text = "",
@@ -2263,26 +2869,26 @@ function SimpleLib:Win(config)
                     Font = Enum.Font.Gotham,
                     TextSize = 13,
                     ClearTextOnFocus = false,
-                    ZIndex = 1002,
+                    ZIndex = zindex + 1,
                 })
-                RegisterThemeObject(DdSearchBox, "TextColor3", "TextPrimary")
-                RegisterThemeObject(DdSearchBox, "PlaceholderColor3", "SearchPlaceholder")
-                DdSearchBox.Parent = SearchContainer
-                SearchContainer.Parent = DropdownScroll
+                RegisterThemeObject(box, "TextColor3", "TextPrimary")
+                RegisterThemeObject(box, "PlaceholderColor3", "SearchPlaceholder")
+                box.Parent = SearchContainer
+                SearchContainer.Parent = parent
+                return box
             end
 
-            local ItemButtons = {}
-            local function CreateItemButton(item)
+            local function MakeItemButton(item, zindex)
                 local ItemBtn = New("TextButton", {
                     Size = UDim2.new(1, 0, 0, 26),
                     BackgroundColor3 = theme.DropdownItem,
                     AutoButtonColor = false,
-                    Text = item,
+                    Text = tostring(item),
                     TextColor3 = theme.TextPrimary,
                     Font = Enum.Font.Gotham,
                     TextSize = 14,
                     BorderSizePixel = 0,
-                    ZIndex = 1001,
+                    ZIndex = zindex,
                 }, { New("UICorner", { CornerRadius = UDim.new(0, 5) }) })
                 RegisterThemeObject(ItemBtn, "BackgroundColor3", "DropdownItem")
                 RegisterThemeObject(ItemBtn, "TextColor3", "TextPrimary")
@@ -2293,97 +2899,235 @@ function SimpleLib:Win(config)
                 ItemBtn.MouseLeave:Connect(function()
                     Tween(ItemBtn, { BackgroundColor3 = GetTheme().DropdownItem }, 0.1)
                 end)
-
                 ItemBtn.MouseButton1Click:Connect(function()
                     SelectedItem = item
                     SelectedBtn.Text = tostring(item)
                     CloseDropdown()
                     callback(item)
                 end)
-
                 return ItemBtn
             end
 
-            for _, item in ipairs(items) do
-                local btn = CreateItemButton(item)
-                btn.Parent = DropdownScroll
-                table.insert(ItemButtons, { Button = btn, Text = string.lower(tostring(item)) })
-            end
-
-            if DdSearchBox then
-                DdSearchBox:GetPropertyChangedSignal("Text"):Connect(function()
-                    local query = string.lower(DdSearchBox.Text)
-                    for _, data in ipairs(ItemButtons) do
-                        data.Button.Visible = query == "" or string.find(data.Text, query, 1, true)
-                    end
-                end)
-            end
-
-            local IsOpen = false
-            local function OpenDropdown()
-                if IsOpen then return end
-                IsOpen = true
-                local absPos = SelectedBtn.AbsolutePosition
-                local absSize = SelectedBtn.AbsoluteSize
-                DropdownPanel.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y + 4)
-                local visibleCount = 0
-                for _, data in ipairs(ItemButtons) do
-                    if data.Button.Visible then visibleCount = visibleCount + 1 end
-                end
-                local targetHeight = math.min(visibleCount * 28 + (searchEnabled and 34 or 16), 225)
-                DropdownPanel.Size = UDim2.new(0, 250, 0, 0)
-                DropdownPanel.Visible = true
-                DropdownPanel.BackgroundTransparency = 1
-
-                local scale = Instance.new("UIScale")
-                scale.Scale = 0.9
-                scale.Parent = DropdownPanel
-
-                Tween(DropdownPanel, { Size = UDim2.new(0, 250, 0, targetHeight), BackgroundTransparency = 0 }, 0.25, Enum.EasingStyle.Quad)
-                SpringTween(scale, { Scale = 1 }, 0.25)
-                game:GetService("Debris"):AddItem(scale, 0.3)
-
-                Tween(ArrowIcon, { Rotation = 180 }, 0.2)
-
+            local function HookSearch()
                 if DdSearchBox then
-                    DdSearchBox.Text = ""
-                    for _, data in ipairs(ItemButtons) do data.Button.Visible = true end
+                    DdSearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+                        local query = string.lower(DdSearchBox.Text)
+                        for _, data in ipairs(ItemButtons) do
+                            data.Button.Visible = query == "" or string.find(data.Text, query, 1, true)
+                        end
+                    end)
                 end
             end
 
-            local function CloseDropdown()
-                if not IsOpen then return end
-                IsOpen = false
-                Tween(DropdownPanel, { Size = UDim2.new(0, 250, 0, 0), BackgroundTransparency = 1 }, 0.2, Enum.EasingStyle.Quad)
-                Tween(ArrowIcon, { Rotation = 0 }, 0.15)
-                task.delay(0.2, function()
-                    if not IsOpen then DropdownPanel.Visible = false end
+            local function CountVisible()
+                local c = 0
+                for _, data in ipairs(ItemButtons) do
+                    if data.Button.Visible then c = c + 1 end
+                end
+                return c
+            end
+
+            if ddType == "classic" then
+                -- classic: list expands inside the element
+                local ClassicList = New("Frame", {
+                    Size = UDim2.new(1, 0, 0, 0),
+                    BackgroundColor3 = theme.DropdownBg,
+                    BorderSizePixel = 0,
+                    Visible = false,
+                    LayoutOrder = 3,
+                    ClipsDescendants = true,
+                }, {
+                    New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                    New("UIStroke", { Color = theme.DropdownStroke or theme.Stroke, Thickness = 1 }),
+                    New("UIPadding", {
+                        PaddingTop = UDim.new(0, 6),
+                        PaddingLeft = UDim.new(0, 6),
+                        PaddingRight = UDim.new(0, 6),
+                        PaddingBottom = UDim.new(0, 6),
+                    }),
+                })
+                RegisterThemeObject(ClassicList, "BackgroundColor3", "DropdownBg")
+                RegisterThemeObject(ClassicList:FindFirstChildOfClass("UIStroke"), "Color", "DropdownStroke")
+
+                local ClassicScroll = New("ScrollingFrame", {
+                    Size = UDim2.new(1, 0, 1, 0),
+                    BackgroundTransparency = 1,
+                    ScrollBarThickness = 3,
+                    ScrollBarImageColor3 = theme.Scrollbar,
+                    CanvasSize = UDim2.new(0, 0, 0, 0),
+                    AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                    ScrollingDirection = Enum.ScrollingDirection.Y,
+                    BorderSizePixel = 0,
+                }, {
+                    New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }),
+                })
+                RegisterThemeObject(ClassicScroll, "ScrollBarImageColor3", "Scrollbar")
+                ClassicScroll.Parent = ClassicList
+                ClassicList.Parent = DDFrame
+
+                if searchEnabled then
+                    DdSearchBox = MakeSearch(ClassicScroll, 5)
+                end
+
+                for _, item in ipairs(items) do
+                    local btn = MakeItemButton(item, 5)
+                    btn.Parent = ClassicScroll
+                    table.insert(ItemButtons, { Button = btn, Text = string.lower(tostring(item)) })
+                end
+                HookSearch()
+
+                local function ClassicHeight()
+                    local listH = math.min(CountVisible() * 28 + (searchEnabled and 30 or 0), 180)
+                    return listH + 12
+                end
+
+                OpenDropdown = function()
+                    if IsOpen then return end
+                    IsOpen = true
+                    if DdSearchBox then
+                        DdSearchBox.Text = ""
+                        for _, data in ipairs(ItemButtons) do data.Button.Visible = true end
+                    end
+                    ClassicList.Visible = true
+                    Tween(ClassicList, { Size = UDim2.new(1, 0, 0, ClassicHeight()) }, 0.25, Enum.EasingStyle.Quad)
+                    Tween(ArrowIcon, { Rotation = 180 }, 0.2)
+                end
+
+                CloseDropdown = function()
+                    if not IsOpen then return end
+                    IsOpen = false
+                    Tween(ClassicList, { Size = UDim2.new(1, 0, 0, 0) }, 0.2, Enum.EasingStyle.Quad)
+                    Tween(ArrowIcon, { Rotation = 0 }, 0.15)
+                    task.delay(0.2, function()
+                        if not IsOpen then ClassicList.Visible = false end
+                    end)
+                end
+            else
+                -- side: panel pops out next to the menu window
+                local SideWidth = 210
+
+                local SidePanel = New("Frame", {
+                    Size = UDim2.new(0, SideWidth, 0, 0),
+                    BackgroundColor3 = theme.DropdownBg,
+                    BorderSizePixel = 0,
+                    Visible = false,
+                    ZIndex = 999,
+                    BackgroundTransparency = 1,
+                    ClipsDescendants = true,
+                }, {
+                    New("UICorner", { CornerRadius = UDim.new(0, 12) }),
+                    New("UIStroke", { Color = theme.DropdownStroke or theme.Stroke, Thickness = 1 }),
+                    New("UIPadding", {
+                        PaddingTop = UDim.new(0, 6),
+                        PaddingLeft = UDim.new(0, 6),
+                        PaddingRight = UDim.new(0, 6),
+                        PaddingBottom = UDim.new(0, 6),
+                    }),
+                })
+                RegisterThemeObject(SidePanel, "BackgroundColor3", "DropdownBg")
+                RegisterThemeObject(SidePanel:FindFirstChildOfClass("UIStroke"), "Color", "DropdownStroke")
+
+                local SideScroll = New("ScrollingFrame", {
+                    Size = UDim2.new(1, 0, 1, 0),
+                    BackgroundTransparency = 1,
+                    ScrollBarThickness = 3,
+                    ScrollBarImageColor3 = theme.Scrollbar,
+                    CanvasSize = UDim2.new(0, 0, 0, 0),
+                    AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                    ZIndex = 1000,
+                }, {
+                    New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }),
+                })
+                RegisterThemeObject(SideScroll, "ScrollBarImageColor3", "Scrollbar")
+                SideScroll.Parent = SidePanel
+                SidePanel.Parent = ScreenGui
+
+                if searchEnabled then
+                    DdSearchBox = MakeSearch(SideScroll, 1001)
+                end
+
+                for _, item in ipairs(items) do
+                    local btn = MakeItemButton(item, 1001)
+                    btn.Parent = SideScroll
+                    table.insert(ItemButtons, { Button = btn, Text = string.lower(tostring(item)) })
+                end
+                HookSearch()
+
+                local followConn = nil
+                local function GetSidePosition()
+                    local mfPos = MainFrame.AbsolutePosition
+                    local mfSize = MainFrame.AbsoluteSize
+                    local viewport = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1920, 1080)
+                    local x = mfPos.X + mfSize.X + 8
+                    if x + SideWidth > viewport.X - 8 then
+                        x = mfPos.X - SideWidth - 8
+                        if x < 8 then x = math.max(8, viewport.X - SideWidth - 8) end
+                    end
+                    return UDim2.new(0, x, 0, mfPos.Y)
+                end
+
+                OpenDropdown = function()
+                    if IsOpen then return end
+                    IsOpen = true
+                    if DdSearchBox then
+                        DdSearchBox.Text = ""
+                        for _, data in ipairs(ItemButtons) do data.Button.Visible = true end
+                    end
+                    local maxH = math.max(MainFrame.AbsoluteSize.Y - 16, 140)
+                    local targetHeight = math.min(CountVisible() * 28 + (searchEnabled and 34 or 0) + 12, maxH)
+                    SidePanel.Position = GetSidePosition()
+                    SidePanel.Size = UDim2.new(0, SideWidth, 0, 0)
+                    SidePanel.Visible = true
+                    SidePanel.BackgroundTransparency = 1
+
+                    local scale = Instance.new("UIScale")
+                    scale.Scale = 0.9
+                    scale.Parent = SidePanel
+
+                    Tween(SidePanel, { Size = UDim2.new(0, SideWidth, 0, targetHeight), BackgroundTransparency = 0 }, 0.25, Enum.EasingStyle.Quad)
+                    SpringTween(scale, { Scale = 1 }, 0.25)
+                    game:GetService("Debris"):AddItem(scale, 0.3)
+                    Tween(ArrowIcon, { Rotation = 180 }, 0.2)
+
+                    if followConn then followConn:Disconnect() end
+                    followConn = RunService.RenderStepped:Connect(function()
+                        if IsOpen and SidePanel.Visible then
+                            SidePanel.Position = GetSidePosition()
+                        end
+                    end)
+                end
+
+                CloseDropdown = function()
+                    if not IsOpen then return end
+                    IsOpen = false
+                    if followConn then followConn:Disconnect() followConn = nil end
+                    Tween(SidePanel, { Size = UDim2.new(0, SideWidth, 0, 0), BackgroundTransparency = 1 }, 0.2, Enum.EasingStyle.Quad)
+                    Tween(ArrowIcon, { Rotation = 0 }, 0.15)
+                    task.delay(0.2, function()
+                        if not IsOpen then SidePanel.Visible = false end
+                    end)
+                end
+
+                UserInputService.InputBegan:Connect(function(input)
+                    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and IsOpen then
+                        local mousePos = UserInputService:GetMouseLocation()
+                        local menuAbs = SidePanel.AbsolutePosition
+                        local menuSize = SidePanel.AbsoluteSize
+                        local inMenu = mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
+                                       mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y
+                        local btnAbs = SelectedBtn.AbsolutePosition
+                        local btnSize = SelectedBtn.AbsoluteSize
+                        local inBtn = mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
+                                      mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y
+                        if not inMenu and not inBtn then
+                            CloseDropdown()
+                        end
+                    end
                 end)
             end
 
             SelectedBtn.MouseButton1Click:Connect(function()
-                if IsOpen then
-                    CloseDropdown()
-                else
-                    OpenDropdown()
-                end
-            end)
-
-            UserInputService.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 and IsOpen then
-                    local mousePos = UserInputService:GetMouseLocation()
-                    local menuAbs = DropdownPanel.AbsolutePosition
-                    local menuSize = DropdownPanel.AbsoluteSize
-                    local inMenu = mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
-                                   mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y
-                    local btnAbs = SelectedBtn.AbsolutePosition
-                    local btnSize = SelectedBtn.AbsoluteSize
-                    local inBtn = mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
-                                  mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y
-                    if not inMenu and not inBtn then
-                        CloseDropdown()
-                    end
-                end
+                if IsOpen then CloseDropdown() else OpenDropdown() end
             end)
 
             DDFrame.Parent = Tab.Content
@@ -2405,12 +3149,13 @@ function SimpleLib:Win(config)
         end
         Tab.DD = Tab.DropDown
 
-        -- MultiDropDown
+        -- MultiDropDown (Type = "side" | "classic")
         function Tab:MultiDropDown(ddmConfig)
             theme = GetTheme()
             local title = ddmConfig.title or "Multi Dropdown"
             local items = ddmConfig.item or {}
             local callbacks = ddmConfig
+            local ddmType = string.lower(tostring(ddmConfig.Type or ddmConfig.type or "side"))
             local SelectedItems = {}
             local searchEnabled = ddmConfig.search ~= false and #items > 6
 
@@ -2480,57 +3225,30 @@ function SimpleLib:Win(config)
             RegisterThemeObject(ArrowIcon, "TextColor3", "TextSecondary")
             ArrowIcon.Parent = SelectedBtn
 
-            -- External Dropdown Panel
-            local DropdownPanel = New("Frame", {
-                Size = UDim2.new(0, 250, 0, 0),
-                BackgroundColor3 = theme.DropdownBg,
-                BorderSizePixel = 0,
-                Visible = false,
-                ZIndex = 999,
-                BackgroundTransparency = 1,
-                ClipsDescendants = true,
-            }, {
-                New("UICorner", { CornerRadius = UDim.new(0, 10) }),
-                New("UIStroke", { Color = theme.Stroke, Thickness = 1 }),
-                New("UIPadding", {
-                    PaddingTop = UDim.new(0, 6),
-                    PaddingLeft = UDim.new(0, 6),
-                    PaddingRight = UDim.new(0, 6),
-                    PaddingBottom = UDim.new(0, 6),
-                }),
-            })
-            RegisterThemeObject(DropdownPanel, "BackgroundColor3", "DropdownBg")
-
-            local DropdownScroll = New("ScrollingFrame", {
-                Size = UDim2.new(1, 0, 1, 0),
-                BackgroundTransparency = 1,
-                ScrollBarThickness = 3,
-                ScrollBarImageColor3 = theme.Scrollbar,
-                CanvasSize = UDim2.new(0, 0, 0, 0),
-                AutomaticCanvasSize = Enum.AutomaticSize.Y,
-                ZIndex = 1000,
-            }, {
-                New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }),
-            })
-            RegisterThemeObject(DropdownScroll, "ScrollBarImageColor3", "Scrollbar")
-            DropdownScroll.Parent = DropdownPanel
-            DropdownPanel.Parent = ScreenGui
-
+            local IsOpen = false
+            local ItemStates = {}
+            local ItemButtons = {}
             local DdSearchBox
-            if searchEnabled then
+            local OpenDropdown, CloseDropdown
+
+            local function UpdateSelectedText()
+                SelectedBtn.Text = #SelectedItems > 0 and tostring(#SelectedItems) .. " selected" or "Select..."
+            end
+
+            local function MakeSearch(parent, zindex)
                 local SearchContainer = New("Frame", {
                     Size = UDim2.new(1, 0, 0, 28),
                     BackgroundColor3 = theme.SearchBg,
                     BorderSizePixel = 0,
                     LayoutOrder = -1,
-                    ZIndex = 1001,
+                    ZIndex = zindex,
                 }, {
                     New("UICorner", { CornerRadius = UDim.new(0, 6) }),
                     New("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8) }),
                 })
                 RegisterThemeObject(SearchContainer, "BackgroundColor3", "SearchBg")
 
-                DdSearchBox = New("TextBox", {
+                local box = New("TextBox", {
                     Size = UDim2.new(1, 0, 1, 0),
                     BackgroundTransparency = 1,
                     Text = "",
@@ -2540,131 +3258,281 @@ function SimpleLib:Win(config)
                     Font = Enum.Font.Gotham,
                     TextSize = 13,
                     ClearTextOnFocus = false,
-                    ZIndex = 1002,
+                    ZIndex = zindex + 1,
                 })
-                RegisterThemeObject(DdSearchBox, "TextColor3", "TextPrimary")
-                RegisterThemeObject(DdSearchBox, "PlaceholderColor3", "SearchPlaceholder")
-                DdSearchBox.Parent = SearchContainer
-                SearchContainer.Parent = DropdownScroll
+                RegisterThemeObject(box, "TextColor3", "TextPrimary")
+                RegisterThemeObject(box, "PlaceholderColor3", "SearchPlaceholder")
+                box.Parent = SearchContainer
+                SearchContainer.Parent = parent
+                return box
             end
 
-            local ItemStates = {}
-            local ItemButtons = {}
-
-            for _, item in ipairs(items) do
+            local function MakeItemButton(item, zindex)
                 ItemStates[item] = false
                 local ItemBtn = New("TextButton", {
                     Size = UDim2.new(1, 0, 0, 26),
                     BackgroundColor3 = theme.DropdownItem,
                     AutoButtonColor = false,
-                    Text = "  " .. item,
+                    Text = "  " .. tostring(item),
                     TextColor3 = theme.TextPrimary,
                     Font = Enum.Font.Gotham,
                     TextSize = 14,
                     BorderSizePixel = 0,
-                    ZIndex = 1001,
+                    ZIndex = zindex,
                 }, { New("UICorner", { CornerRadius = UDim.new(0, 5) }) })
                 RegisterThemeObject(ItemBtn, "BackgroundColor3", "DropdownItem")
                 RegisterThemeObject(ItemBtn, "TextColor3", "TextPrimary")
 
                 ItemBtn.MouseEnter:Connect(function()
-                    Tween(ItemBtn, { BackgroundColor3 = GetTheme().DropdownItemHover }, 0.1)
+                    if not ItemStates[item] then
+                        Tween(ItemBtn, { BackgroundColor3 = GetTheme().DropdownItemHover }, 0.1)
+                    end
                 end)
                 ItemBtn.MouseLeave:Connect(function()
-                    Tween(ItemBtn, { BackgroundColor3 = GetTheme().DropdownItem }, 0.1)
+                    if not ItemStates[item] then
+                        Tween(ItemBtn, { BackgroundColor3 = GetTheme().DropdownItem }, 0.1)
+                    end
                 end)
 
                 ItemBtn.MouseButton1Click:Connect(function()
                     ItemStates[item] = not ItemStates[item]
                     if ItemStates[item] then
                         table.insert(SelectedItems, item)
-                        ItemBtn.Text = "✓ " .. item
+                        ItemBtn.Text = "✓ " .. tostring(item)
                         Tween(ItemBtn, { BackgroundColor3 = GetTheme().ToggleOn }, 0.15)
                         if callbacks[item] then callbacks[item]() end
                     else
                         for i, v in ipairs(SelectedItems) do
                             if v == item then table.remove(SelectedItems, i) break end
                         end
-                        ItemBtn.Text = "  " .. item
+                        ItemBtn.Text = "  " .. tostring(item)
                         Tween(ItemBtn, { BackgroundColor3 = GetTheme().DropdownItem }, 0.15)
                     end
-                    SelectedBtn.Text = #SelectedItems > 0 and tostring(#SelectedItems) .. " selected" or "Select..."
+                    UpdateSelectedText()
                 end)
-
-                ItemBtn.Parent = DropdownScroll
-                table.insert(ItemButtons, { Button = ItemBtn, Text = string.lower(tostring(item)) })
+                return ItemBtn
             end
 
-            if DdSearchBox then
-                DdSearchBox:GetPropertyChangedSignal("Text"):Connect(function()
-                    local query = string.lower(DdSearchBox.Text)
-                    for _, data in ipairs(ItemButtons) do
-                        data.Button.Visible = query == "" or string.find(data.Text, query, 1, true)
-                    end
-                end)
-            end
-
-            local IsOpen = false
-            local function OpenDropdown()
-                if IsOpen then return end
-                IsOpen = true
-                local absPos = SelectedBtn.AbsolutePosition
-                local absSize = SelectedBtn.AbsoluteSize
-                DropdownPanel.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y + 4)
-                local visibleCount = 0
-                for _, data in ipairs(ItemButtons) do
-                    if data.Button.Visible then visibleCount = visibleCount + 1 end
-                end
-                local targetHeight = math.min(visibleCount * 28 + (searchEnabled and 34 or 16), 225)
-                DropdownPanel.Size = UDim2.new(0, 250, 0, 0)
-                DropdownPanel.Visible = true
-                DropdownPanel.BackgroundTransparency = 1
-
-                local scale = Instance.new("UIScale")
-                scale.Scale = 0.9
-                scale.Parent = DropdownPanel
-
-                Tween(DropdownPanel, { Size = UDim2.new(0, 250, 0, targetHeight), BackgroundTransparency = 0 }, 0.25, Enum.EasingStyle.Quad)
-                SpringTween(scale, { Scale = 1 }, 0.25)
-                game:GetService("Debris"):AddItem(scale, 0.3)
-
-                Tween(ArrowIcon, { Rotation = 180 }, 0.2)
-
+            local function HookSearch()
                 if DdSearchBox then
-                    DdSearchBox.Text = ""
-                    for _, data in ipairs(ItemButtons) do data.Button.Visible = true end
+                    DdSearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+                        local query = string.lower(DdSearchBox.Text)
+                        for _, data in ipairs(ItemButtons) do
+                            data.Button.Visible = query == "" or string.find(data.Text, query, 1, true)
+                        end
+                    end)
                 end
             end
 
-            local function CloseDropdown()
-                if not IsOpen then return end
-                IsOpen = false
-                Tween(DropdownPanel, { Size = UDim2.new(0, 250, 0, 0), BackgroundTransparency = 1 }, 0.2, Enum.EasingStyle.Quad)
-                Tween(ArrowIcon, { Rotation = 0 }, 0.15)
-                task.delay(0.2, function()
-                    if not IsOpen then DropdownPanel.Visible = false end
+            local function CountVisible()
+                local c = 0
+                for _, data in ipairs(ItemButtons) do
+                    if data.Button.Visible then c = c + 1 end
+                end
+                return c
+            end
+
+            if ddmType == "classic" then
+                -- classic: list expands inside the element
+                local ClassicList = New("Frame", {
+                    Size = UDim2.new(1, 0, 0, 0),
+                    BackgroundColor3 = theme.DropdownBg,
+                    BorderSizePixel = 0,
+                    Visible = false,
+                    LayoutOrder = 3,
+                    ClipsDescendants = true,
+                }, {
+                    New("UICorner", { CornerRadius = UDim.new(0, 8) }),
+                    New("UIStroke", { Color = theme.DropdownStroke or theme.Stroke, Thickness = 1 }),
+                    New("UIPadding", {
+                        PaddingTop = UDim.new(0, 6),
+                        PaddingLeft = UDim.new(0, 6),
+                        PaddingRight = UDim.new(0, 6),
+                        PaddingBottom = UDim.new(0, 6),
+                    }),
+                })
+                RegisterThemeObject(ClassicList, "BackgroundColor3", "DropdownBg")
+                RegisterThemeObject(ClassicList:FindFirstChildOfClass("UIStroke"), "Color", "DropdownStroke")
+
+                local ClassicScroll = New("ScrollingFrame", {
+                    Size = UDim2.new(1, 0, 1, 0),
+                    BackgroundTransparency = 1,
+                    ScrollBarThickness = 3,
+                    ScrollBarImageColor3 = theme.Scrollbar,
+                    CanvasSize = UDim2.new(0, 0, 0, 0),
+                    AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                    ScrollingDirection = Enum.ScrollingDirection.Y,
+                    BorderSizePixel = 0,
+                }, {
+                    New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }),
+                })
+                RegisterThemeObject(ClassicScroll, "ScrollBarImageColor3", "Scrollbar")
+                ClassicScroll.Parent = ClassicList
+                ClassicList.Parent = DDMFrame
+
+                if searchEnabled then
+                    DdSearchBox = MakeSearch(ClassicScroll, 5)
+                end
+
+                for _, item in ipairs(items) do
+                    local btn = MakeItemButton(item, 5)
+                    btn.Parent = ClassicScroll
+                    table.insert(ItemButtons, { Button = btn, Text = string.lower(tostring(item)) })
+                end
+                HookSearch()
+
+                local function ClassicHeight()
+                    local listH = math.min(CountVisible() * 28 + (searchEnabled and 30 or 0), 180)
+                    return listH + 12
+                end
+
+                OpenDropdown = function()
+                    if IsOpen then return end
+                    IsOpen = true
+                    if DdSearchBox then
+                        DdSearchBox.Text = ""
+                        for _, data in ipairs(ItemButtons) do data.Button.Visible = true end
+                    end
+                    ClassicList.Visible = true
+                    Tween(ClassicList, { Size = UDim2.new(1, 0, 0, ClassicHeight()) }, 0.25, Enum.EasingStyle.Quad)
+                    Tween(ArrowIcon, { Rotation = 180 }, 0.2)
+                end
+
+                CloseDropdown = function()
+                    if not IsOpen then return end
+                    IsOpen = false
+                    Tween(ClassicList, { Size = UDim2.new(1, 0, 0, 0) }, 0.2, Enum.EasingStyle.Quad)
+                    Tween(ArrowIcon, { Rotation = 0 }, 0.15)
+                    task.delay(0.2, function()
+                        if not IsOpen then ClassicList.Visible = false end
+                    end)
+                end
+            else
+                -- side: panel pops out next to the menu window
+                local SideWidth = 210
+
+                local SidePanel = New("Frame", {
+                    Size = UDim2.new(0, SideWidth, 0, 0),
+                    BackgroundColor3 = theme.DropdownBg,
+                    BorderSizePixel = 0,
+                    Visible = false,
+                    ZIndex = 999,
+                    BackgroundTransparency = 1,
+                    ClipsDescendants = true,
+                }, {
+                    New("UICorner", { CornerRadius = UDim.new(0, 12) }),
+                    New("UIStroke", { Color = theme.DropdownStroke or theme.Stroke, Thickness = 1 }),
+                    New("UIPadding", {
+                        PaddingTop = UDim.new(0, 6),
+                        PaddingLeft = UDim.new(0, 6),
+                        PaddingRight = UDim.new(0, 6),
+                        PaddingBottom = UDim.new(0, 6),
+                    }),
+                })
+                RegisterThemeObject(SidePanel, "BackgroundColor3", "DropdownBg")
+                RegisterThemeObject(SidePanel:FindFirstChildOfClass("UIStroke"), "Color", "DropdownStroke")
+
+                local SideScroll = New("ScrollingFrame", {
+                    Size = UDim2.new(1, 0, 1, 0),
+                    BackgroundTransparency = 1,
+                    ScrollBarThickness = 3,
+                    ScrollBarImageColor3 = theme.Scrollbar,
+                    CanvasSize = UDim2.new(0, 0, 0, 0),
+                    AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                    ZIndex = 1000,
+                }, {
+                    New("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }),
+                })
+                RegisterThemeObject(SideScroll, "ScrollBarImageColor3", "Scrollbar")
+                SideScroll.Parent = SidePanel
+                SidePanel.Parent = ScreenGui
+
+                if searchEnabled then
+                    DdSearchBox = MakeSearch(SideScroll, 1001)
+                end
+
+                for _, item in ipairs(items) do
+                    local btn = MakeItemButton(item, 1001)
+                    btn.Parent = SideScroll
+                    table.insert(ItemButtons, { Button = btn, Text = string.lower(tostring(item)) })
+                end
+                HookSearch()
+
+                local followConn = nil
+                local function GetSidePosition()
+                    local mfPos = MainFrame.AbsolutePosition
+                    local mfSize = MainFrame.AbsoluteSize
+                    local viewport = workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize or Vector2.new(1920, 1080)
+                    local x = mfPos.X + mfSize.X + 8
+                    if x + SideWidth > viewport.X - 8 then
+                        x = mfPos.X - SideWidth - 8
+                        if x < 8 then x = math.max(8, viewport.X - SideWidth - 8) end
+                    end
+                    return UDim2.new(0, x, 0, mfPos.Y)
+                end
+
+                OpenDropdown = function()
+                    if IsOpen then return end
+                    IsOpen = true
+                    if DdSearchBox then
+                        DdSearchBox.Text = ""
+                        for _, data in ipairs(ItemButtons) do data.Button.Visible = true end
+                    end
+                    local maxH = math.max(MainFrame.AbsoluteSize.Y - 16, 140)
+                    local targetHeight = math.min(CountVisible() * 28 + (searchEnabled and 34 or 0) + 12, maxH)
+                    SidePanel.Position = GetSidePosition()
+                    SidePanel.Size = UDim2.new(0, SideWidth, 0, 0)
+                    SidePanel.Visible = true
+                    SidePanel.BackgroundTransparency = 1
+
+                    local scale = Instance.new("UIScale")
+                    scale.Scale = 0.9
+                    scale.Parent = SidePanel
+
+                    Tween(SidePanel, { Size = UDim2.new(0, SideWidth, 0, targetHeight), BackgroundTransparency = 0 }, 0.25, Enum.EasingStyle.Quad)
+                    SpringTween(scale, { Scale = 1 }, 0.25)
+                    game:GetService("Debris"):AddItem(scale, 0.3)
+                    Tween(ArrowIcon, { Rotation = 180 }, 0.2)
+
+                    if followConn then followConn:Disconnect() end
+                    followConn = RunService.RenderStepped:Connect(function()
+                        if IsOpen and SidePanel.Visible then
+                            SidePanel.Position = GetSidePosition()
+                        end
+                    end)
+                end
+
+                CloseDropdown = function()
+                    if not IsOpen then return end
+                    IsOpen = false
+                    if followConn then followConn:Disconnect() followConn = nil end
+                    Tween(SidePanel, { Size = UDim2.new(0, SideWidth, 0, 0), BackgroundTransparency = 1 }, 0.2, Enum.EasingStyle.Quad)
+                    Tween(ArrowIcon, { Rotation = 0 }, 0.15)
+                    task.delay(0.2, function()
+                        if not IsOpen then SidePanel.Visible = false end
+                    end)
+                end
+
+                UserInputService.InputBegan:Connect(function(input)
+                    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and IsOpen then
+                        local mousePos = UserInputService:GetMouseLocation()
+                        local menuAbs = SidePanel.AbsolutePosition
+                        local menuSize = SidePanel.AbsoluteSize
+                        local inMenu = mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
+                                       mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y
+                        local btnAbs = SelectedBtn.AbsolutePosition
+                        local btnSize = SelectedBtn.AbsoluteSize
+                        local inBtn = mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
+                                      mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y
+                        if not inMenu and not inBtn then
+                            CloseDropdown()
+                        end
+                    end
                 end)
             end
 
             SelectedBtn.MouseButton1Click:Connect(function()
                 if IsOpen then CloseDropdown() else OpenDropdown() end
-            end)
-
-            UserInputService.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 and IsOpen then
-                    local mousePos = UserInputService:GetMouseLocation()
-                    local menuAbs = DropdownPanel.AbsolutePosition
-                    local menuSize = DropdownPanel.AbsoluteSize
-                    local inMenu = mousePos.X >= menuAbs.X and mousePos.X <= menuAbs.X + menuSize.X and
-                                   mousePos.Y >= menuAbs.Y and mousePos.Y <= menuAbs.Y + menuSize.Y
-                    local btnAbs = SelectedBtn.AbsolutePosition
-                    local btnSize = SelectedBtn.AbsoluteSize
-                    local inBtn = mousePos.X >= btnAbs.X and mousePos.X <= btnAbs.X + btnSize.X and
-                                  mousePos.Y >= btnAbs.Y and mousePos.Y <= btnAbs.Y + btnSize.Y
-                    if not inMenu and not inBtn then
-                        CloseDropdown()
-                    end
-                end
             end)
 
             DDMFrame.Parent = Tab.Content
@@ -2689,12 +3557,12 @@ function SimpleLib:Win(config)
                         table.insert(SelectedItems, v)
                         for _, data in ipairs(ItemButtons) do
                             if data.Button.Text:find(v) then
-                                data.Button.Text = "✓ " .. v
+                                data.Button.Text = "✓ " .. tostring(v)
                                 Tween(data.Button, { BackgroundColor3 = GetTheme().ToggleOn }, 0.1)
                             end
                         end
                     end
-                    SelectedBtn.Text = #SelectedItems > 0 and tostring(#SelectedItems) .. " selected" or "Select..."
+                    UpdateSelectedText()
                 end,
             }
         end
